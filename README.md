@@ -1,5 +1,5 @@
 
-# `Population Genomics in R workshop` <a href="https://green-striped-gecko.github.io/dartR/"><img src='Pictures/logo_course.png' align="right" height="300" /></a>
+# `Population Genomics in R workshop` <a href="https://green-striped-gecko.github.io/dartR/"><img src='Pictures/logo_workshop.png' align="right" height="300" /></a>
 
 DNA is the original big data. It encodes all kinds of information that
 is useful for medicine, agriculture, and environmental management. Our
