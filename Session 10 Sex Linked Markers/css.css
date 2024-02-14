@@ -1,0 +1,33 @@
+.blackbox {
+  padding: 1em;
+  background: black;
+  color: white;
+  border: 2px solid orange;
+  border-radius: 10px;
+}
+.center {
+  text-align: center;
+}
+
+
+
+.infobox {
+  padding: 1em 1em 1em 4em;
+  margin-bottom: 10px;
+  border: 2px solid orange;
+  border-radius: 10px;
+  background: #f5f5f5 5px center/3em no-repeat;
+}
+
+.task {
+  background-image: url("images/task.png");
+}
+
+.pirat {
+  background-image: url("images/pirat.png");
+}
+
+.output {
+  color: black;
+  background-color: lightgrey;
+}
