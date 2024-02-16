@@ -32,7 +32,6 @@ library(dartR.base)
 library(dartR.sexlinked)
 ```
 
-
 # Dataset 1 - ZW//ZZ - The Yellow Tufted Honeyeater
 
 ![The Yellow Tufted Honeyeater](images/Yellow_Tufted_Honeyeater.jpg)
@@ -41,29 +40,51 @@ library(dartR.sexlinked)
 
 ```{r}
 data("YTH")
+YTH                   # Explore the dataset
+YTH@n.loc             # Number of SNPs
+length(YTH@ind.names) # Number of individuals
+
 ```
 
 ## Run `filter.sex.linked`
-This function identifies sex-linked and autosomal loci present in a SNP dataset (genlight object) using individuals with known sex. It identifies five types of loci: w-linked or y-linked, sex-biased, z-linked or x-linked, gametologous and autosomal.
 
-*The genlight object must contain in gl@other$ind.metrics a column named "id", and a column named "sex" in which individuals with known-sex are assigned 'M' for male, or 'F' for female. The function ignores individuals that are assigned anything else or nothing at all (unknown-sex).*
+This function identifies sex-linked and autosomal loci present in a SNP dataset (i.e., genlight object) using individuals with known sex. It identifies five types of loci: w-linked or y-linked, sex-biased, z-linked or x-linked, gametologous and autosomal.
+
+*The genlight object must contain in gl\@other\$ind.metrics a column named "id", and a column named "sex" in which individuals with known-sex are assigned 'M' for male, or 'F' for female. The function ignores individuals that are assigned anything else or nothing at all (unknown-sex).*
 
 ![ZW/ZZ sex chromosomes](images/ZW.png)
 
 ::: {.infobox .task data-latex="{task}"}
 **NOTE**
 
-Set `ncores = 1` if you have less than 50,000 SNPs, since it could actually slow down the analysis.
+Set `ncores` to more than 1 (default) if you have more than 50,000 SNPs, since it could actually slow down the analysis with smaller datasets.
 :::
 
 ```{r, results="hold"}
-res <- dartR.sexlinked::filter.sex.linked(gl = YTH, system = "zw", plots = TRUE, ncores = 1)
+knitr::kable(head(YTH@other$ind.metrics)) # Check that ind.metrics has the necessary columns
+res <- dartR.sexlinked::filter.sex.linked(gl = YTH, system = "zw")
 ```
 
+How many males and females does the dataset contain?
+
+How many sex-linked loci were found?
+
+Now check the output:
+
+```{r, results="hold"}
+res$w.linked       # Notice that it says "w-linked"
+res$z.linked       # Notice that it says "z-linked"
+res$gametolog
+res$sex.biased
+res$autosomal
+res$results.table  # The output table
+```
+
+The output consists of a genlight object for each type of loci, plus a results table.
 
 ## Run `infer.sex`
 
-This function uses the output of function filter.sex.linked (list of 6 genlight objects) to infer the sex of all individuals in the dataset. It uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an agreed sex.
+This function uses the complete output of function filter.sex.linked (list of 6 objects) to infer the sex of all individuals in the dataset. Specifically, the function uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an `agreed sex`.
 
 ```{r}
 sexID <- dartR.sexlinked::infer.sex(gl_sex_filtered = res, system = "zw", seed = 124)
@@ -73,9 +94,10 @@ knitr::kable(head(sexID))
 
 ::: {.infobox .task data-latex="{task}"}
 **IMPORTANT**
-
-Any `agreed sex` with an asterisk* need to manually checked.
+We created this function with the explicit intent that a human checks the evidence for the `agreed sex` that do NOT agree for all types of sex-linked loci (denoted as '\*M' or '\*F'). This human can then use their criterion to validate these assignments.
 :::
+
+Can you find individuals for which the `agreed sex` is uncertain (i.e., has an asterisk "\*")?
 
 # Dataset 2 - XX/XY - The Leadbeater's possum
 
@@ -85,50 +107,79 @@ Any `agreed sex` with an asterisk* need to manually checked.
 
 ```{r}
 data("LBP")
+LBP                   # Explore the dataset
+LBP@n.loc             # Number of SNPs
+length(LBP@ind.names) # Number of individuals
 ```
 
 ## Run `filter.sex.linked`
 
 This function identifies sex-linked and autosomal loci present in a SNP dataset (genlight object) using individuals with known sex. It identifies five types of loci: w-linked or y-linked, sex-biased, z-linked or x-linked, gametologous and autosomal.
 
-*The genlight object must contain in gl@other$ind.metrics a column named "id", and a column named "sex" in which individuals with known-sex are assigned 'M' for male, or 'F' for female. The function ignores individuals that are assigned anything else or nothing at all (unknown-sex).*
+*The genlight object must contain in gl\@other\$ind.metrics a column named "id", and a column named "sex" in which individuals with known-sex are assigned 'M' for male, or 'F' for female. The function ignores individuals that are assigned anything else or nothing at all (unknown-sex).*
 
 ![XX/XY sex chromosomes](images/XY.png)
 
 ```{r, results="hold"}
-res <- dartR.sexlinked::filter.sex.linked(gl = LBP, system = "xy", plots = TRUE, ncores = 1)
+knitr::kable(head(LBP@other$ind.metrics)) # Check that ind.metrics has the necessary columns
+res <- dartR.sexlinked::filter.sex.linked(gl = LBP, system = "xy")
 ```
+
+How many males and females does the dataset contain?
+
+How many sex-linked loci were found?
+
+Now check the output:
+
+```{r, results="hold"}
+res$y.linked      # Notice that it says "y-linked"
+res$x.linked      # Notice that it says "x-linked"
+res$gametolog
+res$sex.biased
+res$autosomal
+res$results.table  # The output table
+```
+
+The output consists of a genlight object for each type of loci, plus a results table.
 
 ## Run `infer.sex`
 
-This function uses the output of function filter.sex.linked (list of 6 genlight objects) to infer the sex of all individuals in the dataset. It uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an agreed sex.
+This function uses the output of function filter.sex.linked (list of 6 objects) to infer the sex of all individuals in the dataset. It uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an `agreed sex`.
 
 ```{r}
 sexID <- dartR.sexlinked::infer.sex(gl_sex_filtered = res, system = "xy", seed = 124)
 knitr::kable(head(sexID))
 ```
 
+What did the function mention about gametologs? How did that impact the results table? How many types of sex-linked loci were used to infer an `agreed sex`?
+
+Can you find individuals for which the `agreed sex` is uncertain?
 
 # EXCERCISE
 
 ::: callout-note
 ## Exercise
 
-![](images/task.png){#id .class width="48" height="48"} 
+![](images/task.png){#id .class width="48" height="48"}
 
-Choose one of the following dataset (or your own data) and report:
+Imagine you are analyzing the genetic data of a population and you want to look at its genetic structure and genetic diversity. You get to work by filtering your beautiful set of SNPs. Because you are a rigorous, you want to test whether using function `filter.sex.linked` to properly filter out sex-linked loci changes the results of the populations analyses. So you: (1) process your SNP dataset by applying standard filters and run analyses, and (2) process the dataset by filtering out sex-linked loci first, applying standard filters second, and then run analyses.
+
+Choose one of the following datasets (or your own data) and report:
 
 1.  How many sex-linked markers are present?
 
 2.  How many individuals had a wrong sexID?
 
-3.  Do you see any changes in your PCA/structure analyses before and after filtering the sex-linked markers?
+3.  Do you see any changes in your PCA/structure analyses when you filtered out sex-linked markers versus when you did not?
 
-4.  Do you see any differences in genetic diversity and fixation indices between autosomal and sex-linked markers?
+4.  Do you see any differences in genetic diversity and fixation indices when you filtered out sex-linked markers versus when you did not?
 :::
 
-![](images/beer.png){#id .class width="350" height="200"} ![](images/Leadbeaters_possum.jpg){#id .class width="350" height="200"}
-![](images/Bull_Shark.jpg){#id .class width="350" height="200"} ![](images/Blue_shark.jpg){#id .class width="350" height="200"}
+![](images/beer.png){.class width="350" height="200"}
+
+![](images/Eastern_Yellow_Robin.jpg){alt="The Eastern Yellow Robin" width="349"}
+
+![](images/Bull_Shark.jpg){.class width="350" height="200"} ![](images/Blue_shark.jpg){.class width="350" height="200"}
 
 ## Exercise data 1 - Your own data
 
@@ -139,15 +190,16 @@ You can have a look at the exercise data below for inspiration.
 :::
 
 ### 1. Number of sex-linked markers?
-### 2. Individuals with wrong sexID?
-### 3. Changes in PCA before and after removing the SLM?
-### 4. Differences in genetic diversity and fixation indices between autosomal and SLM?
 
+### 2. Individuals with wrong sexID?
+
+### 3. Changes in PCA before and after removing the SLM?
+
+### 4. Differences in genetic diversity and fixation indices between autosomal and SLM?
 
 ## Exercise data 2 - The Eastern Yellow Robin
 
 Data from Robledo-Ruiz et al. 2023.
-
 
 ![The Eastern Yellow Robin](images/Eastern_Yellow_Robin.jpg)
 
@@ -165,7 +217,7 @@ table(EYR@other$ind.metrics$sex, useNA = "ifany")
 ### 1. Number of sex-linked markers?
 
 ```{r, results="hold"}
-res <- dartR.sexlinked::filter.sex.linked(gl = EYR, system = "zw", plots = TRUE, ncores = 1)
+res <- dartR.sexlinked::filter.sex.linked(gl = EYR, system = "zw")
 ```
 
 ### 2. Individuals with wrong sexID?
@@ -174,88 +226,105 @@ res <- dartR.sexlinked::filter.sex.linked(gl = EYR, system = "zw", plots = TRUE,
 sexID <- dartR.sexlinked::infer.sex(gl_sex_filtered = res, system = "zw", seed = 124)
 knitr::kable(head(sexID))
 
-agreed.sex <- sub(pattern = "\\*", replacement = "", x = sexID$agreed.sex) # remove asterisk
-sum(EYR$other$ind.metrics$sex != agreed.sex, na.rm = TRUE)
+sum(EYR$other$ind.metrics$sex != sexID$agreed.sex, na.rm = TRUE)
+EYR$other$ind.metrics[EYR$other$ind.metrics$sex != sexID$agreed.sex,]
 ```
 
 ::: callout-note
 #### Exercise
 
-![](images/task.png){#id .class width="48" height="48"} 
+![](images/task.png){.class width="48" height="48"}
 
-Can you check if any misidentified sexes are due to uncertain genetic sexID (indicated with *)?
-
-**HINT**
-Try using `grep(pattern = "\\*", x = sexID$agreed.sex)`
+Can you tell which misidentified sexes are due to uncertain genetic sex (indicated with \*)?
 :::
+
+### Processing SNPs with two filtering regimes
+
+#### Filtering SNPs only with standard filters (sloppy)
+
+```{r, message=FALSE, warning=FALSE}
+# Filter for read depth
+dartR.base::gl.report.rdepth(EYR)  # This is the initial dataset
+EYR.sloppy <- dartR.base::gl.filter.rdepth(EYR, lower = 3, upper = 11, verbose = 0)
+
+# Filter for loci call rate
+dartR.base::gl.report.callrate(EYR.sloppy, method = "loc")
+EYR.sloppy <- dartR.base::gl.filter.callrate(EYR.sloppy, method = "loc",  threshold = 0.75, verbose = 0, recalc = TRUE)
+
+# Filter for individual call rate
+dartR.base::gl.report.callrate(EYR.sloppy, method = "ind")
+EYR.sloppy <- dartR.base::gl.filter.callrate(EYR.sloppy, method = "ind", threshold = 0.65, verbose = 0, recalc = TRUE)
+
+# Filter for MAC (= 3)
+dartR.base::gl.report.maf(EYR.sloppy)
+EYR.sloppy <- dartR.base::gl.filter.maf(EYR.sloppy, threshold = 3, verbose = 0, recalc = TRUE)
+```
+
+#### Filtering SNPs with filter.sex.linked and standard filters (correct)
+
+```{r, message=FALSE, warning=FALSE}
+# Filter for sex-linked loci
+correct <- dartR.sexlinked::filter.sex.linked(EYR, system = "zw")  # This is the initial dataset
+# We will use correct$autosomal for the next filters
+
+# Filter for read depth
+dartR.base::gl.report.rdepth(correct$autosomal)  # This is the filtered dataset
+EYR.correct <- dartR.base::gl.filter.rdepth(correct$autosomal, lower = 3, upper = 11, verbose = 0)
+
+# Filter for loci call rate
+dartR.base::gl.report.callrate(EYR.correct, method = "loc")
+EYR.correct <- dartR.base::gl.filter.callrate(EYR.correct, method = "loc",  threshold = 0.75, verbose = 0, recalc = TRUE)
+
+# Filter for individual call rate
+dartR.base::gl.report.callrate(EYR.correct, method = "ind")
+EYR.correct <- dartR.base::gl.filter.callrate(EYR.correct, method = "ind", threshold = 0.65, verbose = 0, recalc = TRUE)
+
+# Filter for MAC (= 3)
+dartR.base::gl.report.maf(EYR.correct)
+EYR.correct <- dartR.base::gl.filter.maf(EYR.correct, threshold = 3, verbose = 0, recalc = TRUE)
+```
 
 ### 3. Changes in PCA before and after removing the SLM?
 
-#### PCA before
+#### PCA on sloppy dataset (only standard filters)
 
 ```{r, results="hold", warning=FALSE}
-PCA.before <- dartR.base::gl.pcoa(EYR, verbose = 0)
-dartR.base::gl.pcoa.plot(PCA.before, EYR, xaxis = 1, yaxis = 2)
-dartR.base::gl.pcoa.plot(PCA.before, EYR, xaxis = 2, yaxis = 3)
+PCA.sloppy <- dartR.base::gl.pcoa(EYR.sloppy, verbose = 0)
+dartR.base::gl.pcoa.plot(PCA.sloppy, EYR.sloppy, xaxis = 1, yaxis = 2)
+dartR.base::gl.pcoa.plot(PCA.sloppy, EYR.sloppy, xaxis = 2, yaxis = 3)
 ```
 
-#### Filtering
-
-```{r, message=FALSE, warning=FALSE}
-EYR.after <- res$autosomal
-dartR.base::gl.report.rdepth(EYR.after)
-EYR.after <- dartR.base::gl.filter.rdepth(EYR.after, lower = 3, upper = 11, verbose = 0)
-dartR.base::gl.report.callrate(EYR.after, method = "loc")
-EYR.after <- dartR.base::gl.filter.callrate(EYR, method = "loc",  threshold = 0.75, verbose = 0)
-dartR.base::gl.report.callrate(EYR, method = "ind")
-EYR.after <- dartR.base::gl.filter.callrate(EYR.after, method = "ind", threshold = 0.65, verbose = 0)
-dartR.base::gl.report.maf(EYR.after)
-EYR.after <- dartR.base::gl.filter.maf(EYR.after, threshold = 0.05, verbose = 0)
-```
-
-#### PCA after
+#### PCA on correct dataset (filter.sex.linked and standard filters)
 
 ```{r, results="hold", warning=FALSE}
-PCA.after <- dartR.base::gl.pcoa(EYR.after, verbose = 0)
-dartR.base::gl.pcoa.plot(PCA.after, EYR.after, xaxis = 1, yaxis = 2)
-dartR.base::gl.pcoa.plot(PCA.after, EYR.after, xaxis = 2, yaxis = 3)
+PCA.correct <- dartR.base::gl.pcoa(EYR.correct, verbose = 0)
+dartR.base::gl.pcoa.plot(PCA.correct, EYR.correct, xaxis = 1, yaxis = 2)
+dartR.base::gl.pcoa.plot(PCA.correct, EYR.correct, xaxis = 2, yaxis = 3)
 ```
 
 ### 4. Differences in genetic diversity and fixation indices between autosomal and SLM?
 
 ```{r, warning=FALSE}
-autosomal <- res$autosomal
-z.linked <- res$z.linked
-z.linked.F <- z.linked[z.linked$other$ind.metrics$sex == "F",]
-z.linked.M <- z.linked[z.linked$other$ind.metrics$sex == "M",]
+# Basic stats
+basic.sloppy  <- dartR.base::utils.basic.stats(EYR.sloppy)
+basic.correct <- dartR.base::utils.basic.stats(EYR.correct)
+basic.sloppy$overall
+basic.correct$overall
 
-# Genetic diversity
-
-basic.autosomal <- dartR.base::utils.basic.stats(autosomal)
-basic.autosomal$overall
-basic.xF <- dartR.base::utils.basic.stats(z.linked.F)
-basic.xF$overall
-basic.xM <- dartR.base::utils.basic.stats(z.linked.M)
-basic.xM$overall
-
-divers.auto <- dartR.base::gl.report.diversity(autosomal, pbar = FALSE, table = FALSE, verbose = 0)
-divers.auto$one_H_alpha
-divers.auto$one_H_beta
-divers.zF <- dartR.base::gl.report.diversity(z.linked.F, pbar = FALSE, table = FALSE, verbose = 0)
-divers.zF$one_H_alpha
-divers.zF$one_H_beta
-divers.zM <- dartR.base::gl.report.diversity(z.linked.M, pbar = FALSE, table = FALSE, verbose = 0)
-divers.zM$one_H_alpha
-divers.zM$one_H_beta
+# Genetic diversity per pop
+divers.sloppy <- dartR.base::gl.report.diversity(EYR.sloppy, pbar = FALSE, table = FALSE, verbose = 0)
+divers.correct <- dartR.base::gl.report.diversity(EYR.correct, pbar = FALSE, table = FALSE, verbose = 0)
+divers.sloppy$one_H_alpha
+divers.correct$one_H_alpha
+divers.sloppy$one_H_beta
+divers.correct$one_H_beta
 
 # Fixation indices
-dartR.base::gl.fst.pop(autosomal, verbose = 0)
-dartR.base::gl.fst.pop(z.linked.F, verbose = 0)
-dartR.base::gl.fst.pop(z.linked.M, verbose = 0)
+dartR.base::gl.fst.pop(EYR.sloppy, verbose = 0)
+dartR.base::gl.fst.pop(EYR.correct, verbose = 0)
 
-dartR.base::gl.report.fstat(autosomal, verbose = 0)
-dartR.base::gl.report.fstat(z.linked.F, verbose = 0)
-dartR.base::gl.report.fstat(z.linked.F, verbose = 0)
+dartR.base::gl.report.fstat(EYR.sloppy, verbose = 0)
+dartR.base::gl.report.fstat(EYR.correct, verbose = 0)
 ```
 
 ## Exercise data 3 - Bull shark
@@ -324,11 +393,10 @@ agreed.sex <- sub(pattern = "\\*", replacement = "", x = sexID$agreed.sex) # rem
 sum(data.gl$other$ind.metrics$sex != agreed.sex, na.rm = TRUE)
 ```
 
-
 # References
 
 Devloo-Delva, F., Burridge, C. P., Kyne, P. M., Brunnschweiler, J. M., Chapman, D. D., Charvet, P., ... & Feutry, P. (2023). From rivers to ocean basins: The role of ocean barriers and philopatry in the genetic structuring of a cosmopolitan coastal predator. Ecology and Evolution, 13(2), e9837. https://doi.org/10.1002/ece3.9837
 
 Nikolic, N., Devloo-Delva, F., Bailleul, D., Noskova, E., Rougeux, C., Delord, C., ... & Arnaud‐Haond, S. (2023). Stepping up to genome scan allows stock differentiation in the worldwide distributed blue shark *Prionace glauca*. Molecular Ecology, 32(5), 1000-1019. https://doi.org/10.1111/mec.16822
 
-Robledo-Ruiz, D. A., Austin, L., Amos, J. N., Castrejón-Figueroa, J., Harley, D. K. P., Magrath, M. J. L., Sunnucks, P., & Pavlova, A. (2023). Easy-to-use R functions to separate reduced-representation genomic datasets into sex-linked and autosomal loci, and conduct sex assignment. Molecular Ecology Resources, 00, 1–21. https://doi.org/10.1111/1755-0998.13844
+Robledo-Ruiz, D. A., Austin, L., Amos, J. N., Castrejón-Figueroa, J., Harley, D. K. P., Magrath, M. J. L., Sunnucks, P., & Pavlova, A. (2023). Easy-to-use R functions to separate reduced-representation genomic datasets into sex-linked and autosomal loci, and conduct sex assignment. Molecular Ecology Resources, 00, 1--21. https://doi.org/10.1111/1755-0998.13844
