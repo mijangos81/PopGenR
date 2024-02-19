@@ -93,7 +93,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#run-filter.sex.linked-1" id="toc-run-filter.sex.linked-1" class="nav-link" data-scroll-target="#run-filter.sex.linked-1">Run <code>filter.sex.linked</code></a></li>
   <li><a href="#run-infer.sex-1" id="toc-run-infer.sex-1" class="nav-link" data-scroll-target="#run-infer.sex-1">Run <code>infer.sex</code></a></li>
   </ul></li>
-  <li><a href="#excercise" id="toc-excercise" class="nav-link" data-scroll-target="#excercise">EXCERCISE</a>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">EXERCISE</a>
   <ul class="collapse">
   <li><a href="#exercise-data-1---your-own-data" id="toc-exercise-data-1---your-own-data" class="nav-link" data-scroll-target="#exercise-data-1---your-own-data">Exercise data 1 - Your own data</a>
   <ul class="collapse">
@@ -171,13 +171,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="load-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-data">Load data</h2>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-2_f6b84252eadd8b472230db15e8064ea4">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"YTH"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-2_1925c7e07301fa118ae30d0784a5d9f9">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"YTH"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>YTH  <span class="co"># Explore the dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 641 genotypes,  1,000 SNPs , size: 50 Mb
+
+    missing data: 166024 (=25.9 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 641 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  641 individual labels
+   @loc.names:  1000 locus labels
+   @loc.all:  1000 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 1-540)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, pop, sex, sex_original, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Lichenostomus_HeHo_v1, ChromPos_Lichenostomus_HeHo_v1, AlnCnt_Lichenostomus_HeHo_v1, AlnEvalue_Lichenostomus_HeHo_v1, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, maf 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>YTH<span class="sc">@</span>n.loc  <span class="co"># Number of SNPs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(YTH<span class="sc">@</span>ind.names)  <span class="co"># Number of individuals</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 641</code></pre>
+</div>
 </div>
 </section>
 <section id="run-filter.sex.linked" class="level2">
 <h2 class="anchored" data-anchor-id="run-filter.sex.linked">Run <code>filter.sex.linked</code></h2>
-<p>This function identifies sex-linked and autosomal loci present in a SNP dataset (genlight object) using individuals with known sex. It identifies five types of loci: w-linked or y-linked, sex-biased, z-linked or x-linked, gametologous and autosomal.</p>
+<p>This function identifies sex-linked and autosomal loci present in a SNP dataset (i.e., genlight object) using individuals with known sex. It identifies five types of loci: w-linked or y-linked, sex-biased, z-linked or x-linked, gametologous and autosomal.</p>
 <p><em>The genlight object must contain in gl@other$ind.metrics a column named “id”, and a column named “sex” in which individuals with known-sex are assigned ‘M’ for male, or ‘F’ for female. The function ignores individuals that are assigned anything else or nothing at all (unknown-sex).</em></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -185,13 +218,93 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption class="figure-caption">ZW/ZZ sex chromosomes</figcaption>
 </figure>
 </div>
-<div class="infobox task">
+<div class="blackbox">
 <p><strong>NOTE</strong></p>
-<p>Set <code>ncores = 1</code> if you have less than 50,000 SNPs, since it could actually slow down the analysis.</p>
+<p>Set <code>ncores</code> to more than 1 (default) if you have more than 50,000 SNPs, since it could actually slow down the analysis with smaller datasets.</p>
 </div>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-3_a3ea2d7dd009655e505764321b3c2d55">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> YTH, <span class="at">system =</span> <span class="st">"zw"</span>, <span class="at">plots =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncores =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-3_e2888e81d93697c19084ca9c54887ab1">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(YTH<span class="sc">@</span>other<span class="sc">$</span>ind.metrics))  <span class="co"># Check that ind.metrics has the necessary columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 5%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">id</th>
+<th style="text-align: left;">pop</th>
+<th style="text-align: left;">sex</th>
+<th style="text-align: left;">sex_original</th>
+<th style="text-align: left;">service</th>
+<th style="text-align: left;">plate_location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">ANWC46839</td>
+<td style="text-align: left;">ANWC46839</td>
+<td style="text-align: left;">Melanops</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">DLich17-2918</td>
+<td style="text-align: left;">1-A1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">W49</td>
+<td style="text-align: left;">W49</td>
+<td style="text-align: left;">Cassidix</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">DLich17-2918</td>
+<td style="text-align: left;">1-A10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">W90</td>
+<td style="text-align: left;">W90</td>
+<td style="text-align: left;">Cassidix</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">DLich17-2918</td>
+<td style="text-align: left;">1-A12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C25</td>
+<td style="text-align: left;">C25</td>
+<td style="text-align: left;">Cassidix</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: left;">DLich17-2918</td>
+<td style="text-align: left;">1-A2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C8</td>
+<td style="text-align: left;">C8</td>
+<td style="text-align: left;">Cassidix</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: left;">DLich17-2918</td>
+<td style="text-align: left;">1-A3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">W70</td>
+<td style="text-align: left;">W70</td>
+<td style="text-align: left;">Cassidix</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">DLich17-2918</td>
+<td style="text-align: left;">1-A4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> YTH, <span class="at">system =</span> <span class="st">"zw"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Detected 289 females and 347 males.</code></pre>
 </div>
@@ -232,20 +345,381 @@ And 954 autosomal loci.</code></pre>
 <p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-3-4.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><img src="images/task.png" id="id" class="class" width="48" height="48"></p>
+<p>How many males and females does the dataset contain?</p>
+<p>How many sex-linked loci were found?</p>
+</div>
+</div>
+<p>Now check the output:</p>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-4_b24b8c3392824a273cb024ea88ec52a6">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>w.linked  <span class="co"># Notice that it says 'w-linked'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 641 genotypes,  2 SNPs , size: 48.9 Mb
+
+    missing data: 695 (=54.21 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 641 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  641 individual labels
+   @loc.names:  2 locus labels
+   @loc.all:  2 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 1-540)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, pop, sex, sex_original, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Lichenostomus_HeHo_v1, ChromPos_Lichenostomus_HeHo_v1, AlnCnt_Lichenostomus_HeHo_v1, AlnEvalue_Lichenostomus_HeHo_v1, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, maf 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>z.linked  <span class="co"># Notice that it says 'z-linked'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 641 genotypes,  10 SNPs , size: 48.9 Mb
+
+    missing data: 268 (=4.18 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 641 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  641 individual labels
+   @loc.names:  10 locus labels
+   @loc.all:  10 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 1-540)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, pop, sex, sex_original, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Lichenostomus_HeHo_v1, ChromPos_Lichenostomus_HeHo_v1, AlnCnt_Lichenostomus_HeHo_v1, AlnEvalue_Lichenostomus_HeHo_v1, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, maf 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>gametolog</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 641 genotypes,  1 SNPs , size: 48.9 Mb
+
+    missing data: 13 (=2.03 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 641 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  641 individual labels
+   @loc.names:  1 locus labels
+   @loc.all:  1 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 1-540)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, pop, sex, sex_original, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Lichenostomus_HeHo_v1, ChromPos_Lichenostomus_HeHo_v1, AlnCnt_Lichenostomus_HeHo_v1, AlnEvalue_Lichenostomus_HeHo_v1, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, maf 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>sex.biased</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 641 genotypes,  33 SNPs , size: 48.9 Mb
+
+    missing data: 5176 (=24.47 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 641 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  641 individual labels
+   @loc.names:  33 locus labels
+   @loc.all:  33 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 1-540)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, pop, sex, sex_original, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Lichenostomus_HeHo_v1, ChromPos_Lichenostomus_HeHo_v1, AlnCnt_Lichenostomus_HeHo_v1, AlnEvalue_Lichenostomus_HeHo_v1, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, maf 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>autosomal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 641 genotypes,  954 SNPs , size: 50 Mb
+
+    missing data: 159872 (=26.14 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 641 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  641 individual labels
+   @loc.names:  954 locus labels
+   @loc.all:  954 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 1-540)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, pop, sex, sex_original, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Lichenostomus_HeHo_v1, ChromPos_Lichenostomus_HeHo_v1, AlnCnt_Lichenostomus_HeHo_v1, AlnEvalue_Lichenostomus_HeHo_v1, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, maf 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(res<span class="sc">$</span>results.table))  <span class="co"># The output table</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">index</th>
+<th style="text-align: right;">count.F.miss</th>
+<th style="text-align: right;">count.M.miss</th>
+<th style="text-align: right;">count.F.scored</th>
+<th style="text-align: right;">count.M.scored</th>
+<th style="text-align: right;">ratio</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">p.adjusted</th>
+<th style="text-align: right;">scoringRate.F</th>
+<th style="text-align: right;">scoringRate.M</th>
+<th style="text-align: left;">w.linked</th>
+<th style="text-align: left;">sex.biased</th>
+<th style="text-align: right;">count.F.het</th>
+<th style="text-align: right;">count.M.het</th>
+<th style="text-align: right;">count.F.hom</th>
+<th style="text-align: right;">count.M.hom</th>
+<th style="text-align: right;">stat</th>
+<th style="text-align: right;">stat.p.value</th>
+<th style="text-align: right;">stat.p.adjusted</th>
+<th style="text-align: right;">heterozygosity.F</th>
+<th style="text-align: right;">heterozygosity.M</th>
+<th style="text-align: left;">z.linked</th>
+<th style="text-align: left;">zw.gametolog</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">27338051-23-G/A</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">216</td>
+<td style="text-align: right;">270</td>
+<td style="text-align: right;">73</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: right;">0.8440653</td>
+<td style="text-align: right;">0.3987958</td>
+<td style="text-align: right;">0.9728507</td>
+<td style="text-align: right;">0.2525952</td>
+<td style="text-align: right;">0.2219020</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">73</td>
+<td style="text-align: right;">77</td>
+<td style="text-align: right;">1.0544475</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">27350703-58-A/T</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: right;">343</td>
+<td style="text-align: right;">1.2031527</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.9861592</td>
+<td style="text-align: right;">0.9884726</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">85</td>
+<td style="text-align: right;">285</td>
+<td style="text-align: right;">258</td>
+<td style="text-align: right;">0.0106954</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">0.2478134</td>
+<td style="text-align: left;">TRUE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">42055937-67-T/G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">235</td>
+<td style="text-align: right;">288</td>
+<td style="text-align: right;">1.1214686</td>
+<td style="text-align: right;">0.6034024</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.8131488</td>
+<td style="text-align: right;">0.8299712</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">213</td>
+<td style="text-align: right;">252</td>
+<td style="text-align: right;">0.7234483</td>
+<td style="text-align: right;">0.2666319</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0936170</td>
+<td style="text-align: right;">0.1250000</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">27340971-37-C/G</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">73</td>
+<td style="text-align: right;">254</td>
+<td style="text-align: right;">274</td>
+<td style="text-align: right;">0.5177315</td>
+<td style="text-align: right;">0.0029461</td>
+<td style="text-align: right;">0.0701449</td>
+<td style="text-align: right;">0.8788927</td>
+<td style="text-align: right;">0.7896254</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">254</td>
+<td style="text-align: right;">274</td>
+<td style="text-align: right;">1.0785629</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: right;">0.0000000</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">42071187-64-G/T</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">167</td>
+<td style="text-align: right;">157</td>
+<td style="text-align: right;">180</td>
+<td style="text-align: right;">0.9063543</td>
+<td style="text-align: right;">0.5766590</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.5432526</td>
+<td style="text-align: right;">0.5187320</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">138</td>
+<td style="text-align: right;">164</td>
+<td style="text-align: right;">1.4097673</td>
+<td style="text-align: right;">0.3735398</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.1210191</td>
+<td style="text-align: right;">0.0888889</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">27352295-35-A/T</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">191</td>
+<td style="text-align: right;">244</td>
+<td style="text-align: right;">98</td>
+<td style="text-align: right;">103</td>
+<td style="text-align: right;">0.8229837</td>
+<td style="text-align: right;">0.2662610</td>
+<td style="text-align: right;">0.8551634</td>
+<td style="text-align: right;">0.3391003</td>
+<td style="text-align: right;">0.2968300</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">89</td>
+<td style="text-align: right;">94</td>
+<td style="text-align: right;">1.0559200</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.0918367</td>
+<td style="text-align: right;">0.0873786</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The output consists of a genlight object for each type of loci, plus a results table.</p>
 </section>
 <section id="run-infer.sex" class="level2">
 <h2 class="anchored" data-anchor-id="run-infer.sex">Run <code>infer.sex</code></h2>
-<p>This function uses the output of function filter.sex.linked (list of 6 genlight objects) to infer the sex of all individuals in the dataset. It uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an agreed sex.</p>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-4_6025feae0ac5070635db16fa6698f935">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"zw"</span>,</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This function uses the complete output of function filter.sex.linked (list of 6 objects) to infer the sex of all individuals in the dataset. Specifically, the function uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an <code>agreed sex</code>.</p>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-5_ff1b0a79814469159f599808a6025054">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"zw"</span>,</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Not enough gametologs (need at least 5). Assigning NA...</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>***FINISHED***</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
@@ -367,9 +841,22 @@ And 954 autosomal loci.</code></pre>
 </table>
 </div>
 </div>
-<div class="infobox task">
-<p><strong>IMPORTANT</strong></p>
-<p>Any <code>agreed sex</code> with an asterisk* need to manually checked.</p>
+<div class="blackbox">
+<p><strong>IMPORTANT</strong> We created this function with the explicit intent that a human checks the evidence for the <code>agreed sex</code> that do NOT agree for all types of sex-linked loci (denoted as ‘*M’ or ‘*F’). This human can then use their criterion to validate these assignments.</p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><img src="images/task.png" id="id" class="class" width="48" height="48"></p>
+<p>Can you find individuals for which the <code>agreed sex</code> is uncertain (i.e., has an asterisk “*”)?</p>
+</div>
 </div>
 </section>
 </section>
@@ -383,8 +870,41 @@ And 954 autosomal loci.</code></pre>
 </div>
 <section id="load-data-1" class="level2">
 <h2 class="anchored" data-anchor-id="load-data-1">Load data</h2>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-5_5fc6aec291f0ed80940781169f978036">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"LBP"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-6_f8e99302ffd29a6cd58941a373f98e0a">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"LBP"</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>LBP  <span class="co"># Explore the dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 376 genotypes,  1,000 SNPs , size: 5.2 Mb
+
+    missing data: 18414 (=4.9 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 376 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  376 individual labels
+   @loc.names:  1000 locus labels
+   @loc.all:  1000 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 95-281)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, sex, pop, Year.collected, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Possum_v2, ChromPos_Possum_v2, AlnCnt_Possum_v2, AlnEvalue_Possum_v2, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, monomorphs, maf, OneRatio, PIC 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>LBP<span class="sc">@</span>n.loc  <span class="co"># Number of SNPs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(LBP<span class="sc">@</span>ind.names)  <span class="co"># Number of individuals</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 376</code></pre>
+</div>
 </div>
 </section>
 <section id="run-filter.sex.linked-1" class="level2">
@@ -397,9 +917,89 @@ And 954 autosomal loci.</code></pre>
 <figcaption class="figure-caption">XX/XY sex chromosomes</figcaption>
 </figure>
 </div>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-6_9796b72baaad9d45b0a9083c32b0087f">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> LBP, <span class="at">system =</span> <span class="st">"xy"</span>, <span class="at">plots =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncores =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-7_c0b961bdb9e22c0b8094d7d89c3d2716">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(LBP<span class="sc">@</span>other<span class="sc">$</span>ind.metrics))  <span class="co"># Check that ind.metrics has the necessary columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 15%">
+<col style="width: 23%">
+<col style="width: 20%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">id</th>
+<th style="text-align: left;">sex</th>
+<th style="text-align: left;">pop</th>
+<th style="text-align: right;">Year.collected</th>
+<th style="text-align: left;">service</th>
+<th style="text-align: left;">plate_location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Y2</td>
+<td style="text-align: left;">Y2</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">Yellingbo</td>
+<td style="text-align: right;">1997</td>
+<td style="text-align: left;">DLpos17-2786</td>
+<td style="text-align: left;">1-A1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y16</td>
+<td style="text-align: left;">Y16</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: left;">Yellingbo</td>
+<td style="text-align: right;">2001</td>
+<td style="text-align: left;">DLpos17-2786</td>
+<td style="text-align: left;">1-A10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Y17</td>
+<td style="text-align: left;">Y17</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">Yellingbo</td>
+<td style="text-align: right;">1997</td>
+<td style="text-align: left;">DLpos17-2786</td>
+<td style="text-align: left;">1-A11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y18</td>
+<td style="text-align: left;">Y18</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">Yellingbo</td>
+<td style="text-align: right;">1999</td>
+<td style="text-align: left;">DLpos17-2786</td>
+<td style="text-align: left;">1-A12</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Y3</td>
+<td style="text-align: left;">Y3</td>
+<td style="text-align: left;">F</td>
+<td style="text-align: left;">Yellingbo</td>
+<td style="text-align: right;">1997</td>
+<td style="text-align: left;">DLpos17-2786</td>
+<td style="text-align: left;">1-A2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Y4</td>
+<td style="text-align: left;">Y4</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: left;">Yellingbo</td>
+<td style="text-align: right;">1997</td>
+<td style="text-align: left;">DLpos17-2786</td>
+<td style="text-align: left;">1-A3</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> LBP, <span class="at">system =</span> <span class="st">"xy"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Detected 162 females and 211 males.</code></pre>
 </div>
@@ -410,7 +1010,7 @@ And 954 autosomal loci.</code></pre>
 <pre><code>Building call rate plots.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Done. Starting phase 2.</code></pre>
@@ -419,10 +1019,10 @@ And 954 autosomal loci.</code></pre>
 <pre><code>Building heterozygosity plots.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-6-3.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-7-3.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Done building heterozygosity plots.</code></pre>
@@ -437,16 +1037,377 @@ Found 13 sex-linked loci:
 And 987 autosomal loci.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-6-4.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-7-4.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><img src="images/task.png" id="id" class="class" width="48" height="48"></p>
+<p>How many males and females does the dataset contain?</p>
+<p>How many sex-linked loci were found?</p>
+</div>
+</div>
+<p>Now check the output:</p>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-8_57a9b44f770b7d5a59c3bc651f7dd6b8">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>y.linked  <span class="co"># Notice that it says 'y-linked'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 376 genotypes,  0 SNPs , size: 4.8 Mb
+
+    missing data: 18414 (=Inf %) scored as NA
+
+ ** Genetic data
+   @gen: list of 376 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  376 individual labels
+   @loc.names:  0 locus labels
+   @loc.all:  0 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 95-281)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, sex, pop, Year.collected, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Possum_v2, ChromPos_Possum_v2, AlnCnt_Possum_v2, AlnEvalue_Possum_v2, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, monomorphs, maf, OneRatio, PIC 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>x.linked  <span class="co"># Notice that it says 'x-linked'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 376 genotypes,  9 SNPs , size: 4.7 Mb
+
+    missing data: 99 (=2.93 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 376 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  376 individual labels
+   @loc.names:  9 locus labels
+   @loc.all:  9 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 95-281)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, sex, pop, Year.collected, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Possum_v2, ChromPos_Possum_v2, AlnCnt_Possum_v2, AlnEvalue_Possum_v2, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, monomorphs, maf, OneRatio, PIC 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>gametolog</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 376 genotypes,  1 SNPs , size: 4.7 Mb
+
+    missing data: 0 (=0 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 376 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  376 individual labels
+   @loc.names:  1 locus labels
+   @loc.all:  1 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 95-281)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, sex, pop, Year.collected, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Possum_v2, ChromPos_Possum_v2, AlnCnt_Possum_v2, AlnEvalue_Possum_v2, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, monomorphs, maf, OneRatio, PIC 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>sex.biased</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 376 genotypes,  3 SNPs , size: 4.7 Mb
+
+    missing data: 261 (=23.14 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 376 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  376 individual labels
+   @loc.names:  3 locus labels
+   @loc.all:  3 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 95-281)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, sex, pop, Year.collected, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Possum_v2, ChromPos_Possum_v2, AlnCnt_Possum_v2, AlnEvalue_Possum_v2, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, monomorphs, maf, OneRatio, PIC 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>autosomal</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> ********************
+ *** DARTR OBJECT ***
+ ********************
+
+ ** 376 genotypes,  987 SNPs , size: 5.3 Mb
+
+    missing data: 18054 (=4.86 %) scored as NA
+
+ ** Genetic data
+   @gen: list of 376 SNPbin
+   @ploidy: ploidy of each individual  (range: 2-2)
+
+ ** Additional data
+   @ind.names:  376 individual labels
+   @loc.names:  987 locus labels
+   @loc.all:  987 allele labels
+   @position: integer storing positions of the SNPs [within 69 base sequence]
+   @pop: population of each individual (group size range: 95-281)
+   @other: a list containing: loc.metrics, ind.metrics, loc.metrics.flags, verbose, history 
+    @other$ind.metrics: id, sex, pop, Year.collected, service, plate_location 
+    @other$loc.metrics: AlleleID, CloneID, AlleleSequence, TrimmedSequence, Chrom_Possum_v2, ChromPos_Possum_v2, AlnCnt_Possum_v2, AlnEvalue_Possum_v2, SNP, SnpPosition, CallRate, OneRatioRef, OneRatioSnp, FreqHomRef, FreqHomSnp, FreqHets, PICRef, PICSnp, AvgPIC, AvgCountRef, AvgCountSnp, RepAvg, clone, uid, rdepth, monomorphs, maf, OneRatio, PIC 
+   @other$latlon[g]: no coordinates attached</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(res<span class="sc">$</span>results.table))  <span class="co"># The output table</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 4%">
+<col style="width: 3%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 3%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">index</th>
+<th style="text-align: right;">count.F.miss</th>
+<th style="text-align: right;">count.M.miss</th>
+<th style="text-align: right;">count.F.scored</th>
+<th style="text-align: right;">count.M.scored</th>
+<th style="text-align: right;">ratio</th>
+<th style="text-align: right;">p.value</th>
+<th style="text-align: right;">p.adjusted</th>
+<th style="text-align: right;">scoringRate.F</th>
+<th style="text-align: right;">scoringRate.M</th>
+<th style="text-align: left;">y.linked</th>
+<th style="text-align: left;">sex.biased</th>
+<th style="text-align: right;">count.F.het</th>
+<th style="text-align: right;">count.M.het</th>
+<th style="text-align: right;">count.F.hom</th>
+<th style="text-align: right;">count.M.hom</th>
+<th style="text-align: right;">stat</th>
+<th style="text-align: right;">stat.p.value</th>
+<th style="text-align: right;">stat.p.adjusted</th>
+<th style="text-align: right;">heterozygosity.F</th>
+<th style="text-align: right;">heterozygosity.M</th>
+<th style="text-align: left;">x.linked</th>
+<th style="text-align: left;">xy.gametolog</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">28686439-63-T/C</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">162</td>
+<td style="text-align: right;">211</td>
+<td style="text-align: right;">1.301530</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">142</td>
+<td style="text-align: right;">0.8165373</td>
+<td style="text-align: right;">0.4286518</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.2839506</td>
+<td style="text-align: right;">0.3270142</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">28685838-47-G/C</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">146</td>
+<td style="text-align: right;">198</td>
+<td style="text-align: right;">1.666758</td>
+<td style="text-align: right;">0.2415482</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.9012346</td>
+<td style="text-align: right;">0.9383886</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">132</td>
+<td style="text-align: right;">189</td>
+<td style="text-align: right;">2.2220139</td>
+<td style="text-align: right;">0.0805459</td>
+<td style="text-align: right;">0.7568021</td>
+<td style="text-align: right;">0.0958904</td>
+<td style="text-align: right;">0.0454545</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">28686334-21-T/G</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">211</td>
+<td style="text-align: right;">1.309589</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.9938272</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">55</td>
+<td style="text-align: right;">129</td>
+<td style="text-align: right;">156</td>
+<td style="text-align: right;">0.7042556</td>
+<td style="text-align: right;">0.1754130</td>
+<td style="text-align: right;">0.8886749</td>
+<td style="text-align: right;">0.1987578</td>
+<td style="text-align: right;">0.2606635</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">28679782-56-G/T</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">211</td>
+<td style="text-align: right;">1.309589</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.9938272</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">144</td>
+<td style="text-align: right;">187</td>
+<td style="text-align: right;">0.9200279</td>
+<td style="text-align: right;">0.8681945</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.1055901</td>
+<td style="text-align: right;">0.1137441</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">28685362-20-C/T</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">162</td>
+<td style="text-align: right;">211</td>
+<td style="text-align: right;">1.301530</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">157</td>
+<td style="text-align: right;">210</td>
+<td style="text-align: right;">6.6572377</td>
+<td style="text-align: right;">0.0894367</td>
+<td style="text-align: right;">0.7891005</td>
+<td style="text-align: right;">0.0308642</td>
+<td style="text-align: right;">0.0047393</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">28688558-63-C/T</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">161</td>
+<td style="text-align: right;">210</td>
+<td style="text-align: right;">1.303397</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.9938272</td>
+<td style="text-align: right;">0.9952607</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">154</td>
+<td style="text-align: right;">203</td>
+<td style="text-align: right;">1.3171759</td>
+<td style="text-align: right;">0.7845569</td>
+<td style="text-align: right;">1.0000000</td>
+<td style="text-align: right;">0.0434783</td>
+<td style="text-align: right;">0.0333333</td>
+<td style="text-align: left;">FALSE</td>
+<td style="text-align: left;">FALSE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The output consists of a genlight object for each type of loci, plus a results table.</p>
 </section>
 <section id="run-infer.sex-1" class="level2">
 <h2 class="anchored" data-anchor-id="run-infer.sex-1">Run <code>infer.sex</code></h2>
-<p>This function uses the output of function filter.sex.linked (list of 6 genlight objects) to infer the sex of all individuals in the dataset. It uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an agreed sex.</p>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-7_8ac66b7abfad95202f5a83a7894e2050">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"xy"</span>,</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This function uses the output of function filter.sex.linked (list of 6 objects) to infer the sex of all individuals in the dataset. It uses 3 types of sex-linked loci (W-/Y-linked, Z-/X-linked, and gametologs), assigns a preliminary genetic sex for each type of sex-linked loci available, and outputs an <code>agreed sex</code>.</p>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-9_9f947b50c9c9a70600af99165e19c959">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"xy"</span>,</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Not enough W-linked/Y-linked loci (need at least 1). Assigning NA...</code></pre>
 </div>
@@ -456,7 +1417,7 @@ And 987 autosomal loci.</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>***FINISHED***</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
@@ -578,10 +1539,7 @@ And 987 autosomal loci.</code></pre>
 </table>
 </div>
 </div>
-</section>
-</section>
-<section id="excercise" class="level1">
-<h1>EXCERCISE</h1>
+<p>What did the function mention about gametologs? How did that impact the results table? How many types of sex-linked loci were used to infer an <code>agreed sex</code>?</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -593,19 +1551,39 @@ Exercise
 </div>
 <div class="callout-body-container callout-body">
 <p><img src="images/task.png" id="id" class="class" width="48" height="48"></p>
-<p>Choose one of the following dataset (or your own data) and report:</p>
+<p>Can you find individuals for which the <code>agreed sex</code> is uncertain (i.e., has an asterisk “*”)?</p>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-4" class="level1">
+<h1>EXERCISE</h1>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><img src="images/task.png" id="id" class="class" width="48" height="48"></p>
+<p>Imagine you are analyzing the genetic data of a population and you want to look at its genetic structure and genetic diversity. You get to work by filtering your beautiful set of SNPs. Because you are a rigorous, you want to test whether using function <code>filter.sex.linked</code> to properly filter out sex-linked loci changes the results of the populations analyses. So you: (1) process your SNP dataset by applying standard filters and run analyses, and (2) process the dataset by filtering out sex-linked loci first, applying standard filters second, and then run analyses.</p>
+<p>Choose one of the following datasets (or your own data) and report:</p>
 <ol type="1">
 <li><p>How many sex-linked markers are present?</p></li>
 <li><p>How many individuals had a wrong sexID?</p></li>
-<li><p>Do you see any changes in your PCA/structure analyses before and after filtering the sex-linked markers?</p></li>
-<li><p>Do you see any differences in genetic diversity and fixation indices between autosomal and sex-linked markers?</p></li>
+<li><p>Do you see any changes in your PCA/structure analyses when you filtered out sex-linked markers versus when you did not?</p></li>
+<li><p>Do you see any differences in genetic diversity and fixation indices when you filtered out sex-linked markers versus when you did not?</p></li>
 </ol>
 </div>
 </div>
-<p><img src="images/beer.png" id="id" class="class" width="350" height="200"> <img src="images/Leadbeaters_possum.jpg" id="id" class="class" width="350" height="200"> <img src="images/Bull_Shark.jpg" id="id" class="class" width="350" height="200"> <img src="images/Blue_shark.jpg" id="id" class="class" width="350" height="200"></p>
+<p><img src="images/beer.png" class="class" width="350" height="200"> <img src="images/Eastern_Yellow_Robin.jpg" class="img-fluid" alt="The Eastern Yellow Robin" width="349"></p>
+<p><img src="images/Bull_Shark.jpg" class="class" width="350" height="200"> <img src="images/Blue_shark.jpg" class="class" width="350" height="200"></p>
 <section id="exercise-data-1---your-own-data" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-data-1---your-own-data">Exercise data 1 - Your own data</h2>
-<div class="infobox task">
+<div class="infobox">
 <p><strong>HINT</strong></p>
 <p>You can have a look at the exercise data below for inspiration.</p>
 </div>
@@ -633,13 +1611,13 @@ Exercise
 </div>
 <section id="load-data-2" class="level3">
 <h3 class="anchored" data-anchor-id="load-data-2">Load data</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-8_fccf0f50d020e37dec20e0e83b96dce3">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"EYR"</span>)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>EYR<span class="sc">@</span>n.loc</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(EYR<span class="sc">@</span>pop)</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(EYR<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>pop)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(EYR<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-10_5ec2bb273e2680f6472c4a6f29a1edd9">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"EYR"</span>)</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>EYR<span class="sc">@</span>n.loc</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(EYR<span class="sc">@</span>pop)</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(EYR<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>pop)</span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(EYR<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1000
 
@@ -656,9 +1634,8 @@ Exercise
 </section>
 <section id="number-of-sex-linked-markers-1" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-sex-linked-markers-1">1. Number of sex-linked markers?</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-9_97f8383cc09479927ecc72e45c1b57c2">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> EYR, <span class="at">system =</span> <span class="st">"zw"</span>, <span class="at">plots =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncores =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-11_b15e8eccdf915ba82a58acff55cb7298">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> EYR, <span class="at">system =</span> <span class="st">"zw"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Detected 352 females and 429 males.</code></pre>
 </div>
@@ -669,7 +1646,7 @@ Exercise
 <pre><code>Building call rate plots.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Done. Starting phase 2.</code></pre>
@@ -678,10 +1655,10 @@ Exercise
 <pre><code>Building heterozygosity plots.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-9-3.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-11-3.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Done building heterozygosity plots.</code></pre>
@@ -696,22 +1673,21 @@ Found 84 sex-linked loci:
 And 916 autosomal loci.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-9-4.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-11-4.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="individuals-with-wrong-sexid-1" class="level3">
 <h3 class="anchored" data-anchor-id="individuals-with-wrong-sexid-1">2. Individuals with wrong sexID?</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-10_afe8c96b480d835826bc2da9d92a4cbf">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"zw"</span>,</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-12_bb2f693a45f33c57344f15a6828b32e1">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"zw"</span>,</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>***FINISHED***</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>agreed.sex <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">*"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> sexID<span class="sc">$</span>agreed.sex)  <span class="co"># remove asterisk</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(EYR<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">!=</span> agreed.sex, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(EYR<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">!=</span> sexID<span class="sc">$</span>agreed.sex, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>
@@ -833,7 +1809,7 @@ And 916 autosomal loci.</code></pre>
 </table>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 11</code></pre>
+<pre><code>[1] 80</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -846,58 +1822,297 @@ Exercise
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><img src="images/task.png" id="id" class="class" width="48" height="48"></p>
-<p>Can you check if any misidentified sexes are due to uncertain genetic sexID (indicated with *)?</p>
+<p><img src="images/task.png" class="class" width="48" height="48"></p>
+<p>Can you tell which misidentified sexes are due to uncertain genetic sex (indicated with *)?</p>
 <p><strong>HINT</strong> Try using <code>grep(pattern = "\\*", x = sexID$agreed.sex)</code></p>
 </div>
 </div>
-</section>
-<section id="changes-in-pca-before-and-after-removing-the-slm-1" class="level3">
-<h3 class="anchored" data-anchor-id="changes-in-pca-before-and-after-removing-the-slm-1">3. Changes in PCA before and after removing the SLM?</h3>
-<section id="pca-before" class="level4">
-<h4 class="anchored" data-anchor-id="pca-before">PCA before</h4>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-11_a70c4534ec64082b8d067a29355b8c89">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>PCA.before <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.pcoa</span>(EYR, <span class="at">verbose =</span> <span class="dv">0</span>)</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.before, EYR, <span class="at">xaxis =</span> <span class="dv">1</span>, <span class="at">yaxis =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+<section id="processing-snps-with-two-filtering-regimes" class="level4">
+<h4 class="anchored" data-anchor-id="processing-snps-with-two-filtering-regimes">Processing SNPs with two filtering regimes</h4>
+<section id="filtering-snps-only-with-standard-filters-sloppy" class="level5">
+<h5 class="anchored" data-anchor-id="filtering-snps-only-with-standard-filters-sloppy">Filtering SNPs only with standard filters (sloppy)</h5>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-13_9d7998fb0ad0bd0557f67ca748ecfbca">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for read depth</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.rdepth</span>(EYR)  <span class="co"># This is the initial dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Starting :: 
+ Starting dartR.base 
+ Starting gl.report.rdepth 
+  Processing genlight object with SNP data
+  Reporting Read Depth by Locus
+  No. of loci = 1000 
+  No. of individuals = 782 
+    Minimum      :  2.6 
+    1st quartile :  4.2 
+    Median       :  5.5 
+    Mean         :  5.9795 
+    3r quartile  :  7.5 
+    Maximum      :  12.9 
+    Missing Rate Overall:  0.19 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.before, EYR, <span class="at">xaxis =</span> <span class="dv">2</span>, <span class="at">yaxis =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Starting gl.colors 
-Selected color type 2 
-Completed: gl.colors 
-Starting :: 
- Starting dartR.base 
- Starting gl.pcoa.plot 
-  Processing an ordination file (glPca)
-  Processing genlight object with SNP data
-  Plotting populations in a space defined by the SNPs
-  Preparing plot .... please wait
+<pre><code>   Quantile Threshold Retained Percent Filtered Percent
+1      100%      12.9        1     0.1      999    99.9
+2       95%      10.1       51     5.1      949    94.9
+3       90%       9.2      103    10.3      897    89.7
+4       85%       8.6      151    15.1      849    84.9
+5       80%       8.0      204    20.4      796    79.6
+6       75%       7.5      254    25.4      746    74.6
+7       70%       7.1      302    30.2      698    69.8
+8       65%       6.6      354    35.4      646    64.6
+9       60%       6.2      405    40.5      595    59.5
+10      55%       5.9      452    45.2      548    54.8
+11      50%       5.5      512    51.2      488    48.8
+12      45%       5.2      566    56.6      434    43.4
+13      40%       4.9      616    61.6      384    38.4
+14      35%       4.7      661    66.1      339    33.9
+15      30%       4.4      718    71.8      282    28.2
+16      25%       4.2      759    75.9      241    24.1
+17      20%       4.0      808    80.8      192    19.2
+18      15%       3.8      851    85.1      149    14.9
+19      10%       3.5      903    90.3       97     9.7
+20       5%       3.2      952    95.2       48     4.8
+21       0%       2.6     1000   100.0        0     0.0
 Completed: :: 
  Completed: dartR.base 
- Completed: gl.pcoa.plot 
-Starting :: 
+ Completed: gl.report.rdepth </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>EYR.sloppy <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.rdepth</span>(EYR, <span class="at">lower =</span> <span class="dv">3</span>, <span class="at">upper =</span> <span class="dv">11</span>, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for loci call rate</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.callrate</span>(EYR.sloppy, <span class="at">method =</span> <span class="st">"loc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Starting :: 
  Starting dartR.base 
- Starting gl.pcoa.plot 
-  Processing an ordination file (glPca)
+ Starting gl.report.callrate 
   Processing genlight object with SNP data
-  Plotting populations in a space defined by the SNPs
-  Preparing plot .... please wait
+  Reporting Call Rate by Locus
+  No. of loci = 957 
+  No. of individuals = 782 
+    Minimum      :  0.213555 
+    1st quartile :  0.726343 
+    Median       :  0.886189 
+    Mean         :  0.8147825 
+    3r quartile  :  0.950128 
+    Maximum      :  0.98977 
+    Missing Rate Overall:  0.1852 </code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Completed: :: 
+ Completed: dartR.base 
+ Completed: gl.report.callrate </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>EYR.sloppy <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.callrate</span>(EYR.sloppy, <span class="at">method =</span> <span class="st">"loc"</span>,</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold =</span> <span class="fl">0.75</span>, <span class="at">verbose =</span> <span class="dv">0</span>, <span class="at">recalc =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for individual call rate</span></span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.callrate</span>(EYR.sloppy, <span class="at">method =</span> <span class="st">"ind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Starting :: 
+ Starting dartR.base 
+ Starting gl.report.callrate 
+  Processing genlight object with SNP data
+
+  Reporting Call Rate by Individual
+  No. of loci = 694 
+  No. of individuals = 782 
+    Minimum      :  0.03746398 
+    1st quartile :  0.9135447 
+    Median       :  0.9394813 
+    Mean         :  0.9094375 
+    3r quartile  :  0.9538905 
+    Maximum      :  0.9783862 
+    Missing Rate Overall:  0.0906 
+
+Listing 4 populations and their average CallRates
+  Monitor again after filtering
+  Population CallRate   N
+1     Crusoe   0.9017 238
+2 Muckleford   0.9058 421
+3      Timor   0.9411  52
+4     Wombat   0.9338  71
+
+Listing 20 individuals with the lowest CallRates
+  Use this list to see which individuals will be lost on filtering by individual
+  Set ind.to.list parameter to see more individuals
+   Individual   CallRate
+1    M18.29.1 0.03746398
+2    M18.18.1 0.04034582
+3    M18.47.2 0.07204611
+4    C18.21.2 0.09654179
+5   027-34168 0.09942363
+6    C18.15.2 0.09942363
+7    C18.16.1 0.10951009
+8    M18.47.3 0.12103746
+9    M18.35.2 0.15417867
+10   M18.20.3 0.27521614
+11   C18.28.1 0.42939481
+12   M20.70.2 0.43948127
+13   C18.17.2 0.45244957
+14  027-34065 0.48847262
+15   C18.14.1 0.49711816
+16   M20.70.3 0.50864553
+17  M20.110.1 0.51585014
+18    M19.8.1 0.53314121
+19   M19.12.1 0.57060519
+20   M20.64.3 0.58213256
+
+)</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Completed: :: 
+ Completed: dartR.base 
+ Completed: gl.report.callrate </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>EYR.sloppy <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.callrate</span>(EYR.sloppy, <span class="at">method =</span> <span class="st">"ind"</span>,</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold =</span> <span class="fl">0.65</span>, <span class="at">verbose =</span> <span class="dv">0</span>, <span class="at">recalc =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for MAC (= 3)</span></span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.maf</span>(EYR.sloppy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Starting :: 
+ Starting dartR.base 
+ Starting gl.report.maf 
+  Processing genlight object with SNP data
+Starting :: 
+
+ Starting dartR.base 
+
+ Starting gl.report.maf 
+
+  Reporting Minor Allele Frequency (MAF) by Locus for population Crusoe 
+  No. of loci = 668 
+  No. of individuals = 231 
+    Minimum      :  0.0022 
+    1st quantile :  0.066475 
+    Median       :  0.147 
+    Mean         :  0.1822217 
+    3r quantile  :  0.282275 
+    Maximum      :  0.5 
+    Missing Rate Overall:  0.08 
+
+  Reporting Minor Allele Frequency (MAF) by Locus for population Muckleford 
+  No. of loci = 674 
+  No. of individuals = 406 
+    Minimum      :  0.0012 
+    1st quantile :  0.059975 
+    Median       :  0.1432 
+    Mean         :  0.1777687 
+    3r quantile  :  0.2759 
+    Maximum      :  0.4987 
+    Missing Rate Overall:  0.07 
+
+  Reporting Minor Allele Frequency (MAF) by Locus for population Timor 
+  No. of loci = 588 
+  No. of individuals = 52 
+    Minimum      :  0.0096 
+    1st quantile :  0.0673 
+    Median       :  0.1651 
+    Mean         :  0.1945571 
+    3r quantile  :  0.30445 
+    Maximum      :  0.5 
+    Missing Rate Overall:  0.06 
+
+  Reporting Minor Allele Frequency (MAF) by Locus for population Wombat 
+  No. of loci = 626 
+  No. of individuals = 71 
+    Minimum      :  0.007 
+    1st quantile :  0.064525 
+    Median       :  0.14685 
+    Mean         :  0.1810583 
+    3r quantile  :  0.2752 
+    Maximum      :  0.5 
+    Missing Rate Overall:  0.06 
+
+  Reporting Minor Allele Frequency (MAF) by Locus OVERALL
+  No. of loci = 694 
+  No. of individuals = 760 
+    Minimum      :  3e-04 
+    1st quantile :  0.061925 
+    Median       :  0.139 
+    Mean         :  0.1744435 
+    3r quantile  :  0.272375 
+    Maximum      :  0.4954 
+    Missing Rate Overall:  0.07 </code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Quantile Threshold Retained Percent Filtered Percent
+1      100%    0.4954        1     0.1      689    99.9
+2       95%    0.4444       35     5.1      655    94.9
+3       90%    0.3799       70    10.1      620    89.9
+4       85%    0.3485      104    15.1      586    84.9
+5       80%    0.3091      139    20.1      551    79.9
+6       75%    0.2728      173    25.1      517    74.9
+7       70%    0.2368      207    30.0      483    70.0
+8       65%    0.2100      242    35.1      448    64.9
+9       60%    0.1892      276    40.0      414    60.0
+10      55%    0.1585      311    45.1      379    54.9
+11      50%    0.1387      346    50.1      344    49.9
+12      45%    0.1218      381    55.2      309    44.8
+13      40%    0.1027      416    60.3      274    39.7
+14      35%    0.0868      449    65.1      241    34.9
+15      30%    0.0729      483    70.0      207    30.0
+16      25%    0.0619      518    75.1      172    24.9
+17      20%    0.0500      553    80.1      137    19.9
+18      15%    0.0358      587    85.1      103    14.9
+19      10%    0.0221      622    90.1       68     9.9
+20       5%    0.0077      656    95.1       34     4.9
+21       0%    0.0003      690   100.0        0     0.0
 Completed: :: 
  Completed: dartR.base 
- Completed: gl.pcoa.plot </code></pre>
+ Completed: gl.report.maf </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>EYR.sloppy <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.maf</span>(EYR.sloppy, <span class="at">threshold =</span> <span class="dv">3</span>, <span class="at">verbose =</span> <span class="dv">0</span>,</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">recalc =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Starting gl.select.colors 
+  Warning: Number of required colors not specified, set to 9
+  Library: RColorBrewer
+  Palette: brewer.pal
+  Showing and returning 2 of 9 colors for library RColorBrewer : palette Blues </code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Completed: gl.select.colors </code></pre>
 </div>
 </div>
 </section>
-<section id="filtering" class="level4">
-<h4 class="anchored" data-anchor-id="filtering">Filtering</h4>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-12_6c776c34acb9c73f26bd895eff7aaaf7">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>EYR.after <span class="ot">&lt;-</span> res<span class="sc">$</span>autosomal</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.rdepth</span>(EYR.after)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="filtering-snps-with-filter.sex.linked-and-standard-filters-correct" class="level5">
+<h5 class="anchored" data-anchor-id="filtering-snps-with-filter.sex.linked-and-standard-filters-correct">Filtering SNPs with filter.sex.linked and standard filters (correct)</h5>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-14_749e415d9badd944f4b78c0c49fef07a">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for sex-linked loci</span></span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>correct <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(EYR, <span class="at">system =</span> <span class="st">"zw"</span>)  <span class="co"># This is the initial dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-4.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We will use correct$autosomal for the next filters</span></span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for read depth</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.rdepth</span>(correct<span class="sc">$</span>autosomal)  <span class="co"># This is the filtered dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Starting :: 
  Starting dartR.base 
@@ -915,7 +2130,7 @@ Completed: ::
     Missing Rate Overall:  0.18 </code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-5.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Quantile Threshold Retained Percent Filtered Percent
@@ -944,12 +2159,13 @@ Completed: ::
  Completed: dartR.base 
  Completed: gl.report.rdepth </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>EYR.after <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.rdepth</span>(EYR.after, <span class="at">lower =</span> <span class="dv">3</span>, <span class="at">upper =</span> <span class="dv">11</span>,</span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>EYR.correct <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.rdepth</span>(correct<span class="sc">$</span>autosomal, <span class="at">lower =</span> <span class="dv">3</span>,</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">upper =</span> <span class="dv">11</span>, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-6.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.callrate</span>(EYR.after, <span class="at">method =</span> <span class="st">"loc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for loci call rate</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.callrate</span>(EYR.correct, <span class="at">method =</span> <span class="st">"loc"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Starting :: 
  Starting dartR.base 
@@ -967,16 +2183,18 @@ Completed: ::
     Missing Rate Overall:  0.1821 </code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-7.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Completed: :: 
  Completed: dartR.base 
  Completed: gl.report.callrate </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>EYR.after <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.callrate</span>(EYR, <span class="at">method =</span> <span class="st">"loc"</span>, <span class="at">threshold =</span> <span class="fl">0.75</span>,</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="dv">0</span>)</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.callrate</span>(EYR, <span class="at">method =</span> <span class="st">"ind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>EYR.correct <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.callrate</span>(EYR.correct, <span class="at">method =</span> <span class="st">"loc"</span>,</span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold =</span> <span class="fl">0.75</span>, <span class="at">verbose =</span> <span class="dv">0</span>, <span class="at">recalc =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for individual call rate</span></span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.callrate</span>(EYR.correct, <span class="at">method =</span> <span class="st">"ind"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Starting :: 
  Starting dartR.base 
@@ -984,62 +2202,63 @@ Completed: ::
   Processing genlight object with SNP data
 
   Reporting Call Rate by Individual
-  No. of loci = 1000 
+  No. of loci = 639 
   No. of individuals = 782 
-    Minimum      :  0.03 
-    1st quartile :  0.814 
-    Median       :  0.8435 
-    Mean         :  0.8136471 
-    3r quartile  :  0.86 
-    Maximum      :  0.906 
-    Missing Rate Overall:  0.1864 
+    Minimum      :  0.04068858 
+    1st quartile :  0.9170579 
+    Median       :  0.9405321 
+    Mean         :  0.9114205 
+    3r quartile  :  0.9557903 
+    Maximum      :  0.9780908 
+    Missing Rate Overall:  0.0886 
 
 Listing 4 populations and their average CallRates
   Monitor again after filtering
   Population CallRate   N
-1     Crusoe   0.8054 238
-2 Muckleford   0.8107 421
-3      Timor   0.8440  52
-4     Wombat   0.8368  71
+1     Crusoe   0.9028 238
+2 Muckleford   0.9085 421
+3      Timor   0.9428  52
+4     Wombat   0.9347  71
 
 Listing 20 individuals with the lowest CallRates
   Use this list to see which individuals will be lost on filtering by individual
   Set ind.to.list parameter to see more individuals
-   Individual CallRate
-1    M18.29.1    0.030
-2    M18.18.1    0.038
-3    M18.47.2    0.055
-4   027-34168    0.082
-5    C18.21.2    0.083
-6    C18.15.2    0.084
-7    C18.16.1    0.089
-8    M18.47.3    0.097
-9    M18.35.2    0.134
-10   M18.20.3    0.230
-11   C18.28.1    0.360
-12   M20.70.2    0.364
-13   C18.17.2    0.390
-14   C18.14.1    0.419
-15   M20.70.3    0.440
-16  M20.110.1    0.444
-17  027-34065    0.447
-18    M19.8.1    0.458
-19   M20.64.3    0.483
-20   M19.12.1    0.498
+   Individual   CallRate
+1    M18.29.1 0.04068858
+2    M18.18.1 0.04381847
+3    M18.47.2 0.07198748
+4    C18.15.2 0.09702660
+5    C18.21.2 0.09859155
+6   027-34168 0.10172144
+7    C18.16.1 0.10798122
+8    M18.47.3 0.12206573
+9    M18.35.2 0.15492958
+10   M18.20.3 0.28638498
+11   C18.28.1 0.44131455
+12   M20.70.2 0.44757433
+13   C18.17.2 0.44913928
+14  027-34065 0.48513302
+15   C18.14.1 0.49921753
+16  M20.110.1 0.51956182
+17   M20.70.3 0.51956182
+18    M19.8.1 0.54303599
+19   M19.12.1 0.57589984
+20   M20.64.3 0.59780908
 
 )</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-12-4.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-8.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Completed: :: 
  Completed: dartR.base 
  Completed: gl.report.callrate </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>EYR.after <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.callrate</span>(EYR.after, <span class="at">method =</span> <span class="st">"ind"</span>, <span class="at">threshold =</span> <span class="fl">0.65</span>,</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.maf</span>(EYR.after)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>EYR.correct <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.callrate</span>(EYR.correct, <span class="at">method =</span> <span class="st">"ind"</span>,</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">threshold =</span> <span class="fl">0.65</span>, <span class="at">verbose =</span> <span class="dv">0</span>, <span class="at">recalc =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for MAC (= 3)</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.maf</span>(EYR.correct)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Starting :: 
  Starting dartR.base 
@@ -1052,91 +2271,92 @@ Starting ::
  Starting gl.report.maf 
 
   Reporting Minor Allele Frequency (MAF) by Locus for population Crusoe 
-  No. of loci = 685 
+  No. of loci = 613 
   No. of individuals = 231 
     Minimum      :  0.0022 
     1st quantile :  0.0667 
-    Median       :  0.1471 
-    Mean         :  0.1823488 
-    3r quantile  :  0.2822 
+    Median       :  0.145 
+    Mean         :  0.1795251 
+    3r quantile  :  0.2814 
     Maximum      :  0.5 
     Missing Rate Overall:  0.08 
 
   Reporting Minor Allele Frequency (MAF) by Locus for population Muckleford 
-  No. of loci = 693 
+  No. of loci = 620 
   No. of individuals = 406 
     Minimum      :  0.0012 
-    1st quantile :  0.0593 
-    Median       :  0.1426 
-    Mean         :  0.1774444 
-    3r quantile  :  0.2762 
+    1st quantile :  0.05805 
+    Median       :  0.1341 
+    Mean         :  0.1736115 
+    3r quantile  :  0.272125 
     Maximum      :  0.4987 
     Missing Rate Overall:  0.07 
 
   Reporting Minor Allele Frequency (MAF) by Locus for population Timor 
-  No. of loci = 603 
+  No. of loci = 540 
   No. of individuals = 52 
     Minimum      :  0.0096 
-    1st quantile :  0.0673 
-    Median       :  0.1667 
-    Mean         :  0.1952375 
-    3r quantile  :  0.305 
+    1st quantile :  0.066325 
+    Median       :  0.15825 
+    Mean         :  0.1911578 
+    3r quantile  :  0.296325 
     Maximum      :  0.5 
     Missing Rate Overall:  0.06 
 
   Reporting Minor Allele Frequency (MAF) by Locus for population Wombat 
-  No. of loci = 641 
+  No. of loci = 572 
   No. of individuals = 71 
     Minimum      :  0.007 
-    1st quantile :  0.0643 
-    Median       :  0.1479 
-    Mean         :  0.1821835 
-    3r quantile  :  0.2803 
+    1st quantile :  0.063175 
+    Median       :  0.1449 
+    Mean         :  0.1799673 
+    3r quantile  :  0.2754 
     Maximum      :  0.5 
     Missing Rate Overall:  0.06 
 
   Reporting Minor Allele Frequency (MAF) by Locus OVERALL
-  No. of loci = 715 
+  No. of loci = 639 
   No. of individuals = 760 
     Minimum      :  3e-04 
-    1st quantile :  0.0606 
-    Median       :  0.1383 
-    Mean         :  0.1742244 
-    3r quantile  :  0.272375 
+    1st quantile :  0.0575 
+    Median       :  0.1353 
+    Mean         :  0.1702414 
+    3r quantile  :  0.26845 
     Maximum      :  0.4954 
     Missing Rate Overall:  0.07 </code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-12-5.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-9.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Quantile Threshold Retained Percent Filtered Percent
-1      100%    0.4954        1     0.1      709    99.9
-2       95%    0.4452       36     5.1      674    94.9
-3       90%    0.3799       72    10.1      638    89.9
-4       85%    0.3485      107    15.1      603    84.9
-5       80%    0.3092      143    20.1      567    79.9
-6       75%    0.2728      178    25.1      532    74.9
-7       70%    0.2371      213    30.0      497    70.0
-8       65%    0.2108      249    35.1      461    64.9
-9       60%    0.1902      284    40.0      426    60.0
-10      55%    0.1585      320    45.1      390    54.9
-11      50%    0.1379      356    50.1      354    49.9
-12      45%    0.1218      391    55.1      319    44.9
-13      40%    0.1018      427    60.1      283    39.9
-14      35%    0.0852      462    65.1      248    34.9
-15      30%    0.0722      497    70.0      213    30.0
-16      25%    0.0603      533    75.1      177    24.9
-17      20%    0.0488      569    80.1      141    19.9
-18      15%    0.0348      605    85.2      105    14.8
-19      10%    0.0210      640    90.1       70     9.9
-20       5%    0.0073      675    95.1       35     4.9
-21       0%    0.0003      710   100.0        0     0.0
+1      100%    0.4954        1     0.2      634    99.8
+2       95%    0.4397       32     5.0      603    95.0
+3       90%    0.3738       64    10.1      571    89.9
+4       85%    0.3457       96    15.1      539    84.9
+5       80%    0.3006      128    20.2      507    79.8
+6       75%    0.2686      159    25.0      476    75.0
+7       70%    0.2298      191    30.1      444    69.9
+8       65%    0.2021      223    35.1      412    64.9
+9       60%    0.1779      254    40.0      381    60.0
+10      55%    0.1513      286    45.0      349    55.0
+11      50%    0.1353      318    50.1      317    49.9
+12      45%    0.1141      350    55.1      285    44.9
+13      40%    0.0984      383    60.3      252    39.7
+14      35%    0.0823      413    65.0      222    35.0
+15      30%    0.0689      446    70.2      189    29.8
+16      25%    0.0573      477    75.1      158    24.9
+17      20%    0.0478      509    80.2      126    19.8
+18      15%    0.0348      540    85.0       95    15.0
+19      10%    0.0216      572    90.1       63     9.9
+20       5%    0.0073      604    95.1       31     4.9
+21       0%    0.0003      635   100.0        0     0.0
 Completed: :: 
  Completed: dartR.base 
  Completed: gl.report.maf </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>EYR.after <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.maf</span>(EYR.after, <span class="at">threshold =</span> <span class="fl">0.05</span>, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>EYR.correct <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.filter.maf</span>(EYR.correct, <span class="at">threshold =</span> <span class="dv">3</span>, <span class="at">verbose =</span> <span class="dv">0</span>,</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">recalc =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Starting gl.select.colors 
   Warning: Number of required colors not specified, set to 9
@@ -1145,24 +2365,67 @@ Completed: ::
   Showing and returning 2 of 9 colors for library RColorBrewer : palette Blues </code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-12-6.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-10.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Completed: gl.select.colors </code></pre>
 </div>
 </div>
 </section>
-<section id="pca-after" class="level4">
-<h4 class="anchored" data-anchor-id="pca-after">PCA after</h4>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-13_1a76ee54d6dbf38bccbdc2db3fce7a5f">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>PCA.after <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.pcoa</span>(EYR.after, <span class="at">verbose =</span> <span class="dv">0</span>)</span>
-<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.after, EYR.after, <span class="at">xaxis =</span> <span class="dv">1</span>, <span class="at">yaxis =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="changes-in-pca-before-and-after-removing-the-slm-1" class="level3">
+<h3 class="anchored" data-anchor-id="changes-in-pca-before-and-after-removing-the-slm-1">3. Changes in PCA before and after removing the SLM?</h3>
+<section id="pca-on-sloppy-dataset-only-standard-filters" class="level4">
+<h4 class="anchored" data-anchor-id="pca-on-sloppy-dataset-only-standard-filters">PCA on sloppy dataset (only standard filters)</h4>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-15_fd979c6f7f1ca9aa45b194854adb0392">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>PCA.sloppy <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.pcoa</span>(EYR.sloppy, <span class="at">verbose =</span> <span class="dv">0</span>)</span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.sloppy, EYR.sloppy, <span class="at">xaxis =</span> <span class="dv">1</span>, <span class="at">yaxis =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.after, EYR.after, <span class="at">xaxis =</span> <span class="dv">2</span>, <span class="at">yaxis =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.sloppy, EYR.sloppy, <span class="at">xaxis =</span> <span class="dv">2</span>, <span class="at">yaxis =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Starting gl.colors 
+Selected color type 2 
+Completed: gl.colors 
+Starting :: 
+ Starting dartR.base 
+ Starting gl.pcoa.plot 
+  Processing an ordination file (glPca)
+  Processing genlight object with SNP data
+  Plotting populations in a space defined by the SNPs
+  Preparing plot .... please wait
+Completed: :: 
+ Completed: dartR.base 
+ Completed: gl.pcoa.plot 
+Starting :: 
+ Starting dartR.base 
+ Starting gl.pcoa.plot 
+  Processing an ordination file (glPca)
+  Processing genlight object with SNP data
+  Plotting populations in a space defined by the SNPs
+  Preparing plot .... please wait
+Completed: :: 
+ Completed: dartR.base 
+ Completed: gl.pcoa.plot </code></pre>
+</div>
+</div>
+</section>
+<section id="pca-on-correct-dataset-filter.sex.linked-and-standard-filters" class="level4">
+<h4 class="anchored" data-anchor-id="pca-on-correct-dataset-filter.sex.linked-and-standard-filters">PCA on correct dataset (filter.sex.linked and standard filters)</h4>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-16_087336cd7b83017d1d901d8a78ca29ab">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>PCA.correct <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.pcoa</span>(EYR.correct, <span class="at">verbose =</span> <span class="dv">0</span>)</span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.correct, EYR.correct, <span class="at">xaxis =</span> <span class="dv">1</span>, <span class="at">yaxis =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.pcoa.plot</span>(PCA.correct, EYR.correct, <span class="at">xaxis =</span> <span class="dv">2</span>, <span class="at">yaxis =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Starting gl.colors 
@@ -1194,127 +2457,85 @@ Completed: ::
 </section>
 <section id="differences-in-genetic-diversity-and-fixation-indices-between-autosomal-and-slm-1" class="level3">
 <h3 class="anchored" data-anchor-id="differences-in-genetic-diversity-and-fixation-indices-between-autosomal-and-slm-1">4. Differences in genetic diversity and fixation indices between autosomal and SLM?</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-14_20b57270b56f0a108ab68041d0c99197">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>autosomal <span class="ot">&lt;-</span> res<span class="sc">$</span>autosomal</span>
-<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>z.linked <span class="ot">&lt;-</span> res<span class="sc">$</span>z.linked</span>
-<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>z.linked.F <span class="ot">&lt;-</span> z.linked[z.linked<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">"F"</span>, ]</span>
-<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>z.linked.M <span class="ot">&lt;-</span> z.linked[z.linked<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">==</span> <span class="st">"M"</span>, ]</span>
-<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Genetic diversity</span></span>
-<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>basic.autosomal <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">utils.basic.stats</span>(autosomal)</span>
-<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>basic.autosomal<span class="sc">$</span>overall</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-17_a23c402ab2ad949573c240c8c622431b">
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic stats</span></span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>basic.sloppy <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">utils.basic.stats</span>(EYR.sloppy)</span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>basic.correct <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">utils.basic.stats</span>(EYR.correct)</span>
+<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>basic.sloppy<span class="sc">$</span>overall</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Ho      Hs      Ht     Dst     Htp    Dstp     Fst    Fstp     Fis    Dest 
- 0.1355  0.2410  0.2520  0.0110  0.2551  0.0189  0.0438  0.0739  0.4376  0.0331 
+ 0.1632  0.2417  0.2494  0.0078  0.2518  0.0136  0.0311  0.0538  0.3247  0.0238 
 Gst_max   Gst_H 
- 0.7111  0.1040 </code></pre>
+ 0.7099  0.0758 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>basic.xF <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">utils.basic.stats</span>(z.linked.F)</span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>basic.xF<span class="sc">$</span>overall</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>basic.correct<span class="sc">$</span>overall</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Ho      Hs      Ht     Dst     Htp    Dstp     Fst    Fstp     Fis    Dest 
- 0.0100  0.2932  0.3052  0.0120  0.3135  0.0271  0.0393  0.0863  0.9660  0.0510 
+ 0.1656  0.2400  0.2467  0.0067  0.2491  0.0121  0.0272  0.0487  0.3098  0.0213 
 Gst_max   Gst_H 
- 0.6504  0.1327 </code></pre>
+ 0.7119  0.0684 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>basic.xM <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">utils.basic.stats</span>(z.linked.M)</span>
-<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>basic.xM<span class="sc">$</span>overall</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     Ho      Hs      Ht     Dst     Htp    Dstp     Fst    Fstp     Fis    Dest 
- 0.2728  0.2990  0.3144  0.0154  0.3189  0.0265  0.0488  0.0830  0.0877  0.0504 
-Gst_max   Gst_H 
- 0.6427  0.1292 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>divers.auto <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.report.diversity</span>(autosomal, <span class="at">pbar =</span> <span class="cn">FALSE</span>, <span class="at">table =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Genetic diversity per pop</span></span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>divers.sloppy <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.report.diversity</span>(EYR.sloppy, <span class="at">pbar =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">table =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Processing genlight object with SNP data</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>divers.auto<span class="sc">$</span>one_H_alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>divers.correct <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.report.diversity</span>(EYR.correct, <span class="at">pbar =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">table =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Processing genlight object with SNP data</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>divers.sloppy<span class="sc">$</span>one_H_alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    Crusoe Muckleford      Timor     Wombat 
- 0.3910761  0.3836705  0.3542339  0.3559755 </code></pre>
+ 0.3899117  0.3882628  0.3600321  0.3662601 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>divers.auto<span class="sc">$</span>one_H_beta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>divers.correct<span class="sc">$</span>one_H_alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Crusoe Muckleford      Timor     Wombat 
+ 0.3887673  0.3844011  0.3574010  0.3646236 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>divers.sloppy<span class="sc">$</span>one_H_beta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                Crusoe Muckleford      Timor     Wombat
-Crusoe              NA 0.03019970 0.09333132 0.06916599
-Muckleford 0.007742379         NA 0.07641763 0.07214191
-Timor      0.022460636 0.02616347         NA 0.09763661
-Wombat     0.021589876 0.02529271 0.04001097         NA</code></pre>
+Crusoe              NA 0.02591592 0.08428179 0.05744001
+Muckleford 0.006242194         NA 0.06589556 0.06332248
+Timor      0.020357562 0.02118200         NA 0.08530756
+Wombat     0.017243564 0.01806800 0.03218337         NA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>divers.zF <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.report.diversity</span>(z.linked.F, <span class="at">pbar =</span> <span class="cn">FALSE</span>, <span class="at">table =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>divers.correct<span class="sc">$</span>one_H_beta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  Processing genlight object with SNP data</code></pre>
+<pre><code>                Crusoe Muckleford      Timor     Wombat
+Crusoe              NA 0.02470901 0.08101848 0.05574828
+Muckleford 0.005281376         NA 0.06535853 0.06220802
+Timor      0.018781429 0.02096451         NA 0.08157260
+Wombat     0.015170153 0.01735323 0.03085328         NA</code></pre>
 </div>
-<div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>divers.zF<span class="sc">$</span>one_H_alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>    Crusoe Muckleford      Timor     Wombat 
- 0.4167639  0.4723732  0.4184110  0.4361303 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>divers.zF<span class="sc">$</span>one_H_beta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>               Crusoe Muckleford      Timor     Wombat
-Crusoe             NA 0.03446323 0.11220964 0.08327249
-Muckleford 0.02584944         NA 0.08811518 0.08998365
-Timor      0.05283054 0.02502589         NA 0.13788524
-Wombat     0.04397087 0.01616622 0.04314732         NA</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>divers.zM <span class="ot">&lt;-</span> dartR.base<span class="sc">::</span><span class="fu">gl.report.diversity</span>(z.linked.M, <span class="at">pbar =</span> <span class="cn">FALSE</span>, <span class="at">table =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  Processing genlight object with SNP data</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-14-3.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>divers.zM<span class="sc">$</span>one_H_alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>    Crusoe Muckleford      Timor     Wombat 
- 0.4145752  0.4829218  0.4104935  0.5072501 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>divers.zM<span class="sc">$</span>one_H_beta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>               Crusoe  Muckleford      Timor     Wombat
-Crusoe             NA  0.04140262 0.11809375 0.05640494
-Muckleford 0.03238801          NA 0.06872601 0.07601926
-Timor      0.06860214  0.03442884         NA 0.10644965
-Wombat     0.02022387 -0.01394943 0.02226470         NA</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixation indices</span></span>
-<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.fst.pop</span>(autosomal, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>               Crusoe Muckleford     Timor Wombat
-Crusoe             NA         NA        NA     NA
-Muckleford 0.03587265         NA        NA     NA
-Timor      0.05609908 0.06554101        NA     NA
-Wombat     0.06413794 0.03500894 0.1013107     NA</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.fst.pop</span>(z.linked.F, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixation indices</span></span>
+<span id="cb134-2"><a href="#cb134-2" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.fst.pop</span>(EYR.sloppy, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Crusoe Muckleford      Timor Wombat
 Crusoe             NA         NA         NA     NA
-Muckleford 0.04723621         NA         NA     NA
-Timor      0.08604706 0.07861258         NA     NA
-Wombat     0.09469558 0.03570803 0.01753615     NA</code></pre>
+Muckleford 0.02647926         NA         NA     NA
+Timor      0.04091224 0.04504432         NA     NA
+Wombat     0.05056885 0.02243625 0.07085069     NA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.fst.pop</span>(z.linked.M, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.fst.pop</span>(EYR.correct, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Crusoe Muckleford      Timor Wombat
 Crusoe             NA         NA         NA     NA
-Muckleford 0.05611450         NA         NA     NA
-Timor      0.06094081 0.08315729         NA     NA
-Wombat     0.09146032 0.01952923 0.08577174     NA</code></pre>
+Muckleford 0.02392518         NA         NA     NA
+Timor      0.04070621 0.04145570         NA     NA
+Wombat     0.04059252 0.01890841 0.06063922     NA</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.fstat</span>(autosomal, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.fstat</span>(EYR.sloppy, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Your plot was not shown in full because your 'Plots' pane
     is too small. Increase the size of the 'Plots' pane and run the
@@ -1325,51 +2546,51 @@ Wombat     0.09146032 0.01952923 0.08577174     NA</code></pre>
 <pre><code>$Stat_matrices
 $Stat_matrices$Fst
            Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0165 0.0242 0.0295
-Muckleford 0.0165         NA 0.0292 0.0142
-Timor      0.0242     0.0292     NA 0.0455
-Wombat     0.0295     0.0142 0.0455     NA
+Crusoe         NA     0.0122 0.0173 0.0232
+Muckleford 0.0122         NA 0.0199 0.0086
+Timor      0.0173     0.0199     NA 0.0312
+Wombat     0.0232     0.0086 0.0312     NA
 
 $Stat_matrices$Fstp
            Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0407 0.0742 0.0795
-Muckleford 0.0407         NA 0.0834 0.0474
-Timor      0.0742     0.0834     NA 0.1271
-Wombat     0.0795     0.0474 0.1271     NA
+Crusoe         NA     0.0304 0.0549 0.0622
+Muckleford 0.0304         NA 0.0583 0.0319
+Timor      0.0549     0.0583     NA 0.0900
+Wombat     0.0622     0.0319 0.0900     NA
 
 $Stat_matrices$Dest
            Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0276 0.0496 0.0528
-Muckleford 0.0276         NA 0.0550 0.0304
-Timor      0.0496     0.0550     NA 0.0823
-Wombat     0.0528     0.0304 0.0823     NA
+Crusoe         NA     0.0204 0.0361 0.0411
+Muckleford 0.0204         NA 0.0382 0.0206
+Timor      0.0361     0.0382     NA 0.0578
+Wombat     0.0411     0.0206 0.0578     NA
 
 $Stat_matrices$Gst_H
            Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0648 0.1165 0.1247
-Muckleford 0.0648         NA 0.1301 0.0736
-Timor      0.1165     0.1301     NA 0.1954
-Wombat     0.1247     0.0736 0.1954     NA
+Crusoe         NA     0.0485 0.0862 0.0980
+Muckleford 0.0485         NA 0.0914 0.0501
+Timor      0.0862     0.0914     NA 0.1392
+Wombat     0.0980     0.0501 0.1392     NA
 
 
 [[2]]
       Stat_tables.Crusoe_vs_Muckleford Stat_tables.Crusoe_vs_Timor
-Fst                             0.0165                      0.0242
-Fstp                            0.0407                      0.0742
-Dest                            0.0276                      0.0496
-Gst_H                           0.0648                      0.1165
+Fst                             0.0122                      0.0173
+Fstp                            0.0304                      0.0549
+Dest                            0.0204                      0.0361
+Gst_H                           0.0485                      0.0862
       Stat_tables.Crusoe_vs_Wombat Stat_tables.Muckleford_vs_Timor
-Fst                         0.0295                          0.0292
-Fstp                        0.0795                          0.0834
-Dest                        0.0528                          0.0550
-Gst_H                       0.1247                          0.1301
+Fst                         0.0232                          0.0199
+Fstp                        0.0622                          0.0583
+Dest                        0.0411                          0.0382
+Gst_H                       0.0980                          0.0914
       Stat_tables.Muckleford_vs_Wombat Stat_tables.Timor_vs_Wombat
-Fst                             0.0142                      0.0455
-Fstp                            0.0474                      0.1271
-Dest                            0.0304                      0.0823
-Gst_H                           0.0736                      0.1954</code></pre>
+Fst                             0.0086                      0.0312
+Fstp                            0.0319                      0.0900
+Dest                            0.0206                      0.0578
+Gst_H                           0.0501                      0.1392</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.fstat</span>(z.linked.F, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.fstat</span>(EYR.correct, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Your plot was not shown in full because your 'Plots' pane
     is too small. Increase the size of the 'Plots' pane and run the
@@ -1379,105 +2600,50 @@ Gst_H                           0.0736                      0.1954</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>$Stat_matrices
 $Stat_matrices$Fst
-           Crusoe Muckleford   Timor  Wombat
-Crusoe         NA     0.0211  0.0313  0.0334
-Muckleford 0.0211         NA  0.0304  0.0043
-Timor      0.0313     0.0304      NA -0.0154
-Wombat     0.0334     0.0043 -0.0154      NA
+           Crusoe Muckleford  Timor Wombat
+Crusoe         NA     0.0109 0.0173 0.0179
+Muckleford 0.0109         NA 0.0180 0.0068
+Timor      0.0173     0.0180     NA 0.0258
+Wombat     0.0179     0.0068 0.0258     NA
 
 $Stat_matrices$Fstp
            Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0567 0.1126 0.1234
-Muckleford 0.0567         NA 0.1070 0.0644
-Timor      0.1126     0.1070     NA 0.0648
-Wombat     0.1234     0.0644 0.0648     NA
+Crusoe         NA     0.0278 0.0548 0.0517
+Muckleford 0.0278         NA 0.0546 0.0282
+Timor      0.0548     0.0546     NA 0.0793
+Wombat     0.0517     0.0282 0.0793     NA
 
 $Stat_matrices$Dest
            Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0476 0.0938 0.1058
-Muckleford 0.0476         NA 0.0967 0.0582
-Timor      0.0938     0.0967     NA 0.0566
-Wombat     0.1058     0.0582 0.0566     NA
+Crusoe         NA     0.0184 0.0357 0.0338
+Muckleford 0.0184         NA 0.0351 0.0180
+Timor      0.0357     0.0351     NA 0.0503
+Wombat     0.0338     0.0180 0.0503     NA
 
 $Stat_matrices$Gst_H
            Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0997 0.1918 0.2141
-Muckleford 0.0997         NA 0.1919 0.1169
-Timor      0.1918     0.1919     NA 0.1140
-Wombat     0.2141     0.1169 0.1140     NA
+Crusoe         NA     0.0441 0.0858 0.0812
+Muckleford 0.0441         NA 0.0850 0.0440
+Timor      0.0858     0.0850     NA 0.1224
+Wombat     0.0812     0.0440 0.1224     NA
 
 
 [[2]]
       Stat_tables.Crusoe_vs_Muckleford Stat_tables.Crusoe_vs_Timor
-Fst                             0.0211                      0.0313
-Fstp                            0.0567                      0.1126
-Dest                            0.0476                      0.0938
-Gst_H                           0.0997                      0.1918
+Fst                             0.0109                      0.0173
+Fstp                            0.0278                      0.0548
+Dest                            0.0184                      0.0357
+Gst_H                           0.0441                      0.0858
       Stat_tables.Crusoe_vs_Wombat Stat_tables.Muckleford_vs_Timor
-Fst                         0.0334                          0.0304
-Fstp                        0.1234                          0.1070
-Dest                        0.1058                          0.0967
-Gst_H                       0.2141                          0.1919
+Fst                         0.0179                          0.0180
+Fstp                        0.0517                          0.0546
+Dest                        0.0338                          0.0351
+Gst_H                       0.0812                          0.0850
       Stat_tables.Muckleford_vs_Wombat Stat_tables.Timor_vs_Wombat
-Fst                             0.0043                     -0.0154
-Fstp                            0.0644                      0.0648
-Dest                            0.0582                      0.0566
-Gst_H                           0.1169                      0.1140</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>dartR.base<span class="sc">::</span><span class="fu">gl.report.fstat</span>(z.linked.F, <span class="at">verbose =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>   Your plot was not shown in full because your 'Plots' pane
-    is too small. Increase the size of the 'Plots' pane and run the
-    function again. Alternatively, use the parameter 'plot.file' to
-    save the plot to a file.</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>$Stat_matrices
-$Stat_matrices$Fst
-           Crusoe Muckleford   Timor  Wombat
-Crusoe         NA     0.0211  0.0313  0.0334
-Muckleford 0.0211         NA  0.0304  0.0043
-Timor      0.0313     0.0304      NA -0.0154
-Wombat     0.0334     0.0043 -0.0154      NA
-
-$Stat_matrices$Fstp
-           Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0567 0.1126 0.1234
-Muckleford 0.0567         NA 0.1070 0.0644
-Timor      0.1126     0.1070     NA 0.0648
-Wombat     0.1234     0.0644 0.0648     NA
-
-$Stat_matrices$Dest
-           Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0476 0.0938 0.1058
-Muckleford 0.0476         NA 0.0967 0.0582
-Timor      0.0938     0.0967     NA 0.0566
-Wombat     0.1058     0.0582 0.0566     NA
-
-$Stat_matrices$Gst_H
-           Crusoe Muckleford  Timor Wombat
-Crusoe         NA     0.0997 0.1918 0.2141
-Muckleford 0.0997         NA 0.1919 0.1169
-Timor      0.1918     0.1919     NA 0.1140
-Wombat     0.2141     0.1169 0.1140     NA
-
-
-[[2]]
-      Stat_tables.Crusoe_vs_Muckleford Stat_tables.Crusoe_vs_Timor
-Fst                             0.0211                      0.0313
-Fstp                            0.0567                      0.1126
-Dest                            0.0476                      0.0938
-Gst_H                           0.0997                      0.1918
-      Stat_tables.Crusoe_vs_Wombat Stat_tables.Muckleford_vs_Timor
-Fst                         0.0334                          0.0304
-Fstp                        0.1234                          0.1070
-Dest                        0.1058                          0.0967
-Gst_H                       0.2141                          0.1919
-      Stat_tables.Muckleford_vs_Wombat Stat_tables.Timor_vs_Wombat
-Fst                             0.0043                     -0.0154
-Fstp                            0.0644                      0.0648
-Dest                            0.0582                      0.0566
-Gst_H                           0.1169                      0.1140</code></pre>
+Fst                             0.0068                      0.0258
+Fstp                            0.0282                      0.0793
+Dest                            0.0180                      0.0503
+Gst_H                           0.0440                      0.1224</code></pre>
 </div>
 </div>
 </section>
@@ -1493,28 +2659,28 @@ Gst_H                           0.1169                      0.1140</code></pre>
 </div>
 <section id="load-data-3" class="level3">
 <h3 class="anchored" data-anchor-id="load-data-3">Load data</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-15_5bf9e8cf96ddc9ee3b9d232074930e4e">
-<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">load</span>(<span class="st">"data/Bull_shark_DArTseq_genlight_for_sex-linked_markers.Rdata"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-18_666cb9b3849324c9a34b573b8d33cd66">
+<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">load</span>(<span class="st">"data/Bull_shark_DArTseq_genlight_for_sex-linked_markers.Rdata"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "data.gl"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>data.gl<span class="sc">@</span>n.loc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a>data.gl<span class="sc">@</span>n.loc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 93202</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 E-ATL  E-IO  Fiji Japan  N-IO W-ATL  W-IO W-PAC 
     2    36     8    14    20    36    40    26 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 E-ATL  E-IO  Fiji Japan  N-IO W-ATL  W-IO W-PAC 
     2    36     8    14    20    36    40    26 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
    F    M &lt;NA&gt; 
@@ -1524,240 +2690,9 @@ E-ATL  E-IO  Fiji Japan  N-IO W-ATL  W-IO W-PAC
 </section>
 <section id="number-of-sex-linked-markers-2" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-sex-linked-markers-2">1. Number of sex-linked markers?</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-16_58213f8e4ae3e57c2b05a0fb3bb42611">
-<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> data.gl, <span class="at">system =</span> <span class="st">"xy"</span>, <span class="at">plots =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncores =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Detected 85 females and 64 males.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Starting phase 1. May take a while...</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Building call rate plots.</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Done. Starting phase 2.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Building heterozygosity plots.</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-16-3.png" class="img-fluid" width="672"></p>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Done building heterozygosity plots.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>**FINISHED** Total of analyzed loci: 93202.
-Found 9 sex-linked loci:
-   2 Y-linked loci
-   2 sex-biased loci
-   4 X-linked loci
-   1 XY gametologs.
-And 93193 autosomal loci.</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-16-4.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="individuals-with-wrong-sexid-2" class="level3">
-<h3 class="anchored" data-anchor-id="individuals-with-wrong-sexid-2">2. Individuals with wrong sexID?</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-17_2797d2885081a5ca66dd85c698a6290e">
-<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"xy"</span>,</span>
-<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Not enough gametologs (need at least 5). Assigning NA...</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>***FINISHED***</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span>
-<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>agreed.sex <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">*"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> sexID<span class="sc">$</span>agreed.sex)  <span class="co"># remove asterisk</span></span>
-<span id="cb126-4"><a href="#cb126-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(data.gl<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">!=</span> agreed.sex, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<colgroup>
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 6%">
-<col style="width: 7%">
-<col style="width: 10%">
-<col style="width: 5%">
-<col style="width: 5%">
-<col style="width: 11%">
-<col style="width: 5%">
-<col style="width: 5%">
-<col style="width: 9%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: left;">id</th>
-<th style="text-align: left;">y.linked.sex</th>
-<th style="text-align: right;">#called</th>
-<th style="text-align: right;">#missing</th>
-<th style="text-align: left;">x.linked.sex</th>
-<th style="text-align: right;">#Het.x</th>
-<th style="text-align: right;">#Hom.x</th>
-<th style="text-align: left;">gametolog.sex</th>
-<th style="text-align: left;">#Het.g</th>
-<th style="text-align: left;">#Hom.g</th>
-<th style="text-align: left;">agreed.sex</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">CL-FIJ002-F</td>
-<td style="text-align: left;">CL-FIJ002-F</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">F</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">CL-FIJ003-M</td>
-<td style="text-align: left;">CL-FIJ003-M</td>
-<td style="text-align: left;">M</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: left;">M</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">M</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">CL-FIJ008-F</td>
-<td style="text-align: left;">CL-FIJ008-F</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">F</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">CL-FIJ010-F</td>
-<td style="text-align: left;">CL-FIJ010-F</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">F</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">CL-FIJ015-F</td>
-<td style="text-align: left;">CL-FIJ015-F</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">F</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">CL-FIJ018-F</td>
-<td style="text-align: left;">CL-FIJ018-F</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">NA</td>
-<td style="text-align: left;">F</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 8</code></pre>
-</div>
-</div>
-</section>
-</section>
-<section id="exercise-data-4---blue-shark" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-data-4---blue-shark">Exercise data 4 - Blue shark</h2>
-<p>Data from Nikolic et al.&nbsp;2023.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/Blue_shark.jpg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">The Blue Shark</figcaption>
-</figure>
-</div>
-<section id="load-data-4" class="level3">
-<h3 class="anchored" data-anchor-id="load-data-4">Load data</h3>
-<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-18_8882dc0fc1ffdf051c2b36210e5bc2cc">
-<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">load</span>(<span class="st">"data/Blue_shark_DArTseq_genlight_for_sex-linked_markers.Rdata"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "data.gl"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>data.gl<span class="sc">@</span>n.loc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 172384</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-   EIO   MED1   MED2   NATL  NEATL    NIO   NPAC   SAF1   SAF2 SWPAC1 SWPAC2 
-     8     34     20     49     26     27      4     21     89     30     16 
-SWPAC3    WIO 
-    11     29 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-   EIO   MED1   MED2   NATL  NEATL    NIO   NPAC   SAF1   SAF2 SWPAC1 SWPAC2 
-     8     34     20     49     26     27      4     21     89     30     16 
-SWPAC3    WIO 
-    11     29 </code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-   F    M &lt;NA&gt; 
- 104  111  149 </code></pre>
-</div>
-</div>
-</section>
-<section id="number-of-sex-linked-markers-3" class="level3">
-<h3 class="anchored" data-anchor-id="number-of-sex-linked-markers-3">1. Number of sex-linked markers?</h3>
 <div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-19_e32626452543f0c8b761afa4a43f0f06">
-<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> data.gl, <span class="at">system =</span> <span class="st">"xy"</span>, <span class="at">plots =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb138-2"><a href="#cb138-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncores =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> data.gl, <span class="at">system =</span> <span class="st">"xy"</span>, <span class="at">plots =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb154-2"><a href="#cb154-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncores =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Detected 85 females and 64 males.</code></pre>
 </div>
@@ -1799,21 +2734,252 @@ And 93193 autosomal loci.</code></pre>
 </div>
 </div>
 </section>
-<section id="individuals-with-wrong-sexid-3" class="level3">
-<h3 class="anchored" data-anchor-id="individuals-with-wrong-sexid-3">2. Individuals with wrong sexID?</h3>
+<section id="individuals-with-wrong-sexid-2" class="level3">
+<h3 class="anchored" data-anchor-id="individuals-with-wrong-sexid-2">2. Individuals with wrong sexID?</h3>
 <div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-20_0e28f2482d7687bfc477d3465cfdd290">
-<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"xy"</span>,</span>
-<span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb162"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb162-1"><a href="#cb162-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"xy"</span>,</span>
+<span id="cb162-2"><a href="#cb162-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Not enough gametologs (need at least 5). Assigning NA...</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>***FINISHED***</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb149"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span>
-<span id="cb149-2"><a href="#cb149-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb149-3"><a href="#cb149-3" aria-hidden="true" tabindex="-1"></a>agreed.sex <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">*"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> sexID<span class="sc">$</span>agreed.sex)  <span class="co"># remove asterisk</span></span>
-<span id="cb149-4"><a href="#cb149-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(data.gl<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">!=</span> agreed.sex, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span>
+<span id="cb165-2"><a href="#cb165-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb165-3"><a href="#cb165-3" aria-hidden="true" tabindex="-1"></a>agreed.sex <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">*"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> sexID<span class="sc">$</span>agreed.sex)  <span class="co"># remove asterisk</span></span>
+<span id="cb165-4"><a href="#cb165-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(data.gl<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">!=</span> agreed.sex, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 12%">
+<col style="width: 7%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 12%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">id</th>
+<th style="text-align: left;">y.linked.sex</th>
+<th style="text-align: right;">#called</th>
+<th style="text-align: right;">#missing</th>
+<th style="text-align: left;">x.linked.sex</th>
+<th style="text-align: right;">#Het.x</th>
+<th style="text-align: right;">#Hom.x</th>
+<th style="text-align: left;">gametolog.sex</th>
+<th style="text-align: left;">#Het.g</th>
+<th style="text-align: left;">#Hom.g</th>
+<th style="text-align: left;">agreed.sex</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">60088</td>
+<td style="text-align: left;">60088</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">60160</td>
+<td style="text-align: left;">60160</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">60168</td>
+<td style="text-align: left;">60168</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">60176</td>
+<td style="text-align: left;">60176</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">60096</td>
+<td style="text-align: left;">60096</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">60104</td>
+<td style="text-align: left;">60104</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">M</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">M</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 22</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="exercise-data-4---blue-shark" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-data-4---blue-shark">Exercise data 4 - Blue shark</h2>
+<p>Data from Nikolic et al.&nbsp;2023.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Blue_shark.jpg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The Blue Shark</figcaption>
+</figure>
+</div>
+<section id="load-data-4" class="level3">
+<h3 class="anchored" data-anchor-id="load-data-4">Load data</h3>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-21_7d73ed2a5470ae634b246ff419204a03">
+<div class="sourceCode cell-code" id="cb167"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">load</span>(<span class="st">"data/Blue_shark_DArTseq_genlight_for_sex-linked_markers.Rdata"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data.gl"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a>data.gl<span class="sc">@</span>n.loc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 172384</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+   EIO   MED1   MED2   NATL  NEATL    NIO   NPAC   SAF1   SAF2 SWPAC1 SWPAC2 
+     8     34     20     49     26     27      4     21     89     30     16 
+SWPAC3    WIO 
+    11     29 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>pop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+   EIO   MED1   MED2   NATL  NEATL    NIO   NPAC   SAF1   SAF2 SWPAC1 SWPAC2 
+     8     34     20     49     26     27      4     21     89     30     16 
+SWPAC3    WIO 
+    11     29 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data.gl<span class="sc">@</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex, <span class="at">useNA =</span> <span class="st">"ifany"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+   F    M &lt;NA&gt; 
+ 104  111  149 </code></pre>
+</div>
+</div>
+</section>
+<section id="number-of-sex-linked-markers-3" class="level3">
+<h3 class="anchored" data-anchor-id="number-of-sex-linked-markers-3">1. Number of sex-linked markers?</h3>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-22_1d9d1c818893e98334aa75aedcdcabf4">
+<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">filter.sex.linked</span>(<span class="at">gl =</span> data.gl, <span class="at">system =</span> <span class="st">"xy"</span>, <span class="at">plots =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb177-2"><a href="#cb177-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncores =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Detected 104 females and 111 males.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Starting phase 1. May take a while...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building call rate plots.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Done. Starting phase 2.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Building heterozygosity plots.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-22-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-22-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Done building heterozygosity plots.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>**FINISHED** Total of analyzed loci: 172384.
+Found 26 sex-linked loci:
+   2 Y-linked loci
+   2 sex-biased loci
+   22 X-linked loci
+   0 XY gametologs.
+And 172358 autosomal loci.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="Session10_SexLinkedMarkers_files/figure-html/unnamed-chunk-22-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="individuals-with-wrong-sexid-3" class="level3">
+<h3 class="anchored" data-anchor-id="individuals-with-wrong-sexid-3">2. Individuals with wrong sexID?</h3>
+<div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-23_82203f83fb48163c328a127548cfcf51">
+<div class="sourceCode cell-code" id="cb185"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true" tabindex="-1"></a>sexID <span class="ot">&lt;-</span> dartR.sexlinked<span class="sc">::</span><span class="fu">infer.sex</span>(<span class="at">gl_sex_filtered =</span> res, <span class="at">system =</span> <span class="st">"xy"</span>,</span>
+<span id="cb185-2"><a href="#cb185-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">seed =</span> <span class="dv">124</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Not enough gametologs (need at least 5). Assigning NA...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>***FINISHED***</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb188"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(sexID))</span>
+<span id="cb188-2"><a href="#cb188-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb188-3"><a href="#cb188-3" aria-hidden="true" tabindex="-1"></a>agreed.sex <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">*"</span>, <span class="at">replacement =</span> <span class="st">""</span>, <span class="at">x =</span> sexID<span class="sc">$</span>agreed.sex)  <span class="co"># remove asterisk</span></span>
+<span id="cb188-4"><a href="#cb188-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(data.gl<span class="sc">$</span>other<span class="sc">$</span>ind.metrics<span class="sc">$</span>sex <span class="sc">!=</span> agreed.sex, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <colgroup>

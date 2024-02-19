@@ -54,30 +54,38 @@ This function identifies sex-linked and autosomal loci present in a SNP dataset 
 
 ![ZW/ZZ sex chromosomes](images/ZW.png)
 
-::: {.infobox .task data-latex="{task}"}
+::: {.blackbox}
 **NOTE**
 
 Set `ncores` to more than 1 (default) if you have more than 50,000 SNPs, since it could actually slow down the analysis with smaller datasets.
 :::
 
-```{r, results="hold"}
+```{r}
 knitr::kable(head(YTH@other$ind.metrics)) # Check that ind.metrics has the necessary columns
 res <- dartR.sexlinked::filter.sex.linked(gl = YTH, system = "zw")
 ```
 
+
+::: callout-note
+## Exercise
+
+![](images/task.png){#id .class width="48" height="48"}
+
 How many males and females does the dataset contain?
 
 How many sex-linked loci were found?
+:::
+
 
 Now check the output:
 
-```{r, results="hold"}
+```{r}
 res$w.linked       # Notice that it says "w-linked"
 res$z.linked       # Notice that it says "z-linked"
 res$gametolog
 res$sex.biased
 res$autosomal
-res$results.table  # The output table
+knitr::kable(head(res$results.table))  # The output table
 ```
 
 The output consists of a genlight object for each type of loci, plus a results table.
@@ -92,12 +100,20 @@ sexID <- dartR.sexlinked::infer.sex(gl_sex_filtered = res, system = "zw", seed =
 knitr::kable(head(sexID))
 ```
 
-::: {.infobox .task data-latex="{task}"}
-**IMPORTANT**
-We created this function with the explicit intent that a human checks the evidence for the `agreed sex` that do NOT agree for all types of sex-linked loci (denoted as '\*M' or '\*F'). This human can then use their criterion to validate these assignments.
+::: {.blackbox}
+**IMPORTANT** We created this function with the explicit intent that a human checks the evidence for the `agreed sex` that do NOT agree for all types of sex-linked loci (denoted as '\*M' or '\*F'). This human can then use their criterion to validate these assignments.
 :::
 
+
+::: callout-note
+## Exercise
+
+![](images/task.png){#id .class width="48" height="48"}
+
 Can you find individuals for which the `agreed sex` is uncertain (i.e., has an asterisk "\*")?
+:::
+
+
 
 # Dataset 2 - XX/XY - The Leadbeater's possum
 
@@ -120,24 +136,32 @@ This function identifies sex-linked and autosomal loci present in a SNP dataset 
 
 ![XX/XY sex chromosomes](images/XY.png)
 
-```{r, results="hold"}
+```{r}
 knitr::kable(head(LBP@other$ind.metrics)) # Check that ind.metrics has the necessary columns
 res <- dartR.sexlinked::filter.sex.linked(gl = LBP, system = "xy")
 ```
 
+
+::: callout-note
+## Exercise
+
+![](images/task.png){#id .class width="48" height="48"}
+
 How many males and females does the dataset contain?
 
 How many sex-linked loci were found?
+:::
+
 
 Now check the output:
 
-```{r, results="hold"}
+```{r}
 res$y.linked      # Notice that it says "y-linked"
 res$x.linked      # Notice that it says "x-linked"
 res$gametolog
 res$sex.biased
 res$autosomal
-res$results.table  # The output table
+knitr::kable(head(res$results.table))  # The output table
 ```
 
 The output consists of a genlight object for each type of loci, plus a results table.
@@ -153,9 +177,15 @@ knitr::kable(head(sexID))
 
 What did the function mention about gametologs? How did that impact the results table? How many types of sex-linked loci were used to infer an `agreed sex`?
 
-Can you find individuals for which the `agreed sex` is uncertain?
+::: callout-note
+## Exercise
 
-# EXCERCISE
+![](images/task.png){#id .class width="48" height="48"}
+
+Can you find individuals for which the `agreed sex` is uncertain (i.e., has an asterisk "\*")?
+:::
+
+# EXERCISE
 
 ::: callout-note
 ## Exercise
@@ -175,15 +205,13 @@ Choose one of the following datasets (or your own data) and report:
 4.  Do you see any differences in genetic diversity and fixation indices when you filtered out sex-linked markers versus when you did not?
 :::
 
-![](images/beer.png){.class width="350" height="200"}
-
-![](images/Eastern_Yellow_Robin.jpg){alt="The Eastern Yellow Robin" width="349"}
+![](images/beer.png){.class width="350" height="200"} ![](images/Eastern_Yellow_Robin.jpg){alt="The Eastern Yellow Robin" width="349"}
 
 ![](images/Bull_Shark.jpg){.class width="350" height="200"} ![](images/Blue_shark.jpg){.class width="350" height="200"}
 
 ## Exercise data 1 - Your own data
 
-::: {.infobox .task data-latex="{task}"}
+::: {.infobox data-latex="{task}"}
 **HINT**
 
 You can have a look at the exercise data below for inspiration.
@@ -227,7 +255,6 @@ sexID <- dartR.sexlinked::infer.sex(gl_sex_filtered = res, system = "zw", seed =
 knitr::kable(head(sexID))
 
 sum(EYR$other$ind.metrics$sex != sexID$agreed.sex, na.rm = TRUE)
-EYR$other$ind.metrics[EYR$other$ind.metrics$sex != sexID$agreed.sex,]
 ```
 
 ::: callout-note
@@ -236,11 +263,14 @@ EYR$other$ind.metrics[EYR$other$ind.metrics$sex != sexID$agreed.sex,]
 ![](images/task.png){.class width="48" height="48"}
 
 Can you tell which misidentified sexes are due to uncertain genetic sex (indicated with \*)?
+
+**HINT**
+Try using `grep(pattern = "\\*", x = sexID$agreed.sex)`
 :::
 
-### Processing SNPs with two filtering regimes
+#### Processing SNPs with two filtering regimes
 
-#### Filtering SNPs only with standard filters (sloppy)
+##### Filtering SNPs only with standard filters (sloppy)
 
 ```{r, message=FALSE, warning=FALSE}
 # Filter for read depth
@@ -260,7 +290,7 @@ dartR.base::gl.report.maf(EYR.sloppy)
 EYR.sloppy <- dartR.base::gl.filter.maf(EYR.sloppy, threshold = 3, verbose = 0, recalc = TRUE)
 ```
 
-#### Filtering SNPs with filter.sex.linked and standard filters (correct)
+##### Filtering SNPs with filter.sex.linked and standard filters (correct)
 
 ```{r, message=FALSE, warning=FALSE}
 # Filter for sex-linked loci
@@ -288,7 +318,7 @@ EYR.correct <- dartR.base::gl.filter.maf(EYR.correct, threshold = 3, verbose = 0
 
 #### PCA on sloppy dataset (only standard filters)
 
-```{r, results="hold", warning=FALSE}
+```{r, results="hold", warning=FALSE, message=FALSE}
 PCA.sloppy <- dartR.base::gl.pcoa(EYR.sloppy, verbose = 0)
 dartR.base::gl.pcoa.plot(PCA.sloppy, EYR.sloppy, xaxis = 1, yaxis = 2)
 dartR.base::gl.pcoa.plot(PCA.sloppy, EYR.sloppy, xaxis = 2, yaxis = 3)
@@ -296,7 +326,7 @@ dartR.base::gl.pcoa.plot(PCA.sloppy, EYR.sloppy, xaxis = 2, yaxis = 3)
 
 #### PCA on correct dataset (filter.sex.linked and standard filters)
 
-```{r, results="hold", warning=FALSE}
+```{r, results="hold", warning=FALSE, message=FALSE}
 PCA.correct <- dartR.base::gl.pcoa(EYR.correct, verbose = 0)
 dartR.base::gl.pcoa.plot(PCA.correct, EYR.correct, xaxis = 1, yaxis = 2)
 dartR.base::gl.pcoa.plot(PCA.correct, EYR.correct, xaxis = 2, yaxis = 3)
