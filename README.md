@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `Population Genomics in R workshop` <a href="https://green-striped-gecko.github.io/dartR/"><img src='Pictures/logo_workshop.png' align="right" height="300" /></a>
+# `Population Genomics in R workshop` <a href="https://green-striped-gecko.github.io/dartR/"><img src='Pictures/logo_workshop.png' align="center" height="400" /></a>
 
 Welcome, Fellow Magical Beings, to our 5-day spellbinding journey in the
 mystical realm of Population Genetics using the ancient art of R! We’re
