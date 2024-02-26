@@ -1,34 +1,46 @@
 
-# `Population Genomics in R workshop` <a href="https://green-striped-gecko.github.io/dartR/"><img src='Pictures/logo_workshop_2.png' align="right" height="300" /></a>
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-DNA is the original big data. It encodes all kinds of information that
-is useful for medicine, agriculture, and environmental management. Our
-challenge is to collect this information and make sense of it. The first
-part of this challenge is now within reach, with new technologies
-providing access to vast DNA sequence resources. But capitalising on
-this rich and much-needed source of information usually requires deep
-theoretical understanding, considerable computer resources, and strong
-programming skills. Thus, researchers and stakeholders often struggle to
-keep up with the various ways to analyse and apply genetic data and to
-take maximum advantage of them to inform conservation and restoration as
-the number of analyses and their complexity increases, accessible,
-streamlined and reliable platforms to analyse genetic data will play a
-crucial role in translating science into practice.
+# `Population Genomics in R workshop` <a href="https://green-striped-gecko.github.io/dartR/"><img src='Pictures/logo_workshop.png' align="right" height="300" /></a>
 
-This 5-day training workshop run by developers of popular R packages and
-experienced practitioners will help students and ECRs get the most out
-their population genomics research using R. The first 2 days will focus
-on bringing everyone up to speed with an introduction to R, R packages,
-population genetics principles, and their application in a conservation
-context. The following three days will include more advanced topics.
-Each day will have three blocks of two hours. Each block would consist
-of 30 minutes of theory, 60 minutes of analysis in R and 30 minutes
-about how to apply theory and analysis results in the real world.
+Welcome, Fellow Magical Beings, to our 5-day spellbinding journey in the
+mystical realm of Population Genetics using the ancient art of R! We’re
+over the moon (and not just because we’ve mastered levitation spells) to
+have you join us at the enchanted Kioloa ANU Coastal Campus. Nestled
+among the spellbound forests of Murramarang Nation Park and the
+crystal-clear waters of southern New South Wales, our meeting lair
+couldn’t be more perfect. When you’re not weaving R spells, you’ll find
+yourself spoiled for choice with magical brews (a.k.a. coffee) and
+breathtaking sceneries.
 
-Workshop fees: \$850 AUD in-person (30 people); \$425 AUD online (30
-people). The in-person fee includes accommodation, meals, and
-transportation. Transportation will be available Sydney-Kioloa-Sydney
-and Canberra-Kioloa-Canberra.
+Our coven is as varied as the potions in a wizard’s pantry, bringing
+together sorcerers from all corners of the realm. Here, every sorcerer
+and sorceress will don both the student’s cloak and the teacher’s hat,
+expanding their arcane knowledge in genetics for the noble causes of
+biodiversity conservation and ecosystem restoration. Expect a cauldron
+bubbling with interaction, where being right is as celebrated as making
+mistakes, where sensitivity meets resilience, and where every voice
+conjures new spells of knowledge, perspective, and innovation.
 
-Recordings of all the workshop sessions and workshop materials will be
-freely available online.
+Our quest is to master key incantations in population genetics, with our
+wands pointed firmly at the R statistical grimoire. We’re ditching the
+dusty tomes for hands-on magic, aiming to empower you to conjure your
+own population genetics enchantments by the end of our gathering. And
+fear not, there will be ample time to apply these spells on your own
+datasets.
+
+Our magic words? Cooperation, flexibility, and dedication. We embark on
+this journey with a spirit of camaraderie, ready to share potions, carry
+scrolls, and lend a helping wand in times of need. The path may twist
+and turn, with unexpected dragons (breakdowns), storms (rain), and
+spells gone awry (tech hiccups), but our collective humour and knack for
+improvisation will see us through.
+
+We are united by a deep-seated dedication to unravelling the mysteries
+of genetics, a passion that burns as bright within you as it does within
+us. We believe this adventure will be rewarding not just intellectually,
+but also aesthetically, socially, and culturally. We can’t wait to
+embark on this enchanting journey with you. May our time together be as
+fulfilling as finding the philosopher’s stone!
+
+<img src='Pictures/R_logo.png' align="center" height="300" /></a>
