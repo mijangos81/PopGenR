@@ -7,11 +7,11 @@
 <a href="https://green-striped-gecko.github.io/dartR/"><img src='Pictures/logo_workshop.png' height="400" /></a>
 </p>
 
-Welcome, Fellow Magical Beings, to our 5-day spellbinding journey in the
-mystical realm of Population Genetics using the ancient art of R! We’re
-over the moon (and not just because we’ve mastered levitation spells) to
-have you join us at the enchanted Kioloa ANU Coastal Campus. Nestled
-among the spellbound forests of Murramarang Nation Park and the
+**Welcome**, Fellow Magical Beings, to our 5-day spellbinding journey in
+the mystical realm of Population Genetics using the ancient art of R!
+We’re over the moon (and not just because we’ve mastered levitation
+spells) to have you join us at the enchanted Kioloa ANU Coastal Campus.
+Nestled among the spellbound forests of Murramarang Nation Park and the
 crystal-clear waters of southern New South Wales, our meeting lair
 couldn’t be more perfect. When you’re not weaving R spells, you’ll find
 yourself spoiled for choice with magical brews (a.k.a. coffee) and
