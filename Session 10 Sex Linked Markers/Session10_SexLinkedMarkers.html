@@ -69,7 +69,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="Session10_SexLinkedMarkers_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
-<link rel="stylesheet" href="css.css">
 </head>
 
 <body>
@@ -218,9 +217,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption class="figure-caption">ZW/ZZ sex chromosomes</figcaption>
 </figure>
 </div>
-<div class="blackbox">
-<p><strong>NOTE</strong></p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Set <code>ncores</code> to more than 1 (default) if you have more than 50,000 SNPs, since it could actually slow down the analysis with smaller datasets.</p>
+</div>
 </div>
 <div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-3_e2888e81d93697c19084ca9c54887ab1">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">head</span>(YTH<span class="sc">@</span>other<span class="sc">$</span>ind.metrics))  <span class="co"># Check that ind.metrics has the necessary columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -841,8 +849,18 @@ Exercise
 </table>
 </div>
 </div>
-<div class="blackbox">
-<p><strong>IMPORTANT</strong> We created this function with the explicit intent that a human checks the evidence for the <code>agreed sex</code> that do NOT agree for all types of sex-linked loci (denoted as ‘*M’ or ‘*F’). This human can then use their criterion to validate these assignments.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+IMPORTANT
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We created this function with the explicit intent that a human checks the evidence for the <code>agreed sex</code> that do NOT agree for all types of sex-linked loci (denoted as ‘*M’ or ‘*F’). This human can then use their criterion to validate these assignments.</p>
+</div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1583,9 +1601,18 @@ Exercise
 <p><img src="images/Bull_Shark.jpg" class="class" width="350" height="200"> <img src="images/Blue_shark.jpg" class="class" width="350" height="200"></p>
 <section id="exercise-data-1---your-own-data" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-data-1---your-own-data">Exercise data 1 - Your own data</h2>
-<div class="infobox">
-<p><strong>HINT</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+HINT
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>You can have a look at the exercise data below for inspiration.</p>
+</div>
 </div>
 <section id="number-of-sex-linked-markers" class="level3">
 <h3 class="anchored" data-anchor-id="number-of-sex-linked-markers">1. Number of sex-linked markers?</h3>
@@ -1827,6 +1854,9 @@ Exercise
 <p><strong>HINT</strong> Try using <code>grep(pattern = "\\*", x = sexID$agreed.sex)</code></p>
 </div>
 </div>
+</section>
+<section id="changes-in-pca-before-and-after-removing-the-slm-1" class="level3">
+<h3 class="anchored" data-anchor-id="changes-in-pca-before-and-after-removing-the-slm-1">3. Changes in PCA before and after removing the SLM?</h3>
 <section id="processing-snps-with-two-filtering-regimes" class="level4">
 <h4 class="anchored" data-anchor-id="processing-snps-with-two-filtering-regimes">Processing SNPs with two filtering regimes</h4>
 <section id="filtering-snps-only-with-standard-filters-sloppy" class="level5">
@@ -2373,9 +2403,6 @@ Completed: ::
 </div>
 </section>
 </section>
-</section>
-<section id="changes-in-pca-before-and-after-removing-the-slm-1" class="level3">
-<h3 class="anchored" data-anchor-id="changes-in-pca-before-and-after-removing-the-slm-1">3. Changes in PCA before and after removing the SLM?</h3>
 <section id="pca-on-sloppy-dataset-only-standard-filters" class="level4">
 <h4 class="anchored" data-anchor-id="pca-on-sloppy-dataset-only-standard-filters">PCA on sloppy dataset (only standard filters)</h4>
 <div class="cell" data-hash="Session10_SexLinkedMarkers_cache/html/unnamed-chunk-15_fd979c6f7f1ca9aa45b194854adb0392">
