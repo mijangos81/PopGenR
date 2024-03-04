@@ -1,0 +1,15 @@
+#define MAXPOPS 2
+#define BURNIN 1000
+#define NUMREPS 1000
+#define INFILE gtypes.created.on.2024-02-28.05.47.26.structureRun/gtypes.created.on.2024-02-28.05.47.26.structureRun.k2.r1_data
+#define OUTFILE gtypes.created.on.2024-02-28.05.47.26.structureRun/gtypes.created.on.2024-02-28.05.47.26.structureRun.k2.r1_out
+#define NUMINDS 96
+#define NUMLOCI 10
+#define MISSING -9
+#define LABEL 1
+#define POPDATA 1
+#define POPFLAG 1
+#define LOCDATA 0
+#define PHENOTYPE 0
+#define EXTRACOLS 0
+#define MARKERNAMES 1

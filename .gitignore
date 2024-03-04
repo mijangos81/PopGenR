@@ -49,3 +49,6 @@ po/*~
 rsconnect/
 
 project.Rproj
+
+#ignore data folder
+data/

@@ -54,7 +54,7 @@ This function identifies sex-linked and autosomal loci present in a SNP dataset 
 
 ![ZW/ZZ sex chromosomes](images/ZW.png)
 
-::: {.blackbox}
+::: blackbox
 **NOTE**
 
 Set `ncores` to more than 1 (default) if you have more than 50,000 SNPs, since it could actually slow down the analysis with smaller datasets.
@@ -65,7 +65,6 @@ knitr::kable(head(YTH@other$ind.metrics)) # Check that ind.metrics has the neces
 res <- dartR.sexlinked::filter.sex.linked(gl = YTH, system = "zw")
 ```
 
-
 ::: callout-note
 ## Exercise
 
@@ -75,7 +74,6 @@ How many males and females does the dataset contain?
 
 How many sex-linked loci were found?
 :::
-
 
 Now check the output:
 
@@ -100,10 +98,9 @@ sexID <- dartR.sexlinked::infer.sex(gl_sex_filtered = res, system = "zw", seed =
 knitr::kable(head(sexID))
 ```
 
-::: {.blackbox}
+::: blackbox
 **IMPORTANT** We created this function with the explicit intent that a human checks the evidence for the `agreed sex` that do NOT agree for all types of sex-linked loci (denoted as '\*M' or '\*F'). This human can then use their criterion to validate these assignments.
 :::
-
 
 ::: callout-note
 ## Exercise
@@ -112,8 +109,6 @@ knitr::kable(head(sexID))
 
 Can you find individuals for which the `agreed sex` is uncertain (i.e., has an asterisk "\*")?
 :::
-
-
 
 # Dataset 2 - XX/XY - The Leadbeater's possum
 
@@ -141,7 +136,6 @@ knitr::kable(head(LBP@other$ind.metrics)) # Check that ind.metrics has the neces
 res <- dartR.sexlinked::filter.sex.linked(gl = LBP, system = "xy")
 ```
 
-
 ::: callout-note
 ## Exercise
 
@@ -151,7 +145,6 @@ How many males and females does the dataset contain?
 
 How many sex-linked loci were found?
 :::
-
 
 Now check the output:
 
@@ -264,8 +257,7 @@ sum(EYR$other$ind.metrics$sex != sexID$agreed.sex, na.rm = TRUE)
 
 Can you tell which misidentified sexes are due to uncertain genetic sex (indicated with \*)?
 
-**HINT**
-Try using `grep(pattern = "\\*", x = sexID$agreed.sex)`
+**HINT** Try using `grep(pattern = "\\*", x = sexID$agreed.sex)`
 :::
 
 #### Processing SNPs with two filtering regimes
