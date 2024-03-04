@@ -1,6 +1,6 @@
-# Session 12
+# Session 12 Structure and Faststructure
 
-## Structure of simulated possums
+## Setup
 
 As always we need to have dartRverse installed and loaded. In addition you need to have dartR.popgen installend.
 
@@ -12,22 +12,77 @@ To run STRUCTURE from within R, we need to install the non-GUI executable (the v
 
 To let R know where the executable is, you need to set the path to the executable. For example, under windows, if you have the executable in `d:/programms/structure/structure.exe`, you can use the command below:
 
+### Running STRUCTURE
+
+The small example below is just to test if the programm is set up correctly, hence the binary for your system is in the right place and the path is set correctly.
+
 ```{r, echo=TRUE, eval=FALSE}
-#quick running example windows
+#quick test to run on windows
 bc <- bandicoot.gl[,1:10]
 sr <- gl.run.structure(bc, k.range = 2:6, num.k.rep = 5, exec = 'd:/programms/structure/structure.exe' )
 
 ```
 
-for Linux the command looks like this:
+for Linux/Mac the command looks like this:
 
 ```{r,  eval=FALSE, echo=TRUE}
-#quick running example linux
+#quick test to run on linux/mac
 bc <- bandicoot.gl[,1:10]
-sr <- gl.run.structure(bc, k.range = 2:6, num.k.rep = 5, exec = '../binaries/linux/structure')
+sr <- gl.run.structure(bc, k.range = 2:6, num.k.rep = 5, exec = '../binaries/linux/structure' )
+
 ```
 
-To run structure we use an dartR implementation of functions provided by the strataG package (@archer2016). There you can find a detailed description of the function and its arguments. We had to integrate the functionality becausee strataG is no longer on CRAN.
+### A more serious example: simulated possums
+
+For this example we will run STRUCTURE on a simulated dataset of possums. The dataset is a genlight object and contains 10 populations of 30 individuals each and 1000 loci and is part of the dartRverse package.
+
+To simplify this further we limit our exercise to the first 150 individuals only (which entails now 5 populations a 30 individuals). To get an overview on the population we use the function: `gl.map.interactive` which plots the individuals on a map. Please not the genlight object needs to have valid lat long coordinates for each individual to be able to do so.
+
+```{r}
+possums <- possums.gl[1:150,]  #only the first 150 individuals
+table(pop(possums)) #check the individuals and the populations
+
+gl.map.interactive(possums)
+
+
+```
+
+As mentioned this is a simulated data set and we know the true population structure. Populations B and C are very close to each other so those are basically one population and E is at least somewhat in the vicinity. To confirm that our simulation was successful, we quickly can run a pcoa to confirm the population structure.
+
+```{r}
+
+pcoa <- gl.pcoa(possums, plot.out = FALSE, verbose = 0)
+gl.pcoa.plot(pcoa, possums, verbose = 0)
+
+```
+
+And yes it looks like expected.
+
+::: callout-caution
+### Exercise PCOA and a map
+
+![](images/task.png){#id .class width="48" height="48"} Confirm that you understand how the map and the pcoa plot relate to each other.
+:::
+
+Now, lets see what kind of information we can get from a structure run.
+
+Different to the above we run structure with at least some repetitions for each K (num.k.rep=10) and also over a suitable range. Unfortunately, this takes a while and we will not run it here. Instead we will load the results from a previous run that is saved in the data folder of this repository. \[In case you want to re-run structure simply rename or delete the file in your folder, but be aware that this will take a while.\].
+
+```{r cached run}
+if (file.exists("./data/sr.rds")) {
+sr<- readRDS("./data/sr.rds")
+} else {
+possums <- possums.gl[1:150,]
+sr <- gl.run.structure(possums, k.range = 2:7, num.k.rep = 10, exec =
+                       '../binaries/linux/structure',plot.out = FALSE, 
+                       burnin=50000, numreps=100000, noadmix=FALSE)
+saveRDS(sr, "./data/sr.rds")
+}
+```
+
+Hey this was quick! We have the results of the structure run. Let's see what we can do with it.
+
+To run structure we use an dartR implementation of functions which is based on the functions provided by the strataG package (@archer2016). There you can find a detailed description of the function and its arguments. We had to integrate the functionality because strataG is no longer on CRAN.
 
 The possible arguments are listed below:
 
@@ -69,6 +124,10 @@ Some words about admixture
 
 -   **Utility**: The no-admixture model is useful for identifying distinct populations and their members, especially in cases where populations are clearly separated geographically or temporally.
 
+## Structure Results
+
+Okay now that we got that out of our way lets see how to interprete the results of the structure run.
+
 ### Evanno Plots
 
 The Evanno method is a statistical approach used to determine the most likely number of genetic clusters (K) present in a dataset analyzed by STRUCTURE software. STRUCTURE is a computational tool used for inferring population structure using genetic data. Identifying the correct number of clusters (K) is crucial for accurately interpreting genetic data in the context of population structure, evolutionary biology, and conservation genetics. The Evanno method specifically addresses the challenge of choosing the optimal K by analyzing the rate of change in the likelihood of data between successive K values, rather than just relying on the maximum likelihood. This is done through the calculation of ΔK, a quantity based on the second order rate of change of the likelihood function with respect to K. The method suggests that the value of K corresponding to the highest ΔK should be considered the most likely number of clusters present in the dataset.
@@ -97,22 +156,24 @@ head(qmat[[1]])
 
 ### A "spatial" structure plot
 
-```{r}
-
-gl.map.interactive(bandicoot.gl)
-```
-
 ```{r structure map}
-gm <- gl.map.structure(qmat = qmat, x = bc,K=5, scalex=1, scaley=0.5 )
+gm <- gl.map.structure(qmat = qmat, x = possums,K=5, scalex=1, scaley=0.5 )
 ```
 
-![spatial qmat plot](images/bandimap.png){fig-align="center"}
+![spatial qmat plot](images/possummap.png){fig-align="center"}
 
 -   other example for evanno
 -   other example for qmat
 -   some simulations?!
 
-#Faststructure
+## Faststructure
 
 -   how to run it
 -   what is the difference (not much in most cases, but faster, though less screws to turn)
+
+```{r}
+#fs.simple <- gl.run.fas
+```
+
+
+
