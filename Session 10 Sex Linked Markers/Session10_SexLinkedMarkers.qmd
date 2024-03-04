@@ -4,7 +4,6 @@ authors: "Diana Robledo-Ruiz & Floriaan Devloo-Delva"
 format: 
   html:
     theme: cosmo
-    css: "css.css"
     keep-tex: true
     toc: true
     toc_depth: 3
@@ -18,8 +17,6 @@ editor_options:
 
 ```{r setup, include=FALSE}
 library(knitr)
-library(formatR)
-library(tidyverse)
 knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72), 
                       cache = TRUE, 
                       echo = TRUE)
@@ -54,8 +51,13 @@ This function identifies sex-linked and autosomal loci present in a SNP dataset 
 
 ![ZW/ZZ sex chromosomes](images/ZW.png)
 
+<<<<<<< HEAD
 ::: blackbox
 **NOTE**
+=======
+::: {.callout-warning}
+## Warning
+>>>>>>> b4e497b88ef077c92dbc780edc10a126cc8fb21c
 
 Set `ncores` to more than 1 (default) if you have more than 50,000 SNPs, since it could actually slow down the analysis with smaller datasets.
 :::
@@ -98,11 +100,22 @@ sexID <- dartR.sexlinked::infer.sex(gl_sex_filtered = res, system = "zw", seed =
 knitr::kable(head(sexID))
 ```
 
+<<<<<<< HEAD
 ::: blackbox
 **IMPORTANT** We created this function with the explicit intent that a human checks the evidence for the `agreed sex` that do NOT agree for all types of sex-linked loci (denoted as '\*M' or '\*F'). This human can then use their criterion to validate these assignments.
 :::
 
 ::: callout-note
+=======
+::: {.callout-important}
+## IMPORTANT 
+
+We created this function with the explicit intent that a human checks the evidence for the `agreed sex` that do NOT agree for all types of sex-linked loci (denoted as '\*M' or '\*F'). This human can then use their criterion to validate these assignments.
+:::
+
+
+::: {.callout-note}
+>>>>>>> b4e497b88ef077c92dbc780edc10a126cc8fb21c
 ## Exercise
 
 ![](images/task.png){#id .class width="48" height="48"}
@@ -136,7 +149,12 @@ knitr::kable(head(LBP@other$ind.metrics)) # Check that ind.metrics has the neces
 res <- dartR.sexlinked::filter.sex.linked(gl = LBP, system = "xy")
 ```
 
+<<<<<<< HEAD
 ::: callout-note
+=======
+
+::: {.callout-note}
+>>>>>>> b4e497b88ef077c92dbc780edc10a126cc8fb21c
 ## Exercise
 
 ![](images/task.png){#id .class width="48" height="48"}
@@ -170,7 +188,7 @@ knitr::kable(head(sexID))
 
 What did the function mention about gametologs? How did that impact the results table? How many types of sex-linked loci were used to infer an `agreed sex`?
 
-::: callout-note
+::: {.callout-note}
 ## Exercise
 
 ![](images/task.png){#id .class width="48" height="48"}
@@ -180,7 +198,7 @@ Can you find individuals for which the `agreed sex` is uncertain (i.e., has an a
 
 # EXERCISE
 
-::: callout-note
+::: {.callout-note}
 ## Exercise
 
 ![](images/task.png){#id .class width="48" height="48"}
@@ -204,8 +222,8 @@ Choose one of the following datasets (or your own data) and report:
 
 ## Exercise data 1 - Your own data
 
-::: {.infobox data-latex="{task}"}
-**HINT**
+::: {.callout-tip}
+## HINT
 
 You can have a look at the exercise data below for inspiration.
 :::
@@ -250,7 +268,7 @@ knitr::kable(head(sexID))
 sum(EYR$other$ind.metrics$sex != sexID$agreed.sex, na.rm = TRUE)
 ```
 
-::: callout-note
+::: {.callout-note}
 #### Exercise
 
 ![](images/task.png){.class width="48" height="48"}
@@ -259,6 +277,9 @@ Can you tell which misidentified sexes are due to uncertain genetic sex (indicat
 
 **HINT** Try using `grep(pattern = "\\*", x = sexID$agreed.sex)`
 :::
+
+
+### 3. Changes in PCA before and after removing the SLM?
 
 #### Processing SNPs with two filtering regimes
 
@@ -306,7 +327,6 @@ dartR.base::gl.report.maf(EYR.correct)
 EYR.correct <- dartR.base::gl.filter.maf(EYR.correct, threshold = 3, verbose = 0, recalc = TRUE)
 ```
 
-### 3. Changes in PCA before and after removing the SLM?
 
 #### PCA on sloppy dataset (only standard filters)
 
