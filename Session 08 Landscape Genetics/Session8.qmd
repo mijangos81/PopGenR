@@ -505,8 +505,8 @@ In addition you need to provide the path to the EEMS executable (binaries for Wi
 So a typical run of EEMS would look like this (please be aware the suggested number of interations are numMCMCIter = 8000000, so this is just to show how to run EEMS):
 
 ```{r, eval=TRUE}
-eems.path <- "d:/downloads/eems"
-#eems.path <- "~/binaries/linux/"
+#eems.path <- "d:/downloads/eems"
+eems.path <- "./binaries/"
 eems <- gl.run.eems(Sy.gl, buffer = 1000, eems.path =eems.path, nDemes = 50, diploid = TRUE,
                     numMCMCIter = 10000, numThinIter = 99, numBurnIter = 5000, add_demes=TRUE,
                     add_grid=TRUE, out.dir=tempdir())
@@ -590,7 +590,7 @@ eems.comp <- readRDS("data/eems_comp.rds")
 We have not looked at all of the output. There are actually 8 figures that are produced by the EEMS method. You can access the using the notation `eems.comp[[1]] or eems.comp$mrates01`.
 
 | Plot       | Description                                                                                                                                                                                                                                                                                                                                                                      |
-|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|-----------|-------------------------------------------------------------|
 | `mrates01` | Effective migration surface. This contour plot visualizes the estimated effective migration rates (m), on the log10 scale after mean centering.                                                                                                                                                                                                                                  |
 | `mrates02` | Posterior probability contours ($P(\log(m) > 0) = p$) and ($P(\log(m) < 0) = p$) for the given probability level (p). Since migration rates are visualized on the log10 scale after mean centering, 0 corresponds to the overall mean migration rate. This contour plot emphasizes regions with effective migration that is significantly higher/lower than the overall average. |
 | `qrates01` | Effective diversity surface. This contour plot visualizes the estimated effective diversity rates (q), on the log10 scale after mean centering.                                                                                                                                                                                                                                  |
@@ -643,12 +643,12 @@ soil.final
 table(values(soil.final))
 ```
 
-Great the final step is the recoding of the resistance values. From the first plot and using our knowlegde on the terrain colors in R, we can see that the soil type "clay" is coded as 0, "loam" as 1, "rock" as 2, "sand" as 3, and "water" as 4. We have to recode those values to be able to use it as a resistance surface.
+Great the final step is the recoding of the resistance values. From the first plot and using our knowlegde on the terrain colors in R, we can see that the soil type "clay" is coded as 0, "loam" as 1, "rock" as 2, "sand" as 3, and "tidal" as 4. We have to recode those values to be able to use it as a resistance surface.
 
 ```{r}
 
 #convert resistance values
-# clay =0, loam =1, rock = 2, sand =3, water =4
+# clay =0, loam =1, rock = 2, sand =3, tidal =4
 
 #clay only
 res.clay <- soil.final
