@@ -19,6 +19,7 @@ editor_options:
 library(knitr)
 library(formatR)
 library(tidyverse)
+library(gifski)
 knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72), 
                       cache =FALSE, 
                       echo = TRUE)
@@ -73,6 +74,16 @@ sfscon
 
 As you can see the is simply a table of the number of alleles at each frequency. Be aware the the sfs is folded by default, but you can change this with the argument `folded = FALSE`. In most of the cases we will use the folded=TRUE option as you need phased data to use the unfolded sfs (and also have an idea which state is the ancestral one. Often the genomic of an ancestral outgroup is used for this information).
 
+::: callout-note
+## Exercise 1: Parameter in gl.sfs
+
+![](images/task.png){.class width="48" height="48"} Try different settings for the sfs and see what happens. There are three important parameters:
+
+-   `minbinsize` (default is 1)
+-   `folded` (default is TRUE)
+-   `singlepop` (default is TRUE) \[if you have more than one population in your genlight object\]
+:::
+
 ```{r}
 #unfolded sfs
 un.sfs <- gl.sfs(gl100, folded = FALSE)
@@ -95,14 +106,14 @@ glbottle <- readRDS("./data/slim_100_10_50_50yago_10year.rds")
 `gldec` is a population that experienced a decline from Ne=100 to Ne=50 50 years ago, while `glinc` is a population that experienced an increase from Ne=100 to Ne=200 50 years ago. And `glbottle` is a data set that experienced a bottleneck from Ne=100 to Ne=10 50 years ago and then an increase to Ne=50 after years.
 
 ::: callout-note
-## Exercise
+## Exercise 2: Compare SFS
 
 ![](images/task.png){.class width="48" height="48"} Create a SFS for the three new datasets and compare them to the SFS of the constant population. What do you expect?
 :::
 
 Below is a plot that shows all four SFS.
 
-```{r, echho=FALSE}
+```{r}
 sfsdec <- gl.sfs(gldec, folded = TRUE)
 sfsinc <- gl.sfs(glinc, folded = TRUE)
 sfsbottle <- gl.sfs(glbottle, folded = TRUE)
@@ -129,9 +140,9 @@ As you can see it is not really possible to see the differences between the sfs,
 
 Lets start with the simple one and lets use Epos (as this is the fastest method). A typical epos run requires the genlight/dartR object, then the path to the epos binary.
 
-There are two more important parameters l and mu. l is the total lenght of the "sampled" chromosome and we will have a discussion on that. mu is the mutation rate per site per generation. The important concept to keep in mind is that
+There are two more important parameters l and mu. l is the total lenght of the "sampled" chromosome and we will have a discussion on that. mu is the mutation rate per site per generation. The important concept to keep in mind is that:
 
-$$ number of mutations = L * mu * (Ne) $$
+$$\LARGE x = mu \times L \times 2 \times Ne $$ , where x is the number of mutations in a generation.
 
 So to be able to estimate the trajectory in an absolute sense we need to know L and mu. In a simulation that is easy because we know how long the chromosome(s) were we did our simulation on. Here L=5e8 and mu was set to a value of 1e-8.
 
@@ -167,13 +178,13 @@ ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin
 As you can see this is not a good idea the axis values are completely off. The reason is that the number of mutations is calculated as L \* mu \* Ne. So if you set L too low, you will get a too high Ne (and also the number of generations are off). If you set L too high, you will get a too low Ne. So you need to know the length of the chromosome that you are working with. The good news is that the trajectory is still correct, so we can rely on the shape of the curve, but the absolute values are wrong if L (or mu) are set incorrectly.
 
 ::: callout-note
-## Exercise
+## Exercise 3: Run Epos for different combinations of L and mu
 
 ![](images/task.png){.class width="48" height="48"} You can now run epos for different combinations of L and mu. What do you expect if you set L and mu in such a way that L \* mu compensate each other?
 :::
 
 ::: callout-note
-## Exercise
+## Exercise 4: Run Epos for all data sets
 
 ![](images/task.png){.class width="48" height="48"} And now to the next exercise which is the more intersting one: run Epos for all four data sets data sets(glcon, glinc, gldec, glbottle) and compare the results to the simulated trajectories. Once finished you can have a look at the code below.
 :::
@@ -183,22 +194,22 @@ L <- 5e8
 mu = 1e-8
 
 #constant
-Ne_epos <- gl.epos(gl100, epos.path = "./binaries/" , l = L, u=mu, boot=10, minbinsize = 1)
+Ne_epos <- gl.epos(gl100, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
 colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
 pcon <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
  
 #constant
-Ne_epos <- gl.epos(glinc, epos.path = "./binaries/" , l = L, u=mu, boot=10, minbinsize = 1)
+Ne_epos <- gl.epos(glinc, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
 colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
 pinc <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
 
 #constant
-Ne_epos <- gl.epos(gldec, epos.path = "./binaries/" , l = L, u=mu, boot=10, minbinsize = 1)
+Ne_epos <- gl.epos(gldec, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
 colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
 pdec <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)+ylim(c(0, 200))
 
 #constant
-Ne_epos <- gl.epos(glbottle, epos.path = "./binaries/" , l = L, u=mu, boot=10, minbinsize = 1)
+Ne_epos <- gl.epos(glbottle, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
 colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
 pbottle <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
 
@@ -220,15 +231,18 @@ The good new is that stairways uses the identical input parameters: L, mu, minbi
 
 The main difference (and here I admit I have to resort to a general explanation as it is beyond my paygrade to understand). Epos uses a simple semi-analytical optimization method to find the best fitting trajectory, whereas stairways uses a machine learning approach that takes longer (but potentially explores the parameter space better). My current approach is to use both methods and see if the results are similar.
 
-### needs to be added still
+### Example run of Stairways2
 
-```{r}
-  Ne_sw <- gl.stairway2(gl100, stairway.path="./binaries", mu = mu, gentime = 1, run=TRUE, nreps = 30, parallel=2, L=L, minbinsize =1, cleanup = T)
+```{r, eval=TRUE}
 
+L <- 5e8
+mu = 1e-8
+#takes about 5 minutes so not run here
+#Ne_sw <- gl.stairway2(gl100, stairway.path="./binaries", mu = mu, gentime = 1, run=TRUE, nreps = 30, parallel=10, L=L, minbinsize =1)
 
+Ne_sw <- readRDS("./data/Ne_sw_gl100.rds")
 
-
-
+ggplot(Ne_sw, aes(x=year, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=Ne_2.5., ymax=Ne_97.5.), alpha=0.2)
 ```
 
 ::: callout-note
@@ -243,7 +257,7 @@ You can also try to run the simulator to explore how good the methods are for mo
 
 # Gone
 
-\[Be aware Gone is very data hungry and seems not to work too well with the number of SNPs we have at our disposal, but in simulations with Ne\~1000 and lots of individuals it seems to work well\].
+\[Needs more implementation and testing, but I will give a brief overview here.\] \[Be aware Gone is very data hungry and seems not to work too well with the number of SNPs we have at our disposal, but in simulations with Ne\~1000 and lots of individuals it seems to work well\].
 
 Gone is a very different method to estimate the population size. It was developed by @santiago2020. The authors utilize LD patterns to infer the demographic history of populations. LD can be affected by various factors including recombination, mutation, genetic drift, and population structure. The method is based on the idea that the LD decay is a function of the population size and the recombination rate. So we need next to our SNP data also a so called linkage map. This can be achieved if you have a reference genome available and you can map the SNPs to the reference genome. Gone itself has not been tested to much for recent population sizes and is still very much under research about its usefullness for recent population sizes.
 
@@ -262,15 +276,14 @@ So lets run Gone (be aware it is not very userfriendly implemented yet in terms 
 Explain the settings (important MAF)
 
 ```{r}
-#takes too long
-#Ne_gone <- gl.gone(gl100,gone.path = "./binaries/") #runs parallel via InputParamters
-#read it in
-Ne_gone <- readRDS("./data/Ne_gone_gl100.rds")
+#take a bit long
+#Ne_gone <- gl.gone(gl100,gone.path = "./binaries") #runs parallel via InputParamters
+#load it instead
+Ne_gone <- readRDS("./data/Ne_gone_100.rds")
 
 colnames(Ne_gone) <- c("generation", "Ne_mean")
 
 ggplot(Ne_gone, aes(x=generation, y=Ne_mean))+geom_line()
-
 
 ```
 
@@ -292,7 +305,7 @@ ggplot(Ne_gone, aes(x=generation, y=Ne_mean))+geom_line()
 
 ```
 
-It is certainly possible that gone is "saveable" but it is obvious that Gone is not very "good" in recent years. There seems to be a sweet spot where Gone works well \>150 Generations and \<300 generations, but that needs more testing.
+It is certainly possible that gone is "saveable" but it is obvious that Gone is not very "good" in recent years. There seems to be a sweet spot where Gone works well \>100 Generations and \<300 generations, but that needs more testing.
 
 ::: callout-note
 ## Exercise
