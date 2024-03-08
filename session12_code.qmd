@@ -373,6 +373,6 @@ This is a data set (only a subset) of foxes in Australia, which I had lying arou
 
 ```{r}
 foxes <- readRDS("./data/foxes.rds")
-gl.map.interactive(foxes)
+gl.map.interactive(foxes, pop.labels = FALSE)
 ```
 
