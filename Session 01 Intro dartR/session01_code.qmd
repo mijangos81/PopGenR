@@ -1,0 +1,364 @@
+# Intro to dartR
+
+*Session Presenters*
+
+![](images/Presenters1.png)
+
+## *Required packages*
+
+```{r, include = FALSE}
+ library(webexercises)
+```
+
+```{r, warning=FALSE, message=FALSE}
+library(dartR.base)
+library(dartR.data)
+```
+
+*make sure you have the packages installed, see* [Install dartRverse](install.qmd)
+
+## `dartR`'s Reach
+
+![](images/dartr_reach.png){#id .class width="500" fig-align="centre"}
+
+## Diversity Arrays Technology Pty Ltd (DArT)
+
+![](images/dart_diversity.png)
+
+Diversity Arrays Technology Pty Ltd (DArT) is a private company that specializes in genotyping by sequencing. Their approach is one of genome complexity reduction. Basically, DArTSeq is a method that extracts reproducible genomic variation across the genomes of many individuals at an affordable cost. The data are representational in the sense that they are generated for a random but reproducible selection of small fragments of sequence only, fragments that exhibit variation at the level of single base pairs (SNPs).
+
+*For more details check out the DArT website:* <https://www.diversityarrays.com/>
+
+You can also learn more about the methods by checking out the tutorial on **Data Structure and Input** found in the [dartR Tutorials](tutorials.qmd) section.
+
+#### Their mission:
+
+![](images/dart_mission.png)
+
+## The `dartRverse`
+
+#### From 1 package to 7
+
+![](images/dartR7.png) *See the section* [Install dartRverse](install.qmd) *to learn about the reasoning behind how the dartRverse came to be...*
+
+## The magical world of RStudio Cloud
+
+### Step 1: Summoning the RStudio Cloud Portal
+
+-   **Embark on the Journey:** Open your trusty steed (a.k.a. your web browser) and gallop over to [Rstudio Cloud](https://rstudio.cloud/).
+
+-   **Forge Your Credentials:** Spot the "Sign Up" beacon in the realm's upper right corner and click it with courage. Click on the “Learn more” below the “Cloud Free” plan and then in the “Sign Up” button. A scroll will appear, asking for your name, your secret code (password), and your e-mail. Please use the same e-mail you provided when you registered to the workshop.
+
+![](images/cloud_sign_up.png)
+
+-   **Prove Your Worth:** After submitting your details, a pigeon (or was it an email?) will fly into your inbox carrying a secret message. Click the link within to prove you're not a goblin in disguise.
+
+### Step 2: Entering the Secret Workshop Chamber
+
+-   **Return to the Portal:** With your email now verified, make your way back to the RStudio Cloud realm and use your newly forged credentials to enter.
+
+-   **Finding the Secret Door:** One day before the workshop, a link leading to the workshop's chamber will be sent to your e-mail.
+
+### Step 3: Joining the Fellowship of the Project
+
+-   **Locate the Treasure Chest:** Within the grand chamber (workshop space), seek the project “PopGenR” and click on it to reveal its secrets. As you open it for the first time, ancient RStudio Cloud spirits will work their magic to prepare your environment.
+
+![](images/cloud_WS.png){.class width="500"}
+
+## `dartR` fundamentals
+
+### The structure of a genlight object
+
+![](images/genlight_structure.jpg){.class width="600" fig-align="left"}
+
+For a detailed rundown of the genetic data used by the `dartRverse`, check out the tutorial on **Data Structure and Input** found in the [dartR Tutorials](tutorials.qmd) section.
+
+### the Basics
+
+Here is a glimpse at the functions we will be using. Please follow along, or try running the `code` on your own.
+
+```{r}
+testset.gl
+
+gl <- testset.gl
+nInd(gl)
+nLoc(gl)
+nPop(gl)
+popNames(gl)
+indNames(gl)
+locNames(gl)
+table(pop(gl))
+as.matrix(gl)[1:7,1:5]
+
+```
+
+#### Reporting and Filtering
+
+```{r}
+gl.set.verbosity(3)
+
+gl.report.callrate(gl)               # loci callrate             
+gl.report.callrate(gl,method="ind")  # individual callrate
+gl.report.reproducibility(gl)        # reproducibility
+
+# filter
+gl.filter.callrate(gl,method ="ind", threshold=0.8)
+
+```
+
+::: callout-tip
+**Remember**, you can always look up the help file for `dartRverse` functions by putting a question mark (?) before a function. For example: `?gl.filter.callrate`
+
+*Make sure you have the associated library loaded* (eg. `libary(dartR.base)`)
+:::
+
+Now, lets take a look at our genetic data before and after filtering using the `gl.smearplot()` function.
+
+```{r}
+
+gl <- testset.gl
+gl.smearplot(gl) # Before Filtering
+
+gl <- gl.filter.callrate(gl,verbose=0)
+gl <- gl.filter.callrate(gl, method= "ind", 
+                         threshold=0.80, verbose=0)
+gl.smearplot(gl) # After Filtering
+
+```
+
+## Filtering strategies
+
+There is no right filtering order. Your data set will need its own interrogation, so be iterative - test different options. In some cases you may even need to reuse a filter that you used earlier on in the filtering process.
+
+Instead of providing a recipe to follow, I recommend strategies to filtering.
+
+First, lets have a closer look at what some of these filters do (click across the tabs for more insight into each filter):
+
+```{r, eval = FALSE}
+gl.filter.callrate(method = loc) # Call rate by loci (SNPs)
+gl.filter.callrate(method = ind) # Call rate by individuals
+gl.filter.reproducibility()      # reproducibility 
+gl.filter.rdepth()               # read depth 
+gl.filter.maf()                  # minor allele frequency 
+gl.filter.secondaries()          # secondaries 
+```
+
+### callrate: loc
+
+`gl.filter.callrate(gl, method = "loc", threshold = 0.95)`
+
+**What is it?** Removes SNPs with too much missing data based on a specified threshold.
+
+**Why is it important?** Missing loci can add “noise” and computation time to an analysis
+
+**Key Considerations:**
+
+-   Trade-off between strength of filter and number of loci
+-   Call rate filters matter for different metrics
+
+![](images/callrate_loc.png)
+
+### callrate: ind
+
+`gl.filter.callrate(gl, method = "ind", threshold = 0.95)`
+
+**What is it?** Removes individuals with too much missing data based on a specified threshold.
+
+**Why is it important?** Deletes the key thing you need to do a study, and removes individuals that may be misleading as they are sequencing outliers
+
+**Key Considerations:**
+
+-   The filtering step that costs you the very most amount of money
+-   Generally not a first step – recommend filtering lightly here in the first go and seeing if other filters improve the individuals completeness
+
+![](images/callrate_ind.png)
+
+### reproducibility
+
+`gl.filter.reproducibility()`
+
+**What is it?** Diversity Arrays duplicates individuals during library prep, to assess whether the same answer is found for every locus \~ a control.
+
+**Why is it important?** Provides confidence in your base calls which is pretty fundamental
+
+**Key Considerations:**
+
+-   If reproducibility is low, you need your SNPs re-assessed
+-   If doing sequencing through AGRF or other facilities, make sure to include duplicated individuals (this is an additional cost but do it anyway)
+
+### rdepth
+
+`gl.filter.rdepth()`
+
+**What is it?** The mean number of sequencing reads for a particular locus, across all individuals.
+
+**Why is it important?** The number of reads in a stack tells you how confident you can be in your base calls and a low read depth means that your heterozygous sites have pretty low coverage.
+
+**Key Considerations:**
+
+-   If your read depth is not high enough, there are questions you can’t confidently answer (e.g., heterozygosity)
+-   Very high read depth suggests paralogs (genes with multiple copies) being assembled in to one fragment
+
+![](images/rdepth.png)
+
+### maf
+
+`gl.filter.maf()`
+
+**What is it?** Minor allele frequency (maf) is the frequency of the second most common allele in a given population, so this filter removes SNPs based on their relative proportion.
+
+**Importantly,** in the literature, it is often set to 0.05 BUT...
+
+**Key Considerations:**
+
+-   0.05 can be high if you have lot of individuals
+    -   If you have 300 diploid individuals, then you delete SNPs with less than 30 copies of the minor allele
+-   Or singleton if you have a small number of individuals
+-   Should depend on your question
+    -   Rare alleles can be very important to certain questions
+    -   Most SNPs are rare alleles, as are most heterozygous sites
+    -   Rare alleles are important in expansion processes
+    -   NOT important in structure or phylogenetic analyses
+
+![](images/maf.png)
+
+### secondaries
+
+`gl.filter.secondaries()`
+
+**What is it?** When there are two SNPs on a single fragment, choosing to keep only one.
+
+**Why is it important?** Loci that are very close together in the genome are not independently inherited as they are too close together for recombination to split, so they tend to be inherited together.
+
+**Key Considerations:**
+
+-   Can mislead structure and phylogenetic analyses
+-   Can improve representations of heterozygosity
+
+![](images/secondaries.png)
+
+### Strategies
+
+Now for some strategies,
+
+as a starting point I would get rid of loci I don’t believe in and then individuals that didn’t work properly at all:
+
+```{r}
+gl <- platypus.gl # example data from dartR.data
+
+gl <- gl.filter.callrate(gl, method = "loc", threshold = 0.7)
+# Get rid of really poorly sequenced loci, but don’t cut hard
+
+gl <- gl.filter.callrate(gl, method = "ind", threshold = 0.25)
+# Very low filter – this is only to get rid of your really bad 
+# individuals
+
+gl <- gl.filter.monomorphs(gl)
+# Always run this after removing individuals – removes loci that are no
+# longer variable
+
+gl <- gl.filter.reproducibility(gl)
+# Get rid of unreliable loci
+
+gl <- gl.filter.rdepth(gl, lower = 5, upper = 500)
+# Get rid of low and super high read depth loci
+```
+
+Then I would filter more strongly as appropriate for my question. For a population structure analysis I would,
+
+```{r}
+gl <- gl.filter.callrate(gl, method = "loc", threshold = 0.95)
+# Structure dislikes missing data
+
+gl <- gl.filter.maf(gl,  threshold = 1/(2*nInd(gl)))
+# I usually set up the threshold so it is just removing singletons to
+# improve computation time
+
+gl <- gl.filter.secondaries(gl)
+# Always do this as the last loci filter so that you’ve cut for quality
+# before you cut because there are two SNPs
+
+gl <- gl.filter.callrate(gl, method = "ind", threshold = .9)
+# Filter on individuals. You can usually be a bit flexible at this 
+# point.
+
+gl <- gl.filter.monomorphs(gl)
+# Always run this after removing individuals
+```
+
+::: callout-tip
+### More tips
+
+Keep these tips in mind when you go to filter your own data:
+
+-   Be flexible
+-   Know what each filter is doing to your data
+-   Think carefully about whether the filter is appropriate to the test you want to run
+-   Analyse your data many different ways
+-   Don’t over-interpret your PCoA
+:::
+
+## Exploring functions
+
+::: callout-note
+## Exercise
+
+![](images/task.png){.class width="48" height="48"} Try some of these report, subset, and filtering functions on your own.
+
+### Reporting
+
+```{r, eval=FALSE}
+gl.report.callrate()
+gl.report.reproducibility()
+gl.report.secondaries()
+gl.report.rdepth()
+gl.report.monomorphs()
+gl.report.overhang()
+gl.report.hamming()
+gl.report.overshoot()
+
+```
+
+### Subsetting
+
+```{r, eval=FALSE}
+gl.keep.ind()
+gl.drop.ind()
+gl.keep.loc()
+gl.drop.loc()
+gl.keep.pop()
+gl.drop.pop()
+gl.merge.pop()
+gl.subsample.ind()
+gl.subsample.loc()
+
+```
+
+### filtering
+
+```{r, eval=FALSE}
+gl.filter.callrate()
+gl.filter.reproducibility()
+gl.filter.secondaries()
+gl.filter.rdepth()
+gl.filter.monomorphs()
+gl.filter.overhang()
+gl.filter.hamming()
+gl.filter.overshoot()
+
+```
+:::
+
+## *Further Study*
+
+For more tuturials see the [dartR Tutorials](tutorials.qmd) section.
+
+### Readings
+
+@gruber2018
+
+@mijangos2022
+
+@jaya_population_2022
+
+@sopniewski_estimates_2024

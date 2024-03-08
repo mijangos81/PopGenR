@@ -1,0 +1,484 @@
+# Sequencing Technologies
+
+*Session Presenters*
+
+![](images/Presenters3.png)
+
+## *Required packages*
+
+```{r, warning=FALSE, message=FALSE}
+library(dartRverse)
+library(ggplot2)
+
+```
+
+*make sure you have the packages installed, see* [Install dartRverse](install.qmd)
+
+## **DArT sequencing**
+
+![](images/DArT_logo.png)
+
+![](images/dart_sequencing.png)
+
+DArTseq is our proprietary genome complexity reduction-based sequencing technology.
+
+It differs from other methods through its ability to intelligently select the predominantly active – low copy sequence – areas in a genome, which are the ones containing the most useful information. At the same time, DArTseq masks the lesser value, repetitive sequences. It does this through the application of a combination of restriction enzymes to fragment DNA samples in a highly reproducible manner.
+
+A key component of DArTseq is its complexity reduction step. This involves reducing complexity of the genome by cutting it down to a consistent and reproducible fraction from which markers are discovered and called. This process does not introduce ascertainment bias because we are discovering markers within the (restriction) fragment set without the bias.
+
+### Characteristics
+
+DArTseq is designed to provide a consistent genomic representation across samples within and between experiments, even over a decade of operations. DArTseq has been used to process tens of thousands of samples from hundreds of organisms, and is capable of co-analysing thousands of samples together, with the great majority of markers called across all of the samples. These advantages come from the library processing methods of DArTseq which distinguish it from all other complexity reduced genotyping technologies using restriction enzymes.
+
+### Standardised
+
+Laboratory sample processing is performed in a very high throughput streamlined operation utilising end-to-end pipetting robotics and informatics integration, with a Laboratory Information Management System (LIMS). All the physical sample processing steps undertaken in the lab are linked with the data storage and analysis components via tight integration with the LIMS. Sample processing robots have automated data exchange with the LIMS. 
+
+Manual operations have been minimised and plate based sample handling prevents the introduction of sample-tracking mistakes after arrival. The analytical components for processing DArTseq data and generating marker calls have been tailored specifically to the unique DArTseq complexity reduction and library construction methods. This results in a streamlined and highly effective data analysis pipeline, enabling rapid generation of high-quality marker data from thousands or even tens of thousands of assays in a single analysis. Ability to co-analysis with past services of 14 years despite 5 generations of the illumina sequences. The population of fragments in the genomic representation does not vary across multiple sample submissions despite the many years.
+
+
+See more at <https://www.diversityarrays.com/>
+
+
+## **SNP-based heterozygosity estimates**
+
+## 1. Estimating heterozygosity: 70% callrate
+
+*How do estimates of heterozygosity change as the number of individuals changes in your SNP calling?*
+
+This uses data from Litoria rubella, a very abundant and widespread frog species we are using data following <https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13947>. Let's focus on the Kimberley, where we have lots of samples, and we expect the diversity to be really high because there are millions of them everywhere. SNPs were called on different numbers of individuals, in increments of 5 using the Stacks pipeline. We are only going to do a simple filter for call rates because we already filtered for allele depth in Stacks. SNPs were called independent of other populations, which we will get to later.
+
+### Load data
+
+```{r}
+# load data
+load('./data/Session3_data.RData')
+
+#create a list of the kimberley genlights
+kimberley_names <- ls(pattern = "^Kimberley")
+#put all the genlights into a mega list
+kimberley <- mget(kimberley_names)
+
+#we're going to do this in a loop for speed, applying the same filters
+# Iterate over the names of the kimberley list
+for(name in names(kimberley)){
+  # Extract the genlight object from the kimberley list using its name
+  genlight_object <- kimberley[[name]]
+  # Apply the filter call rate function
+  # Assuming gl.filter.callrate is a function that operates on a genlight object
+  filtered_object <- gl.filter.callrate(genlight_object, threshold = 0.7, mono.rm = TRUE)
+  # Assign the filtered object back to the environment with a new name
+  assign(paste0(name, "_0.7"), filtered_object)
+}
+```
+
+### Calculate heterozygosity
+
+```{r}
+# List all object names in the environment
+all_names <- ls()
+
+# Use grep() to match names that start with "Kimberley" 
+# and end with "0.7", .+ indicates any characters in between
+kimberley_filtered <- grep("^Kimberley.+0\\.7$", all_names, value = TRUE)#put all the genlights into a mega list
+#create another list with the ones we want
+kimberley <- mget(kimberley_filtered)
+
+#Initialize an empty data frame
+heterozygosity_reports_df <- data.frame()
+
+# Iterate over the kimberley list to apply gl.report.heterozygosity
+# and bind the results
+for(name in names(kimberley)) {
+  # Apply the function
+  report <- gl.report.heterozygosity(kimberley[[name]])
+  
+  # Add 'ObjectName' as the first column of the report
+  report <- cbind(ObjectName = name, report)
+  
+  # Bind this report to the main data frame
+  heterozygosity_reports_df <- bind_rows(heterozygosity_reports_df, report)
+}
+
+# heterozygosity_reports_df now contains all the reports with an 
+# additional column for object names
+knitr::kable(heterozygosity_reports_df)
+
+```
+
+### Plotting results
+
+```{r}
+kimberley_Ho_0.7callrate <- ggplot(heterozygosity_reports_df, aes(x = ObjectName, y = Ho)) +
+  geom_point() +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+  labs(title = "Observed Heterozygosity by Sample number", x = "Sample Number", y = "Observed Heterozygosity (Ho)")
+
+kimberley_Ho_0.7callrate
+```
+
+::: callout-caution
+## Sampling
+
+As you can see, different numbers samples can substantially change your heterozygosity estimate.
+:::
+
+## 2. Estimating heterozygosity: 95% callrate
+
+*Lets redo our heterozygosity estimates, but see how changing your call rate filter impacts estimates*
+
+### Reload data
+
+```{r}
+# reload data
+load('./data/Session3_data.RData')
+# List all object names in the environment
+all_names <- ls()
+
+# Use grep() to match names that start with "Kimberley" 
+kimberley_names <- grep("^Kimberley.*\\.vcf$", all_names, value = TRUE) #put all the genlights into a mega list
+#create another list with the ones we want
+kimberley <- mget(kimberley_names)
+
+#we're going to do this in a loop for speed, applying the same filters
+# Iterate over the names of the kimberley list
+for(name in names(kimberley)){
+  # Extract the genlight object from the kimberley list using its name
+  genlight_object <- kimberley[[name]]
+  # Apply the filter call rate function
+  # Assuming gl.filter.callrate is a function that operates on a genlight object
+  filtered_object <- gl.filter.callrate(genlight_object, threshold = .95, mono.rm = TRUE)
+  # Assign the filtered object back to the environment with a new name
+  assign(paste0(name, "_0.95"), filtered_object)
+}
+```
+
+### Calculate heterozygosity
+
+```{r}
+# List all object names in the environment
+all_names <- ls()
+
+# Use grep() to match names that start with "Kimberley" 
+# and end with "0.95", .+ indicates any characters in between
+kimberley_filtered <- grep("^Kimberley.+0\\.95$", all_names, value = TRUE)#put all the genlights into a mega list
+#create another list with the ones we want
+kimberley <- mget(kimberley_filtered)
+
+
+#Initialize an empty data frame
+heterozygosity_reports_df_0.95 <- data.frame()
+
+# Iterate over the kimberley list to apply gl.report.heterozygosity
+# and bind the results
+for(name in names(kimberley)) {
+  # Apply the function
+  report <- gl.report.heterozygosity(kimberley[[name]])
+  
+  # Add 'ObjectName' as the first column of the report
+  report <- cbind(ObjectName = name, report)
+  
+  # Bind this report to the main data frame
+  heterozygosity_reports_df_0.95 <- bind_rows(heterozygosity_reports_df_0.95, report)
+}
+
+# heterozygosity_reports_df now contains all the reports with an 
+# additional column for object names
+knitr::kable(heterozygosity_reports_df_0.95)
+```
+
+### Plotting results
+
+```{r}
+
+# Example using ggplot2 to plot the data
+library(ggplot2)
+kimberley_Ho_0.95callrate <- ggplot(heterozygosity_reports_df_0.95, aes(x = ObjectName, y = Ho)) +
+  geom_point() +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+  labs(title = "Observed Heterozygosity by Sample number 0.95 Call Rate",
+       x = "Sample Number", y = "Observed Heterozygosity (Ho)")
+
+kimberley_Ho_0.95callrate
+
+par(mfrow = c(2,1))
+kimberley_Ho_0.7callrate +kimberley_Ho_0.95callrate
+
+```
+
+::: callout-caution
+## Call rate filters
+
+Higher call rate filters can reduce your slightly reduce your heterozygosity estimate
+:::
+
+## 3. Estimating heterozygosity: Even sampling
+
+*does subsetting to have the same sample numbers fix the issue?*
+
+Let's compare heterozygosity when SNPs are called on 5 individuals, versus called on 40 individuals and then is subset to 5 individuals.
+
+If you called SNPs on more individuals than you wanted to make them equal, can you just remove individuals without re-calling SNPS? Let's test.
+
+### Subsampling
+
+```{r}
+# Use grep() to match names that start with "Kimberley" 
+kimberley_names <- grep("^Kimberley.*\\.vcf$", all_names, value = TRUE) 
+# put all the genlights into a mega list
+
+#create another list with the ones we want
+kimberley <- mget(kimberley_names)
+
+# Now lets subsample the datasets down to the same five individuals
+# so that the only difference is our SNP calling
+# who are the individuals
+inds <- indNames(Kimberley_n_05.vcf_0.7)
+
+#Initialize an empty data frame
+heterozygosity_when_subsampling <- data.frame()
+
+for(name in names(kimberley)) {
+  # Access the genlight object from your list
+  genlight_object <- kimberley[[name]]
+  
+  # Subset the individuals
+  x <- gl.keep.ind(genlight_object, ind.list = inds, mono.rm = TRUE)
+  
+  #filter on call rate
+  
+  x <- gl.filter.callrate(x, threshold = .7)
+  
+  # Apply the function
+  report <- gl.report.heterozygosity(x)
+  
+  # Add 'ObjectName' as the first column of the report
+  report$ObjectName <- name 
+  # Adjusting to add column without cbind to maintain data frame classes
+  
+  # Bind this report to the main data frame
+  heterozygosity_when_subsampling <- bind_rows(heterozygosity_when_subsampling,
+                                               report)
+}
+
+```
+
+### Plotting results
+
+```{r}
+kimberley_Ho_subsampling <- ggplot(heterozygosity_when_subsampling, aes(x = ObjectName, y = Ho)) +
+  geom_point() +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+  labs(title = "Observed Heterozygosity when subsampling", 
+       x = "SNP Calling", y = "Observed Heterozygosity (Ho)")
+
+kimberley_Ho_subsampling
+
+```
+
+::: callout-tip
+## subsampling
+
+There are some minor differences but it's not too bad
+:::
+
+### Subsampling more populations
+
+*There appears to be minor differences between sample sizes for the Kimberley population, but is this true for all populations?*
+
+#### Southeast
+
+```{r}
+#create a list of the southeast genlights
+Southeast_names <- ls(pattern = "^SouthEast")
+#put all the genlights into a mega list
+southeast <- mget(Southeast_names)
+
+#Now lets subsample the datasets down to the same five individuals
+#so that the only difference is our SNP calling
+#who are the individuals
+inds <- indNames(SouthEast_n_05.vcf)
+
+
+for(name in names(southeast)) {
+  # Access the genlight object from your list
+  genlight_object <- southeast[[name]]
+  
+  # Subset the individuals
+  x <- gl.keep.ind(genlight_object, ind.list = inds, mono.rm = TRUE)
+  
+  #filter on call rate
+  
+  x <- gl.filter.callrate(x, threshold = .7)
+  
+  # Apply the function
+  report <- gl.report.heterozygosity(x)
+  
+  # Add 'ObjectName' as the first column of the report
+  report$ObjectName <- name # Adjusting to add column without cbind to maintain data frame classes
+  
+  # Bind this report to the main data frame
+  heterozygosity_when_subsampling <- bind_rows(heterozygosity_when_subsampling, report)
+}
+
+southeast_Ho_subsampling <- ggplot(heterozygosity_when_subsampling, aes(x = ObjectName, y = Ho)) +
+  geom_point() +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+  labs(title = "Observed Heterozygosity when subsampling",
+       x = "SNP Calling", y = "Observed Heterozygosity (Ho)")
+```
+
+#### Central
+
+```{r}
+#create a list of the central australian genlights
+central_names <- ls(pattern = "^Central")
+#put all the genlights into a mega list
+central <- mget(central_names)
+
+#Now lets subsample the datasets down to the same five individuals
+#so that the only difference is our SNP calling
+#who are the individuals
+inds <- indNames(Central_n_05.vcf)
+
+for(name in names(central)) {
+  # Access the genlight object from your list
+  genlight_object <- central[[name]]
+  
+  # Subset the individuals
+  x <- gl.keep.ind(genlight_object, ind.list = inds, mono.rm = TRUE)
+  
+  #filter on call rate
+  
+  x <- gl.filter.callrate(x, threshold = .7)
+  
+  # Apply the function
+  report <- gl.report.heterozygosity(x)
+  
+  # Add 'ObjectName' as the first column of the report
+  report$ObjectName <- name # Adjusting to add column without cbind to maintain data frame classes
+  
+  # Bind this report to the main data frame
+  heterozygosity_when_subsampling <- bind_rows(heterozygosity_when_subsampling, report)
+}
+
+central_Ho_subsampling <- ggplot(heterozygosity_when_subsampling, aes(x = ObjectName, y = Ho)) +
+  geom_point() +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
+  labs(title = "Observed Heterozygosity when subsampling 5 individuals",
+       x = "SNP Calling", y = "Observed Heterozygosity (Ho)")
+
+
+```
+
+### Plotting Results
+
+```{r}
+southeast_Ho_subsampling
+central_Ho_subsampling
+```
+
+::: callout-caution
+## Subsampling
+
+so we're not seeing too much impact of subsampling if SNPs are called separately on populations.
+
+**BUT**, BUT, BUT, BUT, BUT, BUT, BUT...
+
+The kimberley population has the highest actual heterozygosity (see the paper) the difference here is that this population lost a lot of variable sites because 7% of the variable sites have more than two alleles So a comparison between Central & SE and Kimberley Rubella would find the highest in the wrong population.
+
+**This is very problematic and is an ongoing bioinformatic issue.**
+
+Therefore, calling SNPs separately on populations and keeping sample sizesthe same does not resolve the issues with heterozygosity based on SNPs.
+:::
+
+## Calling populations together
+
+*Does this resolve the issue?*
+
+Lets look at a file where SNPs were called on all three populations at once, and the samples were equal numbers.
+
+```{r}
+#first we assign populations to the individuals in the genlight
+individual_names <- as.vector(indNames(combined_kim_15_cen_15_se_15.vcf))
+
+# Split each name at the underscore and keep the first part
+modified_names <- sapply(individual_names, function(name) {
+  parts <- strsplit(name, "_")[[1]]
+  parts[1]
+})
+
+# Convert the output to a factor
+modified_names <- factor(modified_names)
+
+#then we assign the populations
+combined_kim_15_cen_15_se_15.vcf@pop <- modified_names
+
+#then we apply a call rate filter
+combined_kim_15_cen_15_se_15.vcf_0.7 <- gl.filter.callrate(combined_kim_15_cen_15_se_15.vcf,
+                                                           threshold = 0.95, mono.rm = T)
+
+#then we look at the heterozygosity estimates by population
+diversity_equal_sample_15_ind <- gl.report.heterozygosity(combined_kim_15_cen_15_se_15.vcf_0.7)
+```
+
+We now see that our heterozygosity if found to be highest in the Kimberley and lowest in Central Australia, which is true.
+
+### Calling SNPs together but with different sample sizes
+
+Lots of times we have different numbers of samples... so what does this do to our estimates? Lets look at what happens when we have different sample numbers across all populations
+
+```{r}
+individual_names <- as.vector(indNames(combined_kim_15_cen_5_se_10.vcf))
+
+# Split each name at the underscore and keep the first part
+modified_names <- sapply(individual_names, function(name) {
+  parts <- strsplit(name, "_")[[1]]
+  parts[1]
+})
+
+# Convert the output to a factor
+modified_names <- factor(modified_names)
+
+#then we assign the populations
+combined_kim_15_cen_5_se_10.vcf@pop <- modified_names
+
+#then we apply a call rate filter
+combined_kim_15_cen_5_se_10.vcf_0.95 <- gl.filter.callrate(combined_kim_15_cen_5_se_10.vcf, threshold = 0.95, mono.rm = T)
+
+#then we look at the heterozygosity estimates by population
+diversity_unequal_sample <- gl.report.heterozygosity(combined_kim_15_cen_5_se_10.vcf_0.95)
+
+#how much more heterozygosity does kimberley have than central in different analyses?
+
+#where our samples are equal?
+diversity_equal_sample_15_ind$Ho[1]/diversity_equal_sample_15_ind$Ho[3]
+
+#where our samples are equal?
+diversity_unequal_sample$Ho[1]/diversity_unequal_sample$Ho[3]
+```
+
+::: callout-tip
+## Take away
+
+What you need to take away here is that as the sample size of our most diverse population grows, the less diverse populations become more similar in this case, if you use really unequal sample sizes, you can get so biased that your less diverse population can be calculated as more diverse than your most diverse population.
+
+#### **Think of the conservation implications!**
+:::
+
+::: callout-warning
+## SNP-based heterozygosity
+
+SNP-based heterozygosity is extremely biased and cannot be used to compare different populations, and there are no clear workarounds that will give you reliable answers.
+
+You need to report autosomal heterozygosity at a minimum, which means doing your own bioinformatics from raw data at this time.
+:::
+
+## *Further Study*
+
+still to come...
