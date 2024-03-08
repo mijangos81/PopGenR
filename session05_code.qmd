@@ -1,19 +1,14 @@
 ---
-title: "Session 5: Effective Population sizes "
-authors: "Carlo Pacioni and Bernd Gruber"
-format: 
-  html:
-    theme: cosmo
-    keep-tex: true
-    toc: true
-    toc_depth: 3
-    toc_float: yes
-    toc-location: left
-    number-sections: false
-editor: visual
-editor_options: 
-  chunk_output_type: console
+title: "Session 5: Effective Population Size
 ---
+
+# Effective Population Size
+
+*Session Presenters*
+
+![](images/Presenters5.png)
+
+## *Required packages*
 
 ```{r setup, include = FALSE}
 library(knitr)
@@ -25,15 +20,15 @@ knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72),
                       echo = TRUE)
 ```
 
-# Load required packages
-
 ```{r, warning=FALSE, message=FALSE}
 library(dartRverse)
+library(dartR.popgen)
 library(ggplot2)
-library(geohippos)
+# devtools::install_github('green-striped-gecko/geohippos')
+library(geohippos)  
 ```
 
-# Introduction
+## Introduction
 
 Ne is important for conservation and management of populations. It is an indicator of the genetic diversity of a population and is used to estimate the probability of extinction.
 
@@ -43,13 +38,99 @@ The 50/500 rule is a guideline in conservation biology that relates to the effec
 
 Be aware the 50/500 rule is a rule of thumb and should be used with caution. It is not a one-size-fits-all rule and should be used in conjunction with other information about the species and its habitat. It has been criticized for being too simplistic and not taking into account the specific needs of individual species.
 
-#1. Current effective population size
+## 1. Current effective population size
 
-Carlo
 
-#2. Historic effective population size
+There are various methods to estimate current effective population size. In this section, we are going to focus on linkage disequilbrium and we will use the methods implemented in `NeEstimator`. `dartR.popgen` has a wrapper to run `NeEstimator`, which has been recently updated to include the new adjustments from Waples et al 2016. Also, we will look at possible causes of $Inf$ estimates.
 
-#2a Based on SFS
+## New dartR.popgen functionalities
+
+The method implemented in `NeEstimator` assumes that the loci are independent and that the linkage detected depends on the finite Ne of a population. Waples et al (2016) demonstrated that, in the genomic era when thousands of SNPs are available and when an annotated genome is available, the Ne can be improved (i.e. reduced downward bias) by considering linkage of only pairs of loci on different chromosomes. This option can now be easily accessed via `gl.LDNe` function using the argument `pairing` (and making sure information on Chromosomes were provided in the `@chromosome` slot.
+
+```{r}
+# Run as it was classically run
+# SNP data (use two populations and only the first 100 SNPs)
+pops <- possums.gl[1:60, 1:100]
+nes <- gl.LDNe(pops,  outfile = "popsLD.txt", neest.path = "./binaries",
+  critical = c(0, 0.05), singleton.rm = TRUE, mating = "random")
+
+# Using only pairs of loci on different chromosomes
+# made up some chromosome location
+pops@chromosome <- as.factor(sample(1:10, size = nLoc(pops), replace = TRUE))
+# Note the use of the argument 'pairing'
+nessep <- gl.LDNe(pops,
+              outfile = "popsLD.txt", pairing="separate",
+              neest.path = "./binaries",
+              critical = c(0, 0.05), singleton.rm = TRUE, mating = "random")
+
+```
+
+If the loci are not mapped, but the number of chromosomes or the genome length is known, it is possible to apply a correction (eq 1a or 1b of Waples et al (2016)) using the arguments `Waples.correction` and `Waples.correction.value`.
+
+```{r}
+# Correct estimates based on the number of chromosomes
+nes <- gl.LDNe(pops,   outfile = "popsLD.txt",  neest.path = "./binaries",
+  critical = c(0, 0.05), singleton.rm = TRUE, mating = "random",
+  Waples.correction='nChromosomes', Waples.correction.value=22) 
+
+```
+
+## The infinite problem
+
+Sometimes, Ne estimates are $Inf$. This is usually taken to mean that the population in question is very large. Indeed, in an infinitely large population no linkage should occur (between independent loci). However, it is sometimes useful to be able to understand the origin of this estimate.
+
+The original formula to calculate Ne for species with random mating systems is (eq 7 Waples 2006):
+
+$$
+1/3(\hat{r}^{2} - 1/S)
+$$
+
+while for species with monogamy is (eq 8 Waples 2006):
+
+$$
+2/3(\hat{r}^{2} - 1/S)
+$$
+
+where $\hat{r}^{2}$ is the estimate inter-locus correlation based on Burrows' $\Delta$. However, `NeEstimator` also applies an empirical correction that was demonstrated by Waples 2006 to reduce the bias of $N_e$ estimations. For example, for species with random mating and with a sample size $S\ge30$ this becomes:
+
+$$
+N_e = \frac{1/3 + \sqrt{(1/9 - 2.76 \hat{r}^{2}\prime)}}{2 \hat{r}^{2}\prime}
+$$
+
+Note that when $\hat{r}^{2}\prime > \frac{1}{9*2.76}$ --\> $\hat{r}^{2}\prime > 0.04025765$ the term within the square root is negative, so it becomes undefined.
+
+The observed inter-locus correlation is a combination of $\hat{r}^{2}_{drift} + E(\hat{r}^{2}_{sample})$. Because we are really after only $\hat{r}^{2}_{drift}$, we estimate it by subtracting $E(\hat{r}^{2}_{sample})$, i.e.:
+
+$$
+\hat{r}^{2}\prime = \hat{r}^{2} - E(\hat{r}^{2}_{sample})
+$$
+
+For small sample sizes, $E(\hat{r}^{2}_{sample})$ can be relatively large and our $N_e$ estimate can become negative. Let's have a look at possible values of $E(\hat{r}^{2}_{sample})$ for different sample size (again in a species with random mating and with a sample size $S\ge30$):
+
+```{r}
+r_sample <- function(S) (1/S) + (3.16/S^2)
+
+r_sample(seq(10, 50, by=5))
+```
+
+it is easy then to imagine that for small sample sizes, we may 'overcorrect' and the denominator may become negative, which is a non sense-result. Generally, the interpretation is that the linkage detected is a result of simple sampling error. A test of whether the detected linkage is statistically significant may help to interpret the results.
+
+`gl.LDNe` gained the argument `naive`, which calculates $N_e$ without the empirical correction. This is mostly to aid the diagnostic of where the $Inf$ estimate (if it occurs) is coming from.
+
+```{r}
+# Correct estimates based on the number of chromosomes
+nes <- gl.LDNe(pops,  outfile = "popsLD.txt", neest.path = "./binaries",
+  critical = c(0, 0.05), singleton.rm = TRUE, mating = "random",
+  naive=TRUE) 
+
+```
+
+Other sources of problems are potentially coming from the loci selection that you have. If all sampled individuals are homozygous for the same allele (in one population) or are heterozygous, the estimation of $N_e$ fails. That is because the inter-locus correlation based on Burrows' $\Delta$ cannot be computed. `NeEstimator` removes all monomorphic loci (if you haven't done that before), so often this is not a problem, but (I think) it still may happen when all individuals are heterozygous.
+
+
+## 2. Historic effective population size
+
+### Based on SFS
 
 The Site Frequency Spectrum (SFS), sometimes referred to as the allele frequency spectrum, is a fundamental concept in population genetics that describes the distribution of allele frequencies at polymorphic sites within a sample of DNA sequences from a population. It provides a powerful summary of the genetic variation present in the population, capturing information about the history of mutations, demographic events (such as population expansions or bottlenecks). There are several methods to estimate historic, but we explore only two here: Epos @lynch2019 and Stairways2 @liu2020
 
@@ -119,7 +200,7 @@ sfsinc <- gl.sfs(glinc, folded = TRUE)
 sfsbottle <- gl.sfs(glbottle, folded = TRUE)
 ```
 
-### examples for different sfs (simulated)
+### Examples for different sfs (simulated)
 
 ```{r}
 
@@ -255,7 +336,7 @@ Foxes in Australia (foxes.rds) Crocodiles in Australia (crocs.rds)
 You can also try to run the simulator to explore how good the methods are for more complicated demographic histories. \[slim simulator\]
 :::
 
-# Gone
+## Gone
 
 \[Needs more implementation and testing, but I will give a brief overview here.\] \[Be aware Gone is very data hungry and seems not to work too well with the number of SNPs we have at our disposal, but in simulations with Ne\~1000 and lots of individuals it seems to work well\].
 
