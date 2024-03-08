@@ -1,0 +1,39 @@
+*******************************************************************
+* Genome-wide Complex Trait Analysis (GCTA)
+* version v1.94.1 Linux
+* Built at Nov 15 2022 21:14:25, by GCC 8.5
+* (C) 2010-present, Yang Lab, Westlake University
+* Please report bugs to Jian Yang <jian.yang@westlake.edu.cn>
+*******************************************************************
+Analysis started at 10:04:09 UTC on Fri Mar 08 2024.
+Hostname: application-11350362-deployment-21645050-9scq2
+
+Accepted options:
+--bfile gl_plink
+--make-grm-bin
+--out gcta_grm
+
+Note: This is a multi-thread program. You could specify the number of threads by the --thread-num option to speed up the computation if there are multiple processors in your machine.
+
+Reading PLINK FAM file from [gl_plink.fam].
+103 individuals to be included from [gl_plink.fam].
+Reading PLINK BIM file from [gl_plink.bim].
+2626 SNPs to be included from [gl_plink.bim].
+Reading PLINK BED file from [gl_plink.bed] in SNP-major format ...
+Genotype data for 103 individuals and 2626 SNPs to be included from [gl_plink.bed].
+Calculating allele frequencies ...
+Recoding genotypes (individual major mode) ...
+
+Calculating the genetic relationship matrix (GRM) ... (Note: default speed-optimized mode, may use huge RAM)
+
+Summary of the GRM:
+Mean of diagonals = 1.1978
+Variance of diagonals = 0.225967
+Mean of off-diagonals = -0.0120594
+Variance of off-diagonals = 0.0597764
+GRM of 103 individuals has been saved in the file [gcta_grm.grm.bin] (in binary format).
+Number of SNPs to calculate the genetic relationship between each pair of individuals has been saved in the file [gcta_grm.grm.N.bin] (in binary format).
+IDs for the GRM file [gcta_grm.grm.bin] have been saved in the file [gcta_grm.grm.id].
+
+Analysis finished at 10:04:09 UTC on Fri Mar 08 2024
+Overall computational time: 0.01 sec.
