@@ -645,6 +645,8 @@ table(values(soil.final))
 
 Great the final step is the recoding of the resistance values. From the first plot and using our knowlegde on the terrain colors in R, we can see that the soil type "clay" is coded as 0, "loam" as 1, "rock" as 2, "sand" as 3, and "tidal" as 4. We have to recode those values to be able to use it as a resistance surface.
 
+This is actually a step that has potentially a lot of effect and there is not really a good way to give advice as the recoding can be very specific. For a binary resistance surface (e.g. a river or road) it is fairly easy, but the absolute values to use is not really clear. E.g. linear structures like roads are fairly thin, hence they need a high resistance value to have an effect. in contrast layers such as the soil layer, lower values are more appropriate as individual cells are not barriers but the overall area is. Then there are contineous layers such as elevation and here a "mapping" function is needed. E.g. is the effect meant to be linear or is it more like a limiting curve (e.g. from a certain elevation the resistance becomes not much higher. Also step functions might be a good idea. As a general rule how to decide on the recoding it is important to think about the feature that is meant to be a barrier and how it expected to affect the migration of individuals.
+
 ```{r}
 
 #convert resistance values
