@@ -1,3 +1,7 @@
+---
+title: "Session 2: Pop Gen In Conservation"
+---
+
 # Pop Gen In Conservation
 
 *Session Presenters*
@@ -14,6 +18,7 @@ library(gifski)
 knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72), 
                       cache =TRUE, 
                       echo = TRUE)
+
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -289,14 +294,19 @@ This is a structure-like analysis called SNMF. This code is not all you would ne
 
 ```{r, output = FALSE}
 
+#takes quite a while to run (about 15 minutes)
+#in case you want to run it uncomment the following lines and comment the readRDS line
+
 # LEA requires the genotype style file
-gl2faststructure(gl.structure, outfile = "gl_structure.fstr",
-                 outpath = './data/')
-struct2geno("./data/gl_structure.fstr", ploidy = 2, FORMAT = 2) 
+#gl2faststructure(gl.structure, outfile = "gl_structure.fstr",
+#                 outpath = './data/')
+#struct2geno("./data/gl_structure.fstr", ploidy = 2, FORMAT = 2) 
 ###this hates any loci with all heterozygotes
 
-snmf.Sy.K1_8.10 = snmf("./data/gl_structure.fstr.geno", K = 1:8,
-                       entropy = T, ploidy = 2, project="new", repetitions = 10)  
+#snmf.Sy.K1_8.10 = snmf("./data/gl_structure.fstr.geno", K = 1:8,
+#                       entropy = T, ploidy = 2, project="new", repetitions = 10)
+
+snmf.Sy.K1_8.10 <- readRDS("./data/snmf.Sy.K1_8.10.rds")
 
 ```
 
@@ -539,8 +549,6 @@ This shows how understanding the population genetic theory for a metric is cruci
 :::
 
 ## *Further Study*
-
-
 
 Another teaching app in R, covering only Shannon for genes and its change over time, produced by Computer Science and Engineering third-year students: <https://evolutionaryecology.shinyapps.io/learningEE>
 
