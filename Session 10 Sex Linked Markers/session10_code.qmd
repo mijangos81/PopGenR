@@ -6,7 +6,7 @@ title: "Session 10: Sex Linked Markers"
 
 *Session presenters*
 
-![](images/Presenters10.png)
+![](../images/Presenters10.png)
 
 ```{r setup, include=FALSE}
 library(knitr)
@@ -15,6 +15,7 @@ library(tidyverse)
 knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72), 
                       cache = TRUE, 
                       echo = TRUE)
+knitr::opts_knit$set(root.dir = "/cloud/project/")
 ```
 
 ## *Required packages*
@@ -369,7 +370,10 @@ table(data.gl@other$ind.metrics$sex, useNA = "ifany")
 #### 1. Number of sex-linked markers?
 
 ```{r, results="hold"}
-res <- dartR.sexlinked::gl.filter.sexlinked(gl = data.gl, system = "xy", plots = TRUE, ncores = 1)
+ncores <- min(4, parallel::detectCores())
+#still takes some minutes to run
+res <- dartR.sexlinked::gl.filter.sexlinked(gl = data.gl, system = "xy", plots = TRUE, ncores = ncores)
+
 ```
 
 #### 2. Individuals with wrong sexID?
@@ -404,9 +408,9 @@ table(data.gl@other$ind.metrics$sex, useNA = "ifany")
 
 ```{r, results="hold"}
 #check if you can increase the number of cores
-#takes very long, you can load the results via the line below
-#resbull <- dartR.sexlinked::gl.filter.sexlinked(gl = data.gl, system = "xy", plots = TRUE, ncores = 1)
-
+#ncores <- min(4,parallel::detectCores())
+#resbull <- dartR.sexlinked::gl.filter.sexlinked(gl = data.gl, system = "xy", plots = TRUE, ncores = ncores)
+#load results from previous run
 resbull <- readRDS("./data/resbull.rds")
 ```
 

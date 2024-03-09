@@ -8,7 +8,7 @@ title: "Session 6: Management of Small Populations"
 
 *Session Presenters*
 
-![](images/Presenters6.png)
+![](../images/Presenters6.png)
 
 *Written by Kate Farquharson with input from Catherine Grueber.*
 
@@ -17,6 +17,7 @@ title: "Session 6: Management of Small Populations"
 ```{r, warning=FALSE, message=FALSE}
 library(dartRverse)
 library(hierfstat)
+knitr::opts_knit$set(root.dir = "/cloud/project")
 
 ```
 
@@ -41,7 +42,7 @@ The data is a subset of the genome-wide SNPs that are publicly available from th
 :::
 
 ```{r}
-load("./data/session6_gl.Rdata")
+load("../data/session6_gl.Rdata")
 gl
 summary(gl@pop)
 ```
@@ -191,8 +192,11 @@ Calculate pairwise Fsts between populations.
 :::
 
 ```{r}
-fsts <- gl.fst.pop(gl, nboots=1000, percent=95)
-knitr::kable((fsts$Fsts))
+nclusters <- min(4,parallel::detectCores()) #run with 4 cores if available
+#to run faster nboots are set to 100 instead of 1000
+#takes about a minute to run
+fsts <- gl.fst.pop(gl, nboots=100, percent=95, nclusters = nclusters)
+knitr::kable((round(fsts$Fsts,3)))
 #summary(fsts$Fsts)
 ```
 

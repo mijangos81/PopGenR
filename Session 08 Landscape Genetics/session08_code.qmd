@@ -4,11 +4,11 @@ title: "Session 8: Landscape Genetics"
 
 
 
-# 
+# Landscape Genetics
 
 *Session Presenters*
 
-![](images/Presenters8.png)
+![](../images/Presenters8.png)
 
 ### *Required packages*
 
@@ -19,6 +19,8 @@ library(tidyverse)
 library(gifski)
 knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72), 
                       echo = TRUE)
+knitr::opts_knit$set(root.dir = "/cloud/project/")
+
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -390,7 +392,7 @@ We expect a continuous linear relationship - when there are discontinuities, thi
 
 ### Lesser hairy-footed dunnartsin the Pilbara
 
-![*Sminthopsis youngsonii*](images/Dunnart.png){fig-align="left"}
+![*Sminthopsis youngsonii*](../images/Dunnart.png){fig-align="left"}
 
 ### Load the data
 
@@ -536,7 +538,7 @@ The bigger open circles are the demes that EEMS will use to estimate the migrati
 ::: callout-note
 ## Exercise
 
-![](images/task.png){.class width="48" height="48"} Change the number of ndemes and see how this affects the grid placement and number of demes.
+![](../images/task.png){.class width="48" height="48"} Change the number of ndemes and see how this affects the grid placement and number of demes.
 
 ```{r, eval=FALSE}
 eems <- gl.run.eems(Sy.gl, eems.path =eems.path, nDemes = 200, diploid = TRUE,
@@ -599,7 +601,7 @@ We have not looked at all of the output. There are actually 8 figures that are p
 ::: callout-note
 ## Exercise
 
-![](images/task.png){.class width="48" height="48"} Have a look at all the plot and try to understand what they are showing.
+![](../images/task.png){.class width="48" height="48"} Have a look at all the plot and try to understand what they are showing.
 :::
 
 The plot that are most often shown (and probably most interesting) are the mrates plots as they demonstrate the migration pattern across the landscape. The simply differ in the way how they threshold the migration rates (basically how they color them) Plot 3 and 4 are about the second important feature, which is the "diversity" across the landscape. Plot 5 and 6 demontrate the relationship between observerd and fitted between and within demes dissimilarity. In short they should show a linear relationship (the more linear the better is the model fit). Plot 7 shows the relationship between genetic and geographic distance. If the genetic distance increases with geographic distance, then there is a pattern of isolation by distance (IBD). Plot 8 shows the convergence of MCMC chain (should stabilise towards similar valus if run multiple times).
@@ -773,7 +775,7 @@ In this case the MPLE selects the mlpe.full as being the best \[lowest AIC\], bu
 ::: callout-note
 ## Exercise
 
-![](images/task.png){.class width="48" height="48"} Antechinus in Kioloa
+![](../images/task.png){.class width="48" height="48"} Antechinus in Kioloa
 :::
 
 The following data set is simulated based on the scenario of Antechinus in Kioloa.\
@@ -806,6 +808,25 @@ A bit mean is that we have not recoded the resistance layers, so you have to do 
 ```{r}
 
 names(antechinus@other)
+```
+
+
+### Elevation layer
+```{r}
+gl.map.interactive(antechinus, provider = "Esri.WorldImagery") %>% addRasterImage(elevation, opacity = 0.8)
+
+```
+
+Roads layer
+```{r}
+gl.map.interactive(antechinus, provider = "Esri.WorldImagery") %>% addRasterImage(roads, opacity = 0.5)
+
+```
+
+
+Forest layer
+```{r}
+gl.map.interactive(antechinus, provider = "Esri.WorldImagery") %>% addRasterImage(forest, opacity = 0.7)
 
 ```
 

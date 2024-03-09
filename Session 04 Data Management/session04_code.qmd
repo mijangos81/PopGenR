@@ -1,8 +1,10 @@
 ---
-title: "Hello, Quarto"
+title: "Session 4 Data Management: Hello, Quarto"
 format: html
 editor: visual
 ---
+
+![](../images/Presenters4.png)
 
 ```{r}
 #| label: load-packages

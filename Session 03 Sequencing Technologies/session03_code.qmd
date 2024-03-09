@@ -6,13 +6,14 @@ title: "Session 3: Sequencing Technologies"
 
 *Session Presenters*
 
-![](images/Presenters3.png)
+![](../images/Presenters3.png)
 
 ## *Required packages*
 
 ```{r, warning=FALSE, message=FALSE}
 library(dartRverse)
 library(ggplot2)
+knitr::opts_knit$set(root.dir = "/cloud/project")
 
 ```
 
@@ -20,9 +21,9 @@ library(ggplot2)
 
 ## **DArT sequencing**
 
-![](images/DArT_logo.png)
+![](../images/DArT_logo.png)
 
-![](images/dart_sequencing.png)
+![](../images/dart_sequencing.png)
 
 DArTseq is our proprietary genome complexity reduction-based sequencing technology.
 
@@ -54,9 +55,9 @@ This uses data from Litoria rubella, a very abundant and widespread frog species
 
 ```{r}
 
-
+getwd()
 # load data
-load("./data/Session3_data.RData")
+load("../data/Session3_data.RData")
 
 #create a list of the kimberley genlights
 kimberley_names <- ls(pattern = "^Kimberley")

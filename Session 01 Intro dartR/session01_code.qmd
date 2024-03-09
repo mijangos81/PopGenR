@@ -11,7 +11,7 @@ project:
 
 *Session Presenters*
 
-![](images/Presenters1.png)
+![](../images/Presenters1.png)
 
 ## *Required packages*
 
@@ -22,17 +22,18 @@ project:
 ```{r, warning=FALSE, message=FALSE}
 library(dartR.base)
 library(dartR.data)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
 *make sure you have the packages installed, see* [Install dartRverse](install.qmd)
 
 ## `dartR`'s Reach
 
-![](images/dartr_reach.png){#id .class width="500" fig-align="centre"}
+![](../images/dartr_reach.png){#id .class width="500" fig-align="centre"}
 
 ## Diversity Arrays Technology Pty Ltd (DArT)
 
-![](images/dart_diversity.png)
+![](../images/dart_diversity.png)
 
 Diversity Arrays Technology Pty Ltd (DArT) is a private company that specializes in genotyping by sequencing. Their approach is one of genome complexity reduction. Basically, DArTSeq is a method that extracts reproducible genomic variation across the genomes of many individuals at an affordable cost. The data are representational in the sense that they are generated for a random but reproducible selection of small fragments of sequence only, fragments that exhibit variation at the level of single base pairs (SNPs).
 
@@ -42,13 +43,13 @@ You can also learn more about the methods by checking out the tutorial on **Data
 
 #### Their mission:
 
-![](images/dart_mission.png)
+![](../images/dart_mission.png)
 
 ## The `dartRverse`
 
 #### From 1 package to 7
 
-![](images/dartR7.png) *See the section* [Install dartRverse](install.qmd) *to learn about the reasoning behind how the dartRverse came to be...*
+![](../images/dartR7.png) *See the section* [Install dartRverse](install.qmd) *to learn about the reasoning behind how the dartRverse came to be...*
 
 ## The magical world of RStudio Cloud
 
@@ -58,7 +59,7 @@ You can also learn more about the methods by checking out the tutorial on **Data
 
 -   **Forge Your Credentials:** Spot the "Sign Up" beacon in the realm's upper right corner and click it with courage. Click on the “Learn more” below the “Cloud Free” plan and then in the “Sign Up” button. A scroll will appear, asking for your name, your secret code (password), and your e-mail. Please use the same e-mail you provided when you registered to the workshop.
 
-![](images/cloud_sign_up.png)
+![](../images/cloud_sign_up.png)
 
 -   **Prove Your Worth:** After submitting your details, a pigeon (or was it an email?) will fly into your inbox carrying a secret message. Click the link within to prove you're not a goblin in disguise.
 
@@ -72,13 +73,13 @@ You can also learn more about the methods by checking out the tutorial on **Data
 
 -   **Locate the Treasure Chest:** Within the grand chamber (workshop space), seek the project “PopGenR” and click on it to reveal its secrets. As you open it for the first time, ancient RStudio Cloud spirits will work their magic to prepare your environment.
 
-![](images/cloud_WS.png){.class width="500"}
+![](../images/cloud_WS.png){.class width="500"}
 
 ## `dartR` fundamentals
 
 ### The structure of a genlight object
 
-![](images/genlight_structure.jpg){.class width="600" fig-align="left"}
+![](../images/genlight_structure.jpg){.class width="600" fig-align="left"}
 
 For a detailed rundown of the genetic data used by the `dartRverse`, check out the tutorial on **Data Structure and Input** found in the [dartR Tutorials](tutorials.qmd) section.
 
@@ -165,7 +166,7 @@ gl.filter.secondaries()          # secondaries
 -   Trade-off between strength of filter and number of loci
 -   Call rate filters matter for different metrics
 
-![](images/callrate_loc.png)
+![](../images/callrate_loc.png)
 
 ### callrate: ind
 
@@ -180,7 +181,7 @@ gl.filter.secondaries()          # secondaries
 -   The filtering step that costs you the very most amount of money
 -   Generally not a first step – recommend filtering lightly here in the first go and seeing if other filters improve the individuals completeness
 
-![](images/callrate_ind.png)
+![](../images/callrate_ind.png)
 
 ### reproducibility
 
@@ -208,7 +209,7 @@ gl.filter.secondaries()          # secondaries
 -   If your read depth is not high enough, there are questions you can’t confidently answer (e.g., heterozygosity)
 -   Very high read depth suggests paralogs (genes with multiple copies) being assembled in to one fragment
 
-![](images/rdepth.png)
+![](../images/rdepth.png)
 
 ### maf
 
@@ -229,7 +230,7 @@ gl.filter.secondaries()          # secondaries
     -   Rare alleles are important in expansion processes
     -   NOT important in structure or phylogenetic analyses
 
-![](images/maf.png)
+![](../images/maf.png)
 
 ### secondaries
 
@@ -244,7 +245,7 @@ gl.filter.secondaries()          # secondaries
 -   Can mislead structure and phylogenetic analyses
 -   Can improve representations of heterozygosity
 
-![](images/secondaries.png)
+![](../images/secondaries.png)
 
 ### Strategies
 
@@ -312,7 +313,7 @@ Keep these tips in mind when you go to filter your own data:
 ::: callout-note
 ## Exercise
 
-![](images/task.png){.class width="48" height="48"} Try some of these report, subset, and filtering functions on your own.
+![](../images/task.png){.class width="48" height="48"} Try some of these report, subset, and filtering functions on your own.
 
 ### Reporting
 

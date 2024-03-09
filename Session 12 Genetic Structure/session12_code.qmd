@@ -6,7 +6,7 @@ title: "Session 12: Genetic Structure"
 
 *Session Presenters*
 
-![](images/Presenters12.png)
+![](../images/Presenters12.png)
 
 ## *Required packages*
 
@@ -18,6 +18,7 @@ As always we need to have dartRverse installed and loaded. In addition you need 
 #install.packages('expm')
 library(dartRverse)
 library(dartR.popgen)
+knitr::opts_knit$set(root.dir = "/cloud/project/")
 ```
 
 *make sure you have the packages installed, see* [Install dartRverse](install.qmd)
@@ -30,7 +31,7 @@ library(dartR.popgen)
 
 ```{r}
 # Read in the example data
-gl <- readRDS("./data/Example_12.1_SNP.Rdata")
+gl <- readRDS("../data/Example_12.1_SNP.Rdata")
 # Interrogate to see what the data are
 nLoc(gl)
 nInd(gl)
@@ -132,7 +133,7 @@ And yes it looks like expected.
 ::: callout-caution
 ### Exercise PCOA and a map
 
-![](images/task.png){#id .class width="48" height="48"} Confirm that you understand how the map and the pcoa plot relate to each other.
+![](../images/task.png){#id .class width="48" height="48"} Confirm that you understand how the map and the pcoa plot relate to each other.
 :::
 
 Now, lets see what kind of information we can get from a structure run.
@@ -140,14 +141,14 @@ Now, lets see what kind of information we can get from a structure run.
 Different to the above we run structure with at least some repetitions for each K (num.k.rep=10) and also over a suitable range. Unfortunately, this takes a while and we will not run it here. Instead we will load the results from a previous run that is saved in the data folder of this repository. \[In case you want to re-run structure simply rename or delete the file in your folder, but be aware that this will take a while.\].
 
 ```{r cached run}
-if (file.exists("./data/srnoad.rds")) {
-srnoad<- readRDS("./data/srnoad.rds")
+if (file.exists("../data/srnoad.rds")) {
+srnoad<- readRDS("../data/srnoad.rds")
 } else {
 possums <- possums.gl[1:150,]
 srnoad <- gl.run.structure(possums, k.range = 2:7, num.k.rep = 10, exec =
-                       './binaries/structure',plot.out = FALSE, 
-                       burnin=50000, numreps=100000, noadmix=FALSE)
-saveRDS(srnoad, "./data/srnoad.rds")
+                       './.binaries/structure',plot.out = FALSE, 
+                       burnin=50000, numreps=100000, noadmix=TRUE)
+saveRDS(srnoad, "../data/srnoad.rds")
 }
 ```
 
@@ -233,12 +234,12 @@ head(qmatnoad[[1]])
 gm <- gl.map.structure(qmat = qmatnoad, x = possums,K=5, scalex=1, scaley=0.5 )
 ```
 
-![spatial qmat plot](images/srnoad.png){fig-align="center"}
+![spatial qmat plot](../images/srnoad.png){fig-align="center"}
 
 ::: callout-note
 ## Exercise: Study the results using different Ks
 
-![](images/task.png){.class width="48" height="48"} The above run was a structure run using the no-admixture model for a range of K=2:7. Study the results by plotting it for various Ks and try to interpret the results in the light of the simulated population structure.
+![](../images/task.png){.class width="48" height="48"} The above run was a structure run using the no-admixture model for a range of K=2:7. Study the results by plotting it for various Ks and try to interpret the results in the light of the simulated population structure.
 :::
 
 ### Structure run (no-admixture=FALSE :-))
@@ -247,14 +248,14 @@ We will now run the same example using the admixture model. The only difference 
 
 ```{r}
 
-if (file.exists("./data/srnoad.rds")) {
-srad<- readRDS("./data/srad.rds")
+if (file.exists("../data/srad.rds")) {
+srad<- readRDS("../data/srad.rds")
 } else {
 possums <- possums.gl[1:150,]
 srad <- gl.run.structure(possums, k.range = 2:7, num.k.rep = 10, exec =
-                       '../binaries/linux/structure',plot.out = FALSE, 
+                       '../binaries/structure',plot.out = FALSE, 
                        burnin=50000, numreps=100000, noadmix=FALSE)
-saveRDS(srad, "./data/srad.rds")
+saveRDS(srad, "../data/srad.rds")
 }
 
 ```
@@ -282,7 +283,7 @@ gm <- gl.map.structure(qmat = qmatad, x = possums,K=4, scalex=1, scaley=0.5 )
 
 ```
 
-![spatial qmat plot](images/srad.png){fig-align="center"}
+![spatial qmat plot](../images/srad.png){fig-align="center"}
 
 ## Faststructure
 
@@ -298,7 +299,7 @@ The method is now implemented in the `gl.run.faststructure` function. Unfortunat
 #                                exec = "./binaries/fastStructure", output = tempdir(),
 #                                exec.plink="./binaries", prior = "simple")
 #load from the previous run
-fsr.simple <- readRDS(("./data/fsr.sim.rds"))
+fsr.simple <- readRDS("../data/fsr.sim.rds")
 ```
 
 Here is the output of the run:
@@ -307,7 +308,7 @@ Here is the output of the run:
 fsr.simple$plot
 ```
 
-![faststructure simple prior plot](images/fs.sim.ev.png){fig-align="center"}
+![faststructure simple prior plot](../images/fs.sim.ev.png){fig-align="center"}
 
 Here we can check the marginal likelihoods for the different K values. The recommended K is then the one with the highest marginal likelihood at the lowest K possible. So here we would decide on K=4. As before we can plot the Q matrix and the spatial structure plot.
 
@@ -323,7 +324,7 @@ gm <-gl.map.structure(qmat.simple, K = 4, x = possums, scalex = 1, scaley = 0.5)
 #takes about 4 minutes
 #fsr.log <- gl.run.faststructure(possums, k.range = 2:7, num.k.rep = 10, exec = "./binaries/fastStructure", output = tempdir(), exec.plink="./binaries", prior = "logistic",)
 
-fsr.log <- readRDS(("./data/fsr.log.rds"))
+fsr.log <- readRDS("../data/fsr.log.rds")
 
 
 ```
@@ -334,7 +335,7 @@ Here is the output of the run:
 fsr.log$plot
 ```
 
-![faststructure logistic prior plot](images/fst.log.ev.png){fig-align="center"}
+![faststructure logistic prior plot](../images/fst.log.ev.png){fig-align="center"}
 
 As before we can plot the Q matrix and the spatial structure plot.
 
@@ -349,13 +350,13 @@ gm <-gl.map.structure(qmat.log, K = 4, x = possums, scalex = 1, scaley = 0.5)
 ::: callout-note
 ## Exercise: Compare Structure and Faststructure runs
 
-![](images/task.png){.class width="48" height="48"} Now it is time to compare the results from all four previous runs.
+![](../images/task.png){.class width="48" height="48"} Now it is time to compare the results from all four previous runs.
 :::
 
 ::: callout-note
 ## Exercise: Crocodiles
 
-![](images/task.png){.class width="48" height="48"} If you are feeling energetic, you can try to run the structure and faststructure on the crocodile dataset. (crocs.rds)
+![](../images/task.png){.class width="48" height="48"} If you are feeling energetic, you can try to run the structure and faststructure on the crocodile dataset. (crocs.rds)
 
 This is a publically available dataset (though it has been filtered and pruned) from the paper:) to make is a bit easier to run. Nevertheless it still has \>1500 SNPs and more then 400 individuals, so it takes a bit of time to run. If you do not want to wait I did two faststructure runs for you. \* prior = simple, K=2:18 (max number of populations), but only 3 repeat (num.k.rep) \* prior = logistic, K=2:18 (max number of populations), but only 3 repeat (num.k.rep)
 
@@ -363,7 +364,7 @@ Maybe plot the data first, have a look at a PCA and then decide on the number of
 :::
 
 ```{r}
-crocs <- readRDS("./data/crocs.rds")
+crocs <- readRDS("../data/crocs.rds")
 gl.map.interactive(crocs)
 ```
 
@@ -372,7 +373,7 @@ gl.map.interactive(crocs)
 This is a data set (only a subset) of foxes in Australia, which I had lying around. Admittedly the dataset has been pruned, but maybe run a faststructure analysis to check for the population structure between foxes from the west and to the east. 
 
 ```{r}
-foxes <- readRDS("./data/foxes.rds")
+foxes <- readRDS("../data/foxes.rds")
 gl.map.interactive(foxes, pop.labels = FALSE)
 ```
 

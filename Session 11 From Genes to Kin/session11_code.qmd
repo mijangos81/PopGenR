@@ -1,13 +1,8 @@
----
-title: "Session 11: From Genes to Kin: Dissecting Relatedness & Kinship"
----
-
-
 # 11 From Genes to Kin: Dissecting Relatedness & Kinship
 
 *Session Presenters*
 
-![](images/Presenters11.png)
+![](../images/Presenters11.png)
 
 ### *Required packages*
 
@@ -18,6 +13,26 @@ knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(width.cutoff = 72), 
                       cache = TRUE, 
                       echo = TRUE)
+knitr::opts_knit$set(root.dir = "/cloud/project")
+switch(Sys.info()[['sysname']],
+       Windows= {
+         path.plink <- "./binaries/winbinaries"
+         path.colony <- "./binaries/winbinaries/Colony2.msi"
+         path.gcta <- "./binaries/winbinaries/gcta64.exe"
+         path.EMIBD9 <- "./binaries/winbinaries"
+         },
+       Linux  = {
+         path.plink <- "./binaries/"
+         path.colony <- "./binaries/colony2s.gnu.out"
+         path.gcta <- "./binaries/gcta64"
+         path.EMIBD9 <- "./binaries/"
+         },
+       Darwin = {
+         path.plink <- "./binaries/macbinaries"
+         path.colony <- "./binaries/macbinaries/colony2s.out"
+         path.gcta <- "./binaries/macbinaries/gcta64"
+         path.EMIBD9 <- "./binaries/macbinaries"
+         })
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -57,7 +72,7 @@ Below is a table modified from Speed & Balding ([2015](https://doi.org/10.1038/n
 
 ## The Quest to Quash the Cane Toad Conundrum in Mandalong
 
-![*Cane toad (Rhinella marinus)*](images/cane_toad.png){fig-align="left" width="300"}
+![*Cane toad (Rhinella marinus)*](../images/cane_toad.png){fig-align="left" width="300"}
 
 Introduced to Australia in the 1930s to combat cane beetles, cane toads have since become a significant invasive threat, adapting to diverse habitats and reproducing prolifically. Lacking natural predators and possessing toxic secretions, they've harmed native wildlife and disrupted ecosystems across eastern and northern Australia.
 
@@ -65,7 +80,7 @@ Introduced to Australia in the 1930s to combat cane beetles, cane toads have sin
 
 #### Loading data
 ```{r}
-t1 <- gl.load("../data/cane_toad.rds")
+t1 <- gl.load("./data/cane_toad.rds")
 ```
 
 #### Finding duplicated samples
@@ -102,7 +117,7 @@ We will use
 [Diana Robledo's](https://doi.org/10.1111/1755-0998.13844) function to convert a genlight object into COLONY format.
 ```{r}
 # loading gl2colony function from Diana Robledo 
-source("../Session 11 From Genes to Kin/gl2colony.R")
+source("./Session 11 From Genes to Kin/functions/gl2colony.R")
 t3 <- t1_dup
 t3$other$ind.metrics$offspring <- "yes"
 t3$other$ind.metrics$mother <- "no"
@@ -146,15 +161,12 @@ gl2colony(gl = t3,
 )
 
 # Uncomment to run .
-# system.time(
-# system("
-# ./colony2s.out IFN:colony
-# ")
-# )
+# system.time(system(paste(path.colony, "IFN:colony")))
 # # user  system elapsed 
 # # 181.102   1.893 183.162 
+# duplicates <- read.csv("./my_project.PairwiseCloneDyad")
 # read the output
-duplicates <- read.csv("../data/my_project.PairwiseCloneDyad")
+duplicates <- read.csv("./data/my_project.PairwiseCloneDyad")
 duplicates
 cat(res_dup_2,sep="\n")
 ```
@@ -237,14 +249,12 @@ Now let's estimate kinship using new Wang's method which uses a likelihood appro
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
 # Uncomment to run 
-# system.time(
-# EMIBD9 <- gl.run.EMIBD9(t2)
-# )
+ # system.time(EMIBD9 <- gl.run.EMIBD9(t2,emibd9.path = path.EMIBD9))
 # user  system elapsed 
 # 444.003   0.226 449.960 
 # saveRDS(EMIBD9,"EMIBD9.rds")
 # read output
-EMIBD9 <- readRDS("../data/EMIBD9.rds")
+EMIBD9 <- readRDS("./data/EMIBD9.rds")
 EMIBD9_col <- EMIBD9$rel
 EMIBD9_col[upper.tri(EMIBD9_col)] <- NA
 EMIBD9_col <- as.data.frame(as.table(as.matrix(EMIBD9_col)))
@@ -266,15 +276,15 @@ ReadGRMBin <- function(prefix, AllN=FALSE, size=4){
   id <-  read.table(IDFileName)
   n <- dim(id)[1]
   BinFile <- file(BinFileName, "rb");
-  grm <- readBin(BinFile, n=n*(n+1)/2, what=numeric(0), size=size)
+  grm <- readBin(BinFile, n =n*(n+1)/2, what=numeric(0), size=size)
   NFile=file(NFileName, "rb");
   if(AllN==TRUE){
-    N <- readBin(NFile, n=n*(n+1)/2, what=numeric(0), size=size)
+    N <- readBin(NFile, n = n * (n+1)/2, what=numeric(0), size=size)
   }else{
     N <- readBin(NFile, n=1, what=numeric(0), size=size)
   }
-  i=sapply(1:n, sum_i)
-  return(list(diag=grm[i], off=grm[-i], id=id, N=N))
+  i <- sapply(1:n, sum_i)
+  return(list(diag = grm[i], off = grm[-i], id = id, N = N))
 }
 # using dummy chromosome and position information
 t2$chromosome <- as.factor(as.character("1"))
@@ -282,11 +292,11 @@ t2$position <- 1:nLoc(t2)
 # converting to BED format using PLINK
 gl2plink(t2,
          bed.files = TRUE,
-         outpath = "./",
-         plink.bin.path = "../binaries")
+         outpath = getwd(),
+         plink.bin.path = path.plink)
 
 # running GCTA
-system("../binaries/gcta64 --bfile gl_plink --make-grm-bin --out gcta_grm")
+system(paste(path.gcta,"--bfile gl_plink --make-grm-bin --out gcta_grm"))
 # reading output
 grm_GCTA <- ReadGRMBin("gcta_grm")
 # formatting data
@@ -329,7 +339,7 @@ GRM_col$Freq <- GRM_col$Freq/2
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
 #Sibling/Parent-Offspring
-source("../Session 11 From Genes to Kin/gl.grm.network_2.R")
+source("./Session 11 From Genes to Kin/functions/gl.grm.network_2.R")
 grm_sib <- gl.grm.network_2(mat_coan, t2,
                             node.size = 10,
                             method_relatedness = "fr",
@@ -397,7 +407,7 @@ ggplot(rel_plot_2,aes(y=value,x=variable,color = variable,fill = variable)) +
 
 ## Feathers of Laughter: Unveiling the Mysteries of the Amazonian Giggletuft (Hilaroplumis amazoniana)"
 
-![*Amazonian Giggletuft (Hilaroplumis amazoniana)*](images/New_bird.png){fig-align="left" width="300"}
+![*Amazonian Giggletuft (Hilaroplumis amazoniana)*](../images/New_bird.png){fig-align="left" width="300"}
 
 A new bird species has recently been identified in the Amazon region, characterized by its distinctive and intriguing appearance. Scientists are keen to explore the possibility of multiple paternity occurrences within clutches for this species. To delve into this question, the research team employs SNP data to conduct relatedness analyses. Egg samples have been collected from three separate clutches.
 
@@ -406,7 +416,7 @@ Understanding of mating dynamics of this species in the wild may help shape futu
 ```{r, warning=FALSE, results='hide', message=FALSE}
 
 # loading filtered file
-new_bird <- readRDS("../data/new_bird.rds") 
+new_bird <- readRDS("./data/new_bird.rds") 
 # PCA visualization. 
 pcoa_new_bird <- gl.pcoa(new_bird)
 # you can zoom in or out and move in all directions. you can also 
@@ -464,16 +474,16 @@ print(
 
 ## From the Brink and Back: The Arabian Oryx's Oman Odyssey
 
-![*Arabian oryx (Oryx leucoryx)*](images/Arabian_Oryx.png){fig-align="left" width="300"}
+![*Arabian oryx (Oryx leucoryx)*](../images/Arabian_Oryx.png){fig-align="left" width="300"}
 
 The Arabian oryx, once extinct in the wild by 1972, found a lifeline through global zoo and private collection breeding efforts. Thanks to "The World Herd" in the Phoenix Zoo and Saudi Arabian private reserves, these oryxes were reintroduced into the wild. Now, we've got about 1,000 roaming free and another 6,000-7,000 in captivity, marking a historic comeback from extinction to vulnerable status. Quite the turnaround for these majestic creatures in Oman!
 
-![*Arabian oryx (Oryx leucoryx)*](images/oryx_timeline.png){fig-align="left" width="100%"}
+![*Arabian oryx (Oryx leucoryx)*](../images/oryx_timeline.png){fig-align="left" width="100%"}
 Timeline of the Arabian oryx reintroduction program in Oman and establishment of the “World Herd”. Top row displays the years when the animals were captured, translocated or released and the country where the event took place. Middle boxes show the major event and activity at that time. Bottom boxes show the number and sex of animals which had been used.
 
 ### Load dataset and filtering
 ```{r, warning=FALSE, results='hide', message=FALSE}
-oryx_gl <- gl.load("../data/oryx.rds")
+oryx_gl <- gl.load("./data/oryx.rds")
 t1_dup <- oryx_gl
 
 res_dup <- gl.report.replicates(t1_dup,perc_geno = 0.925)
