@@ -49,13 +49,12 @@ See more at <https://www.diversityarrays.com/>
 
 *How do estimates of heterozygosity change as the number of individuals changes in your SNP calling?*
 
-This uses data from Litoria rubella, a very abundant and widespread frog species we are using data following <https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13947>. Let's focus on the Kimberley, where we have lots of samples, and we expect the diversity to be really high because there are millions of them everywhere. SNPs were called on different numbers of individuals, in increments of 5 using the Stacks pipeline. We are only going to do a simple filter for call rates because we already filtered for allele depth in Stacks. SNPs were called independent of other populations, which we will get to later.
+This uses data from Litoria rubella, a very abundant and widespread frog species. We are using data following <https://onlinelibrary.wiley.com/doi/10.1111/1755-0998.13947>. Let's focus on the Kimberley, where we have lots of samples, and we expect the diversity to be really high because there are millions of them everywhere. SNPs were called on different numbers of individuals, in increments of 5 using the Stacks pipeline. We are only going to do a simple filter for call rates because we already filtered for allele depth in Stacks. SNPs were called independent of other populations, which we will get to later.
 
 ### Load data
 
 ```{r}
 
-getwd()
 # load data
 load("../data/Session3_data.RData")
 
@@ -118,7 +117,7 @@ kimberley_Ho_0.7callrate <- ggplot(heterozygosity_reports_df, aes(x = ObjectName
   geom_point() +
   scale_y_continuous(limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
-  labs(title = "Observed Heterozygosity by Sample number", x = "Sample Number", y = "Observed Heterozygosity (Ho)")
+  labs(title = "Observed Heterozygosity by Sample number", x = "Sample Number", y = "Observed Heterozygosity (Ho) at 0.7 Call Rate")
 
 kimberley_Ho_0.7callrate
 ```
@@ -126,7 +125,7 @@ kimberley_Ho_0.7callrate
 ::: callout-caution
 ## Sampling
 
-As you can see, different numbers samples can substantially change your heterozygosity estimate.
+As you can see, different numbers of samples can substantially change your heterozygosity estimate.
 :::
 
 ## 2. Estimating heterozygosity: 95% callrate
@@ -153,7 +152,7 @@ for(name in names(kimberley)){
   genlight_object <- kimberley[[name]]
   # Apply the filter call rate function
   # Assuming gl.filter.callrate is a function that operates on a genlight object
-  filtered_object <- gl.filter.callrate(genlight_object, threshold = .95, mono.rm = TRUE)
+   filtered_object <- gl.filter.callrate(genlight_object, threshold = .95, mono.rm = TRUE)
   # Assign the filtered object back to the environment with a new name
   assign(paste0(name, "_0.95"), filtered_object)
 }
@@ -204,8 +203,7 @@ kimberley_Ho_0.95callrate <- ggplot(heterozygosity_reports_df_0.95, aes(x = Obje
   scale_y_continuous(limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 65, hjust = 1)) +
   labs(title = "Observed Heterozygosity by Sample number 0.95 Call Rate",
-       x = "Sample Number", y = "Observed Heterozygosity (Ho)")
-
+       x = "Sample Number", y = "Observed Heterozygosity (Ho) at 0.95 Call Rate")
 kimberley_Ho_0.95callrate
 
 par(mfrow = c(2,1))
@@ -216,14 +214,14 @@ kimberley_Ho_0.7callrate +kimberley_Ho_0.95callrate
 ::: callout-caution
 ## Call rate filters
 
-Higher call rate filters can reduce your slightly reduce your heterozygosity estimate
+Higher call rate filters can reduce your slightly reduce your heterozygosity estimate, but the major issue is sample number.
 :::
 
 ## 3. Estimating heterozygosity: Even sampling
 
 *does subsetting to have the same sample numbers fix the issue?*
 
-Let's compare heterozygosity when SNPs are called on 5 individuals, versus called on 40 individuals and then is subset to 5 individuals.
+Let's compare heterozygosity when SNPs are called on 5 individuals, versus called on 40 individuals and then subset to 5 individuals.
 
 If you called SNPs on more individuals than you wanted to make them equal, can you just remove individuals without re-calling SNPS? Let's test.
 
@@ -287,7 +285,7 @@ kimberley_Ho_subsampling
 ::: callout-tip
 ## subsampling
 
-There are some minor differences but it's not too bad
+There are some minor differences but it's not too bad so this may be okay in some circumstances.
 :::
 
 ### Subsampling more populations
@@ -359,7 +357,7 @@ for(name in names(central)) {
   
   #filter on call rate
   
-  x <- gl.filter.callrate(x, threshold = .7)
+ x <- gl.filter.callrate(x, threshold = .7)
   
   # Apply the function
   report <- gl.report.heterozygosity(x)
@@ -391,15 +389,15 @@ central_Ho_subsampling
 ::: callout-caution
 ## Subsampling
 
-so we're not seeing too much impact of subsampling if SNPs are called separately on populations.
+So we're not seeing too much impact of subsampling if SNPs are called separately on populations.
 
 **BUT**, BUT, BUT, BUT, BUT, BUT, BUT...
 
-The kimberley population has the highest actual heterozygosity (see the paper) the difference here is that this population lost a lot of variable sites because 7% of the variable sites have more than two alleles So a comparison between Central & SE and Kimberley Rubella would find the highest in the wrong population.
+The Kimberley population has the highest actual heterozygosity (see the paper). The difference here is that this population lost a lot of variable sites because more than 5% (or >35k) of the variable sites have more than two alleles. So a comparison between Central, Southeast and Kimberley Litoria rubella would find the highest heterozygosity in the wrong population.
 
 **This is very problematic and is an ongoing bioinformatic issue.**
 
-Therefore, calling SNPs separately on populations and keeping sample sizesthe same does not resolve the issues with heterozygosity based on SNPs.
+Therefore, calling SNPs separately on populations and keeping sample sizes the same does not resolve the issues with heterozygosity based on SNPs.
 :::
 
 ## Calling populations together
@@ -432,7 +430,7 @@ combined_kim_15_cen_15_se_15.vcf_0.7 <- gl.filter.callrate(combined_kim_15_cen_1
 diversity_equal_sample_15_ind <- gl.report.heterozygosity(combined_kim_15_cen_15_se_15.vcf_0.7)
 ```
 
-We now see that our heterozygosity if found to be highest in the Kimberley and lowest in Central Australia, which is true.
+We now see that our heterozygosity is found to be highest in the Kimberley and lowest in Central Australia, which is true.v
 
 ### Calling SNPs together but with different sample sizes
 
@@ -471,9 +469,11 @@ diversity_unequal_sample$Ho[1]/diversity_unequal_sample$Ho[3]
 ::: callout-tip
 ## Take away
 
-What you need to take away here is that as the sample size of our most diverse population grows, the less diverse populations become more similar in this case, if you use really unequal sample sizes, you can get so biased that your less diverse population can be calculated as more diverse than your most diverse population.
+What you need to take away is that as the sample size of our most diverse population grows, the less diverse populations become more similar. In this case, if you use really unequal sample sizes, your results get so biased that your less diverse population can be calculated as more diverse than your most diverse population.
 
 #### **Think of the conservation implications!**
+In a full analysis of all the data, with unequal sample numbers and SNPs called on all populations, we got a result that the Kimberley population was the least diverse.
+This would then result in a direction that the most genetically important population is actually one of the least.
 :::
 
 ::: callout-warning
