@@ -5,7 +5,7 @@
 * (C) 2010-present, Yang Lab, Westlake University
 * Please report bugs to Jian Yang <jian.yang@westlake.edu.cn>
 *******************************************************************
-Analysis started at 10:04:09 UTC on Fri Mar 08 2024.
+Analysis started at 10:11:08 UTC on Fri Mar 08 2024.
 Hostname: application-11350362-deployment-21645050-9scq2
 
 Accepted options:
@@ -35,5 +35,5 @@ GRM of 103 individuals has been saved in the file [gcta_grm.grm.bin] (in binary 
 Number of SNPs to calculate the genetic relationship between each pair of individuals has been saved in the file [gcta_grm.grm.N.bin] (in binary format).
 IDs for the GRM file [gcta_grm.grm.bin] have been saved in the file [gcta_grm.grm.id].
 
-Analysis finished at 10:04:09 UTC on Fri Mar 08 2024
+Analysis finished at 10:11:08 UTC on Fri Mar 08 2024
 Overall computational time: 0.01 sec.

@@ -1,0 +1,816 @@
+---
+title: "Session 8: Landscape Genetics"
+---
+
+
+
+# 
+
+*Session Presenters*
+
+![](images/Presenters8.png)
+
+### *Required packages*
+
+```{r setup, include = FALSE}
+library(knitr)
+library(formatR)
+library(tidyverse)
+library(gifski)
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72), 
+                      echo = TRUE)
+```
+
+```{r, warning=FALSE, message=FALSE}
+library(dartRverse)
+library(ggplot2)
+library(dismo)
+library(leaflet)
+library(htmltools)
+library(leaflegend)
+library(sf)
+library(raster)
+library(terra)
+library(GGally)
+library(ResistanceGA)
+```
+
+*make sure you have the packages installed, see* [Install dartRverse](install.qmd)
+
+## Introduction
+
+Landscape genetics combines landscape ecology with population genetics to understand how the structure, composition and configuration of the landscape affect gene flow, genetic drift, and selection.
+
+In this tutorial, we will dive into the first question - how does the landscape influence gene flow? There are many ways to tackle this question, for example, we can explore gene flow among individuals across tens of metres up to entire landscapes, or among populations within a meta-population.
+
+Here we'll start with the basics, by looking at the spatial distribution of individuals, and build on this until we incorporate landscape features, to understand:
+
+1.  Different dispersal strategies
+
+2.  Limitations to gene flow, including:
+
+    a\) Geographic distance (isolation-by-distance)
+
+    b\) Geographic barriers (isolation-by-barrier)
+
+    c\) Landscape attributes (isolation-by-resistance)
+
+## 1. Dispersal strategies
+
+Many biological and demographic processes can shape patterns of genetic structure. Dispersal and social behaviours often occur over a fine scale. This means that exploring patters within populations over 10s-100s of metres can often be very informative, especially in small and inconspicuous species.
+
+Before diving into more complex and correlative analyses, it can be very useful to understand some of the baseline life-history and demographic traits in your species. One common question is: *how far do individuals disperse and is this the same/different for males and females?* When one sex disperses further than the other, this is known as sex-biased dispersal. This can be detected via genetic spatial autocorrelation analysis, as increased philopatry by one sex (i.e. individuals remain close to where they are born) results in greater genetic similarity among neighbouring individuals, while genetic similarity is reduced in the dispersing sex.
+
+To explore the genetic patterns that result from sex-biased dispersal, we're going to simulate this process in a population. First, we need to set up the dispersal kernels, using the custom function below.
+
+```{r}
+# Create a function, where: 
+# x = minimum to maximum distance, 
+# d0 = mean distance, 
+# p= proportion  that go to mean
+p2p <- function(x, d0, p)
+{
+  return (exp(((x/d0)*log(p))))
+}
+
+# Dispersal kernels:
+# Females
+dispfemale <- (p2p(x = 1:50, # range of distances
+                   d0 = 1, # mean dispersal distance
+                   p = 0.5)) # proportion that go to mean
+pdispfemale <- c(0, cumsum(dispfemale)/sum(dispfemale))
+
+# Males
+dispmale <- (p2p(x = 1:50, # range of distances
+                 d0 = 20, # mean dispersal distance
+                 p = 0.5)) # proportion that go to mean
+pdispmale <- c(0, cumsum(dispmale)/sum(dispmale))
+
+```
+
+Let's look at the dispersal curves. In this case, males disperse further than females (i.e. there is male-biased dispersal):
+
+```{r}
+# Plot
+plot(dispfemale,
+     type = "l",
+     col = '#E69F00',
+     lwd = 2,
+     main = "Female dispersal curve", 
+     xlab = "Distance (m)", 
+     ylab = "")
+plot(dispmale,
+     type = "l",
+     lwd = 2,
+     col =  '#5D3FD3',
+     main = "Male dispersal curve", 
+     xlab = "Distance (m)", 
+     ylab = "")
+```
+
+Next we'll create a function that runs a simulation, based on the dispersal probabilities created above. We'll generate a population using the function `glSim`, which simulates simple SNP data, returning a genlight object.
+
+```{r}
+# Create a function, where: 
+# Nind = number of individuals,  
+# Nsnp = number of SNPs,  
+# pdispF = female dispersal probability (generated above)  
+# pdispM = male dispersal probability (generated above)  
+# seed = set the seed so simulation is repeatable  
+SimDisp <- 
+  function(Nind, Nsnp, pdispF, pdispM, seed) {
+  
+    set.seed(seed)
+    
+    # Simulate a genlight object 
+    gg <- glSim(n.ind = Nind,
+                n.snp.nonstruc = Nsnp, 
+                grp.size = c(0.999, 0.001), 
+                ploidy = 2, 
+                k=1, 
+                LD=FALSE, 
+                ind.names=paste(sprintf("ind%03d", 1:Nind), sep=""),
+                snp.names=paste(sprintf("snp%03d", 1:Nsnp), sep=""))
+    
+    # Define pop
+    pop(gg) <- rep("A", Nind)
+    
+    # Create all the other parameters
+    gg <- gl.compliance.check(gg)
+    
+    # Define sex using a sex ratio of 0.5
+    ds <- c(rep("F", 0.5*Nind), rep("M", (1-0.5)*Nind))
+    ds <- ds[order(runif(length(ds)))]
+    gg@other$ind.metrics$sex <- factor(ds)
+    
+    # Set coordinates
+    xy <- expand.grid(x=1:100, y=1:100)
+    xys <- xy[sample(1:nrow(xy), Nind, replace=FALSE),] # sample from the grid
+    gg@other$ind.metrics$x <- xys$x
+    gg@other$ind.metrics$y <- xys$y
+  
+    for (ii in 1:20) { # Run for 20 generations
+      
+      # Find mating pairs & reproduce
+      females <- which(gg@other$ind.metrics$sex=="F")
+      males <- which(gg@other$ind.metrics$sex=="M")
+      
+      off <-list()
+      
+      for (i in 1:length(females)) {
+        mfemale <- gg[females[i],]
+        fxy <- c(gg@other$ind.metrics$x[females[i]], 
+                 gg@other$ind.metrics$y[females[i]])
+        mxy <- cbind(gg@other$ind.metrics$x[males], 
+                     gg@other$ind.metrics$y[males])
+        xxyy <- rbind(fxy, mxy)
+        
+        # Find closest mating male
+        chosenm <- which.min(as.matrix(dist(xxyy))[1,-1])
+        mmale <- gg[males[chosenm],]
+        
+        
+        doff <- gl.sim.offspring(mmale,mfemale,sexratio = 0.5, 
+                                 noffpermother = 2) # 2 offspring
+        doff@other$ind.metrics <- data.frame(sex =factor(c("F","M")), 
+                                             x= mfemale@other$ind.metrics$x,
+                                             y = mfemale@other$ind.metrics$y)
+        
+        off[[i]]<- doff
+        
+        
+      }
+      
+      gg <- do.call(rbind, off)
+      
+      # Make all offspring adults
+      xx <- (lapply(off, function(x) x@other$ind.metrics))
+      xx <- do.call(rbind, xx)
+      gg@other$ind.metrics <- xx
+      
+      
+      # Emigrate depending on dispersial distance
+      
+      for (i in 1:nInd(gg)) {
+        
+        # Use dispersal curves generated above to determine distance
+        if (gg@other$ind.metrics$sex[i]=="M") dis <- max(which(runif(1)>pdispM)) else dis=max(which(runif(1)>pdispF))
+        
+        # Dispersal direction
+        dir <- runif(1,0,2*pi)
+        
+        # Assign new coordinates
+        gg@other$ind.metrics$x[i] <- gg@other$ind.metrics$x[i] + dis*cos(dir)
+        gg@other$ind.metrics$y[i] <- gg@other$ind.metrics$y[i] + dis*sin(dir)
+      }
+      
+      # Use torus to determine what to do with individuals that 
+      # disperse outside of extent
+      gg@other$ind.metrics$x <- gg@other$ind.metrics$x %% 100
+      gg@other$ind.metrics$y <- gg@other$ind.metrics$y %% 100
+      
+      # Plot 
+       plot(gg@other$ind.metrics$x, 
+            gg@other$ind.metrics$y,  
+            pch=16, cex=1, 
+            col=c('#E69F00', '#5D3FD3')[as.numeric(gg@other$ind.metrics$sex)], 
+            asp=1,
+            main = paste("Generation", ii),
+            xlab = "x",
+            ylab = "y")
+       legend("bottomleft", legend=c("Female", "Male"),
+           col=c('#E69F00', '#5D3FD3'), pch = 16, cex= 1)
+      
+    
+    }
+    
+    # Output genlight object containing simulated data
+    return(gg) 
+  }
+```
+
+Now run the function to simulate a population with 100 individuals, 1000 SNPs, and male-biased dispersal.
+
+::: callout-note
+The simulation goes for 20 generations - you can see an animation below
+:::
+
+```{r, fig.show = 'animate', results='hide'}
+
+simdat <- 
+    SimDisp(Nind = 100, 
+            Nsnp = 1000, 
+            pdispF = pdispfemale, 
+            pdispM = pdispmale, 
+            seed = 123)
+
+```
+
+What does this mean for fine-scale genetic structure? Can we identify different dispersal patterns for males and females? Let's run genetic spatial autocorrelation to find out. We'll use the function `gl.spatial.autoCorr`, which is a multivariate approach combining all loci into a single analysis. The autocorrelation coefficient "r" is calculated for each pair of individuals in each specified distance class (called "bins" in this function). We'll use evenly distributed bins and compare individuals at 10 m intervals up to 50 m.
+
+```{r, warning=FALSE, results='hide', message=FALSE}
+# Make 'sex' the population name
+pop(simdat)<- simdat@other$ind.metrics$sex
+
+# Add xy coordinates to the 'other' slot in genlight
+simdat@other$latlon <- data.frame(lon = simdat@other$ind.metrics$x, 
+                                  lat = simdat@other$ind.metrics$y)
+simdat@other$latlon <- Mercator(simdat@other$latlon, inverse = T)
+
+# Run genetic spatial autocorrelation
+gl.spatial.autoCorr(simdat, bins = seq(0, 50, 10), 
+                    plot.pops.together = T, 
+                    plot.colors.pop = c('#E69F00', '#5D3FD3'))
+
+```
+
+We can see that:
+
+1.  Both females and males show significant positive spatial autocorrelation up to 30 m (where confidence intervals overlap zero). In other words, once you start comparing individuals 30 m apart, they are unlikely to be related/genetically similar (regardless of sex).
+2.  Females have significantly stronger fine-scale genetic structure than males up to 10 m (i.e. a greater "r" value and female and male bootstrap CIs are non-overlapping).
+
+These results are not surprising, since we set our distance classes based on the known (simulated) dispersal capacity of males and females, and we had large sample sizes (both individuals and loci). In reality, this analysis is a careful balance between power (maximising the sample size in each bin), and ensuring you are looking at the right scale (i.e. the size of the distance class).
+
+::: callout-caution
+#### What do you think would happen if you used a single 50 m distance class?
+
+While the sample size would be great, we might lose the signal of female philopatry. Give it a try above and see what happens.
+:::
+
+::: blackbox
+### Exercise
+
+*What happens when you vary the dispersal distances? Can you pick up small differences between the sexes?*
+
+*What happens if you change the number of individuals or SNPs? Does this influence the sensitivity of the analysis? IWhich is more important - more individuals or more loci?*
+
+*What happens when you vary the size and number of distance classes (i.e. bins)? How does this interact with sample size?*
+:::
+
+::: callout-tip
+Vary the dispersal parameters "d0" and "p" below
+:::
+
+```{r, eval=FALSE}
+# Dispersal kernels: 
+# Females 
+dispfemale <- (p2p(x = 1:50,
+                   d0 = 1, # Try varying this parameter: mean disp. distance
+                   p = 0.5)) # Try varying this parameter: prop. that go to mean 
+pdispfemale <- c(0, cumsum(dispfemale)/sum(dispfemale))  
+
+# Males 
+dispmale <- (p2p(x = 1:50,
+                 d0 = 20, # Try varying this parameter: mean disp. distance
+                 p = 0.8)) # Try varying this parameter: prop. that go to mean  
+pdispmale <- c(0, cumsum(dispmale)/sum(dispmale))
+
+# Plot 
+plot(dispfemale,      
+     type = "l",      
+     col = '#E69F00',      
+     lwd = 2,      
+     main = "Female dispersal curve",       
+     xlab = "Distance (m)",      
+     ylab = "") 
+plot(dispmale,      
+     type = "l",      
+     lwd = 2,      
+     col =  '#5D3FD3',      
+     main = "Male dispersal curve",       
+     xlab = "Distance (m)",       
+     ylab = "")
+
+```
+
+::: callout-tip
+Vary the number of individuals or the number of SNPs
+:::
+
+```{r, eval=FALSE}
+simdat2 <- 
+    SimDisp(Nind = 100, # Try varying this parameter
+            Nsnp = 1000, # Try varying this parameter
+            pdispF = pdispfemale, 
+            pdispM = pdispmale, 
+            seed = 123)
+
+# Make 'sex' the population name
+pop(simdat)<- simdat@other$ind.metrics$sex
+
+# Add xy coordinates to the 'other' slot in genlight
+simdat@other$latlon <- data.frame(lon = simdat@other$ind.metrics$x, 
+                                  lat = simdat@other$ind.metrics$y)
+simdat@other$latlon <- Mercator(simdat@other$latlon, inverse = T)
+
+```
+
+::: callout-tip
+Try changing the size of the bins
+:::
+
+```{r, eval=FALSE}
+gl.spatial.autoCorr(simdat, bins = seq(0, 50, 5), # Try varying this parameter
+                    plot.pops.together = T, 
+                    plot.colors.pop = c('#E69F00', '#5D3FD3'))
+```
+
+## 2. Isolation-by-distance
+
+An isolation-by-distance model describes a genetic pattern where gene flow (i.e. dispersal/migration) is spatially limited, such that geographic distance alone explains genetic differentiation.
+
+Mantel test... something about individuals vs pops (genetic distance vs. FST)
+
+Let's take a look at IBD in our simulated data set:
+
+```{r, results='hide'}
+
+gl.ibd(simdat, distance="euclidean", coordinates= 'latlon')
+
+```
+
+We find significant IBD across all individuals, but it's not very pronounced. Can we still see the signal of male-biased dispersal? Let's create separate IBD plots for females and males.
+
+```{r, results='hide'}
+gl.ibd(simdat[simdat@pop == "F"], distance="euclidean", coordinates= 'latlon')
+gl.ibd(simdat[simdat@pop == "M"], distance="euclidean", coordinates= 'latlon')
+```
+
+Yes - we see significant IBD in females, since dispersal is more restricted. Males show no pattern of IBD, since many individuals can disperse right up to the scale we are sampling.... However, we lose some of the nuance from the previous analysis.
+
+::: callout-caution
+#### What can we learn from each analysis?
+
+By binning samples in the analysis above we learn about fine-scale patterns of structure, the extent of spatial genetic structure/dispersal, etc...
+
+Mantel tests show us the broad trends... and is a simple model for describing... can use individuals or populations.
+:::
+
+We expect a continuous linear relationship - when there are discontinuities, this can be an indication that something else is happening. We can explore this idea using a real example?
+
+### Lesser hairy-footed dunnartsin the Pilbara
+
+![*Sminthopsis youngsonii*](images/Dunnart.png){fig-align="left"}
+
+### Load the data
+
+```{r, results='hide'}
+Sy.gl <- readRDS('./data/sy.gl.rds') # genetic data
+```
+
+Something about the species... S. youngsonii is a sandy specialist.
+
+Let's take a look at a map ...
+
+```{r}
+leaflet(Sy.gl@other$latlong) %>% 
+  addTiles() %>%
+  addCircleMarkers(lng = ~lon, lat = ~lat, 
+                   popup = ~htmlEscape(lon))
+```
+
+Is there isolation by distance? ...
+
+```{r, results='hide'}
+
+gl.ibd(Sy.gl, distance="euclidean")
+
+```
+
+Yes! The pattern is very strong. But... some of the points don't seem to follow the same slope? Why might this be?
+
+There seems to be a big gap in sampling. This might be due to sampling bias, or the species may not occur here, suggesting there might be something going on with the habitat.
+
+::: callout-caution
+#### Given what we know about the species, what would be a reasonable hypothesis?
+
+Could substrate be driving this sampling gap and the strange IBD pattern? Or could it be the Ashbuton river?
+:::
+
+Let's separate the individuals into two populations on either side of this break, we'll use longitude to separate them. You can click on the points in the map above to choose the correct location.
+
+```{r}
+
+lon.break <- 114.87
+
+Sy.gl@pop <- as.factor(ifelse(Sy.gl@other$latlong$lon < lon.break, "West", "East"))
+
+```
+
+Let's take another look at IBD, including some information about the break
+
+```{r, results='hide'}
+
+gl.ibd(Sy.gl, distance = "euclidean", paircols = 'pop')
+
+```
+
+It looks like there are two slopes describing IBD within each 'population'. Discontinuities like this can sometimes suggest a barrier to gene flow. Let's take a look at the substrate.
+
+```{r, results='hide'}
+# Load a soil shapefile
+soil <- st_read("data/Soil.shp") # spatial data
+
+# Create a colour palette for the two populations
+pop.pal <- colorFactor(
+  palette = c("#F8766D", "#00BFC4"),
+  domain = Sy.gl@pop
+)
+
+# Create a palette
+soil.pal <- colorFactor(
+  palette = c("#9C640C", 
+              "#85929E", 
+              "#873600", 
+              "#C0392B", 
+              "#F4D03F", 
+              "#85929E",
+              "#A9CCE3"),
+  domain = soil$Type
+)
+
+```
+
+```{r}
+# Generate another map
+leaflet(cbind(pop = Sy.gl@pop, Sy.gl@other$latlong)) %>% 
+  addTiles() %>%
+  addPolygons(data=soil, weight = 0, fillOpacity = 0.7,
+                   color = ~soil.pal(Type)) %>%
+  addCircleMarkers(lng = ~lon, lat = ~lat, 
+                   color = ~pop.pal(pop)) %>%
+  addLegendFactor(pal = soil.pal, shape = 'rect', fillOpacity = .7,
+                  opacity = 0, values = ~soil$Type, title = 'Soil type',
+                  position = 'topright', data = gadmCHE, group = 'Polygons')
+```
+
+It looks like clay could be acting as a barrier. This is a good theory, but it would be useful to be able to visualise these patterns of isolation by distance spatially to get an indication of where exactly gene flow is being restricted. We can achieve this by estimating effective migration surfaces....
+
+## 3. EEMS
+
+Visualise the effect of landscape features on gene flow (dispersal) using EEMS
+
+EEMS (Estimated Effective Migration Surfaces) is a fairly new method introduced to visualize and infer patterns of historical gene flow across geographical spaces @petkova2016. This method offers a novel approach to understanding how populations have migrated, mixed, and been isolated from each other over time, based on genetic data. EEMS lays a triangular mesh over the study area and estimates the effective migration rate between each pair of vertices. The effective migration rate is a measure of the rate of gene flow between two populations, and is a function of the geographic distance between them, as well as the resistance to gene flow imposed by the landscape. The effective migration rate is estimated by comparing the genetic differentiation between populations to the geographic distance between them, and is used to infer the strength of gene flow between populations. The EEMS method is based on a Bayesian model, and the effective migration rate is estimated using a Markov Chain Monte Carlo (MCMC) algorithm. The run the EEMS method you need to have the reemsplot2 package installed, which is only provided via github:
+
+```{r, eval=FALSE}
+devtools::install_github("dipetkov/reemsplots2")
+```
+
+In addition you need to provide the path to the EEMS executable (binaries for Windows and Linux are available in the binaries folder). Good news all is set up within the rstudio cloud
+
+So a typical run of EEMS would look like this (please be aware the suggested number of interations are numMCMCIter = 8000000, so this is just to show how to run EEMS):
+
+```{r, eval=TRUE}
+#eems.path <- "d:/downloads/eems"
+eems.path <- "./binaries/"
+eems <- gl.run.eems(Sy.gl, buffer = 1000, eems.path =eems.path, nDemes = 50, diploid = TRUE,
+                    numMCMCIter = 10000, numThinIter = 99, numBurnIter = 5000, add_demes=TRUE,
+                    add_grid=TRUE, out.dir=tempdir())
+
+```
+
+Looking at the input parameters you might find the nDemes parameter to have to be explained. The nDemes is the number of demes (or vertices) in the triangular mesh that is laid over the study area. The number of demes is a critical parameter, as it determines the resolution of the EEMS plot. A higher number of demes will result in a finer resolution, but will also require more computational time. The number of demes should be chosen based on the size of the study area, the number of populations, and the amount of genetic data available. Unfortunately the EEMS method does not allow to check the grid and the placement of demes before it is finished. My approach is therefore to run the EEMS method with a low number of iterations, simply to check the demes and its placement. Once the demes seems to be set appropriately I run the full method.
+
+### Checking the demes
+
+```{r}
+eems <- gl.run.eems(Sy.gl, eems.path =eems.path, nDemes = 200, diploid = TRUE,
+                    numMCMCIter = 10000, numThinIter = 99, numBurnIter = 5000, add_demes=TRUE,
+                    add_grid=TRUE)
+```
+
+In case you are wondering, the gl.run.eems functions reprojects your points to a planar coordinate system (Mercator as used by google maps), so you don't have to worry about the projection of your data and distances are in meters. But this has the "trouble" that you no longer have latlongs as your coordinate system. The benefit is that we can simply use leaflet package to visualise the data afterwards. We simply hack our genlight object in the sense that we add the Mercator data to a new xy slot.
+
+```{r}
+Sy.gl@other$xy <- data.frame(dismo::Mercator(Sy.gl@other$latlong[,2:1]))
+```
+
+Then we can plot the demes and the grid to check if the demes are set appropriately.
+
+```{r}
+eems[[1]]+coord_equal()+geom_point(data=Sy.gl@other$xy, aes(x=x, y=y), pch=16)
+```
+
+The bigger open circles are the demes that EEMS will use to estimate the migration rates and the smaller black dots are you genetic samples.
+
+::: callout-note
+## Exercise
+
+![](images/task.png){.class width="48" height="48"} Change the number of ndemes and see how this affects the grid placement and number of demes.
+
+```{r, eval=FALSE}
+eems <- gl.run.eems(Sy.gl, eems.path =eems.path, nDemes = 200, diploid = TRUE,
+                    numMCMCIter = 10000, numThinIter = 99, numBurnIter = 5000, add_demes=TRUE,
+                    add_grid=TRUE)
+eems[[1]]+coord_equal()+geom_point(data=Sy.gl@other$xy, aes(x=x, y=y), pch=16)
+```
+:::
+
+Then I run the full method. @petkova2016 also recommends to run it with 8 Mio iterations and the burnin to be 2 Mio interations. Finally it recommends to run the whole procedure 3 times with different seed settings (If you do not specify the seed, then a random seed is chosen.)
+
+```{r, eval=FALSE}
+
+eems <- gl.run.eems(Sy.gl, eems.path =eems.path, nDemes =50, diploid = TRUE,
+                    numMCMCIter = 10000, numThinIter = 99, numBurnIter = 5000, add_demes=TRUE,
+                    add_grid=TRUE, out.dir=tempdir())
+
+```
+
+### Plot the EEMS results on a map
+
+Before we go into the evaluation andinterpretation of our EEMS runs we want to be able to create a map that shows the results within a landscape context.
+
+```{r}
+r <- raster::rasterFromXYZ(eems[[1]]$data) #create a raster from the EEMS results map 1
+#define Mercator projection
+crs(r) <- "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs" 
+
+gl.map.interactive(Sy.gl, provider = "Esri.WorldShadedRelief") %>% addRasterImage(r, opacity = 0.5)  
+
+#in case you are interested you can also add the soil polygons 
+#a bit hard to see but the clay overlaps quite well with the high resistance areas
+gl.map.interactive(Sy.gl, provider = "Esri.WorldShadedRelief")%>% addPolygons(data=soil, weight = 0, fillOpacity = 0.7,  color = ~soil.pal(Type))  %>% addRasterImage(r, opacity = 0.5)  
+
+
+```
+
+### Evaluation of the EEMS results
+
+To avoid a long waiting time we simply load a longer EEMS run (default settings) using the same data.
+
+```{r}
+eems.comp <- readRDS("data/eems_comp.rds")
+
+```
+
+We have not looked at all of the output. There are actually 8 figures that are produced by the EEMS method. You can access the using the notation `eems.comp[[1]] or eems.comp$mrates01`.
+
+| Plot       | Description                                                                                                                                                                                                                                                                                                                                                                      |
+|-----------------|-------------------------------------------------------|
+| `mrates01` | Effective migration surface. This contour plot visualizes the estimated effective migration rates (m), on the log10 scale after mean centering.                                                                                                                                                                                                                                  |
+| `mrates02` | Posterior probability contours ($P(\log(m) > 0) = p$) and ($P(\log(m) < 0) = p$) for the given probability level (p). Since migration rates are visualized on the log10 scale after mean centering, 0 corresponds to the overall mean migration rate. This contour plot emphasizes regions with effective migration that is significantly higher/lower than the overall average. |
+| `qrates01` | Effective diversity surface. This contour plot visualizes the estimated effective diversity rates (q), on the log10 scale after mean centering.                                                                                                                                                                                                                                  |
+| `qrates02` | Posterior probability contours ($P(\log(q) > 0) = p$) and ($P(\log(q) < 0) = p$). Similar to `mrates02` but applied to the effective diversity rates.                                                                                                                                                                                                                            |
+| `rdist01`  | Scatter plot of the observed vs the fitted between-deme component of genetic dissimilarity, where one point represents a pair of sampled demes.                                                                                                                                                                                                                                  |
+| `rdist02`  | Scatter plot of the observed vs the fitted within-deme component of genetic dissimilarity, where one point represents a sampled deme.                                                                                                                                                                                                                                            |
+| `rdist03`  | Scatter plot of observed genetic dissimilarities between demes vs observed geographic distances between demes.                                                                                                                                                                                                                                                                   |
+| `pilogl01` | Posterior probability trace.                                                                                                                                                                                                                                                                                                                                                     |
+
+::: callout-note
+## Exercise
+
+![](images/task.png){.class width="48" height="48"} Have a look at all the plot and try to understand what they are showing.
+:::
+
+The plot that are most often shown (and probably most interesting) are the mrates plots as they demonstrate the migration pattern across the landscape. The simply differ in the way how they threshold the migration rates (basically how they color them) Plot 3 and 4 are about the second important feature, which is the "diversity" across the landscape. Plot 5 and 6 demontrate the relationship between observerd and fitted between and within demes dissimilarity. In short they should show a linear relationship (the more linear the better is the model fit). Plot 7 shows the relationship between genetic and geographic distance. If the genetic distance increases with geographic distance, then there is a pattern of isolation by distance (IBD). Plot 8 shows the convergence of MCMC chain (should stabilise towards similar valus if run multiple times).
+
+## 4. Isolation-by-resistance
+
+Up to this point, we've tested for IBD - but have not tested for an effect of the landscape on gene flow. We can do that using the `genleastcost` function in the `gdistance` package. This function calculates the least cost path between all pairs of demes and then calculates the correlation between the genetic distance and the least cost path distance.
+
+To be able to run an isolation-by-barrier analysis, we need to have a raster that represents the resistance to gene flow. This can be a resistance surface that is based on the landscape features (e.g. land cover, elevation, soil type, etc.). As we have a good indication that the soil type clay might be a barrier (and sand might be a facilitator) we will use the soil type raster as a resistance surface. To do so some GIS jumble is needed, namely we need to create a raster that covers the area, and code resistance values for the different soil types.
+
+```{r}
+# create a template raster 
+template = rast(vect(soil),res=0.005)
+#convert soil (vector) to raster
+soil_raster <- rasterize(vect(soil), template,"Type")
+plot(soil_raster)
+
+```
+
+The next step is to convert the raster to the Mercator projection, then crop it to the extent of the study area, and finally resample it to a coarser resolution (to make the analysis faster).
+
+```{r}
+
+
+#project raster to Mercator (using r from above)
+soil_raster.merc <- project(soil_raster, crs(r))
+
+
+#crop raster to extent of the study area
+soil.raster.merc.crop <-raster(crop(soil_raster.merc, extent(r)))
+
+#resample to 500 meters (to make it faster)
+template2 <-  raster(extent(soil.raster.merc.crop), resolution=1000)
+soil.final <- resample(soil.raster.merc.crop, template2, method="ngb")
+plot(soil.final)
+soil.final
+table(values(soil.final))
+```
+
+Great the final step is the recoding of the resistance values. From the first plot and using our knowlegde on the terrain colors in R, we can see that the soil type "clay" is coded as 0, "loam" as 1, "rock" as 2, "sand" as 3, and "tidal" as 4. We have to recode those values to be able to use it as a resistance surface.
+
+This is actually a step that has potentially a lot of effect and there is not really a good way to give advice as the recoding can be very specific. For a binary resistance surface (e.g. a river or road) it is fairly easy, but the absolute values to use is not really clear. E.g. linear structures like roads are fairly thin, hence they need a high resistance value to have an effect. in contrast layers such as the soil layer, lower values are more appropriate as individual cells are not barriers but the overall area is. Then there are contineous layers such as elevation and here a "mapping" function is needed. E.g. is the effect meant to be linear or is it more like a limiting curve (e.g. from a certain elevation the resistance becomes not much higher. Also step functions might be a good idea. As a general rule how to decide on the recoding it is important to think about the feature that is meant to be a barrier and how it expected to affect the migration of individuals.
+
+```{r}
+
+#convert resistance values
+# clay =0, loam =1, rock = 2, sand =3, tidal =4
+
+#clay only
+res.clay <- soil.final
+res.clay[res.clay==0] <- 20
+res.clay[res.clay<20] <- 1
+res.clay[is.nan(res.clay)] <- 50
+names(res.clay)<- "Clay20"
+
+
+plot(res.clay)
+#exercise test if sand only is better
+#sand only
+
+```
+
+Now we can run the isolation-by-resistance analysis. We will use the `leastcost` function to calculate the least cost path between all pairs of demes. Then we will use the `wassermann` function to calculate the correlation between the genetic distance and the least cost path distance and correct for Euclidean distance (and vice versa).
+
+```{r}
+#takes about a minute to run
+system.time( glc.clay<- gl.genleastcost(Sy.gl, fric.raster = res.clay, 
+            gen.distance =  "dist", NN=8, 
+            pathtype = "leastcost"))
+
+PopGenReport::wassermann(eucl.mat = glc.clay$eucl.mat, 
+                         cost.mat = glc.clay$cost.mats, 
+                         gen.mat = glc.clay$gen.mat, plot = FALSE)
+
+```
+
+And voila the results is as we hoped (the effect of clay is a significanct when corrected by Euclidean distance and the effect of Eucledian distance when corrected for Clay is not).
+
+Be aware this is just a quick example, hence we only used 1000 loci and 30 individuals. A full analysis would require more loci and individuals. Also to have a valid resistance surface, we would need to check the correlation between the least cost distance matrix and the Euclidean distance matrix. If the leastcost matrix does correlate too closely with the Euclidean distance matrix (e.g. r\>0.7) then I would be very careful with my interpretation.
+
+Lets check that quickly
+
+```{r}
+Alldis <- list(GDis = glc.clay$gen.mat, 
+                Edis = glc.clay$eucl.mat,
+                CD.clay =glc.clay$cost.mats[[1]])
+df <- data.frame(lapply(Alldis, lower))
+
+ggpairs(df[,3:1])  #reverse order so GDis is on the y-axis
+
+
+```
+
+As you can see the correlation between Edis and CD.clay is \>0.95, hence they are basically inseperable hence I would not trust the results. Nevertheless we test our next hypothesis, that sand is a facilitator of gene flow.
+
+```{r}
+
+
+
+#maybe best
+#clay and sand 
+#clay only
+res.sand <- soil.final
+res.sand[res.sand!=3] <- 10
+res.sand[res.sand==3] <- 1
+res.sand[is.nan(res.sand)] <- 50
+
+
+
+
+
+system.time(glc.sand <- gl.genleastcost(Sy.gl, fric.raster = res.sand, "propShared", NN=8, 
+                      pathtype = "leastcost"))
+
+PopGenReport::wassermann(eucl.mat = glc.sand$eucl.mat, cost.mat = glc.sand$cost.mats, 
+                         gen.mat = glc.sand$gen.mat,plot = FALSE)
+```
+
+Finally it would be great to have an approach to test both layers within on Framework. To do so Clarke et al. (2002) proposed a method to test the effect of multiple layers on the genetic distance \[maximum likelihood population effects mixed effects model (MLPE)\]. It allows to test different hypothesis by running the differnt models and compare them using AIC values.
+
+```{r}
+#clay and sand
+
+Alldis <- list(GDis = glc.clay$gen.mat, 
+               Edis = glc.clay$eucl.mat,
+               CD.clay =glc.clay$cost.mats[[1]], 
+               CD.sand = glc.sand$cost.mats[[1]])
+
+
+ids <- To.From.ID(nInd(Sy.gl))
+
+
+
+df <- data.frame(lapply(Alldis, lower))
+names(df)
+
+df <- data.frame(scale(df))
+
+df$pop <- ids$pop1
+
+```
+
+Now we can run the MLPE model and compare the AIC values to see which model is the best.
+
+```{r}
+mlpe.full <- mlpe_rga(formula = GDis ~ Edis+  CD.clay + CD.sand +(1|pop), data=df)
+summary(mlpe.full)
+AIC(mlpe.full)
+
+
+mlpe.clay <- mlpe_rga(formula = GDis ~ Edis+  CD.clay +(1|pop), data=df)
+AIC(mlpe.clay)
+
+
+mlpe.sand <- mlpe_rga(formula = GDis ~ Edis+  CD.sand +(1|pop), data=df)
+AIC(mlpe.sand)
+
+mlpe.euc <- mlpe_rga(formula = GDis ~ Edis +(1|pop), data=df)
+summary(mlpe.euc)
+AIC(mlpe.full)
+
+
+AIC(mlpe.full, mlpe.clay, mlpe.sand, mlpe.euc)
+
+```
+
+In this case the MPLE selects the mlpe.full as being the best \[lowest AIC\], but the difference is small (less than 4). hence the two models are not really separable.
+
+## 5. Antechinus at Kiola
+
+::: callout-note
+## Exercise
+
+![](images/task.png){.class width="48" height="48"} Antechinus in Kioloa
+:::
+
+The following data set is simulated based on the scenario of Antechinus in Kioloa.\
+We simulated 50 individuals and 20000 loci and let the individuals "live" for several generations on a resistance surface (actual a combination of two out of the three provided. The provided layers are elevation, roads and forest. Because this is a simulation there is obviously a "correct" answer, but we leave it to you to find it.
+
+Maybe the best way to start is to load the data and have a look at the provided layers. Then you could run a EEMS to get an idea which layers might be important. Then you can run a leastcost analysis and see if the EEMS results are supported. Finally you could run the MLPE model to see if you have found a good layer/combination of layers.
+
+1.  Load the data
+
+```{r}
+#load the data
+antechinus <- readRDS("./data/antechinus.rds")
+gl.map.interactive(antechinus, provider = "OpenTopoMap")
+
+#load layers
+
+elevation <- raster("./data/elevation.tif")
+roads <- raster("./data/roads.tif")
+forest <- raster("./data/forest.tif")
+```
+
+2.  Have a look at the layers
+
+3.  Run an EEMS
+
+4.  Run a leastcost analysis (for several resistance layers)
+
+A bit mean is that we have not recoded the resistance layers, so you have to do that yourself. For example when you load the road layer roads are "coded" as 255, but you might want to recode them to another value. But be aware roads are small features and are only a barrier if you have moderately high resistance values. Also the layer starts at zero, and you need to have this coded to one, because zero resistance means an animal can run around without penalty. In case you do not like this step you can use the costmatrices which are added to the antechinus object, so you can use them directly and no need to recode your layers.
+
+```{r}
+
+names(antechinus@other)
+
+```
+
+5.  Finally run the MLPE model to see if you have found a good layer.
+
+Have fun and please ask as many questions as you like.
+
+Robyn & Bernd

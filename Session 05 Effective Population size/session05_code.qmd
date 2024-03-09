@@ -1,0 +1,411 @@
+---
+title: "Session 5: Effective Population Size
+---
+
+# Effective Population Size
+
+*Session Presenters*
+
+![](images/Presenters5.png)
+
+## *Required packages*
+
+```{r setup, include = FALSE}
+library(knitr)
+library(formatR)
+library(tidyverse)
+library(gifski)
+knitr::opts_chunk$set(tidy = TRUE, tidy.opts = list(width.cutoff = 72), 
+                      cache =FALSE, 
+                      echo = TRUE)
+```
+
+```{r, warning=FALSE, message=FALSE}
+library(dartRverse)
+library(dartR.popgen)
+library(ggplot2)
+# devtools::install_github('green-striped-gecko/geohippos')
+library(geohippos)  
+```
+
+## Introduction
+
+Ne is important for conservation and management of populations. It is an indicator of the genetic diversity of a population and is used to estimate the probability of extinction.
+
+Effective population size (*Ne*) is a concept in population genetics that refers to the number of breeding individuals in an idealized population that would show the same amount of genetic drift or inbreeding or linkage disequilbrium or coalescent as the population under study. Unlike the actual census size (*Nc*), which counts all individuals within a population, *Ne* focuses on those contributing genes to the next generation, offering a more precise understanding of a population's genetic health and potential for evolutionary change.
+
+The 50/500 rule is a guideline in conservation biology that relates to the effective population size (*Ne*) and its implications for the conservation of species. This rule was first proposed by Franklin in 1980 and later expanded by Soule in 1986. It serves as a rule of thumb for determining the minimum viable population sizes needed to prevent inbreeding depression in the short term and maintain evolutionary potential over the long term.
+
+Be aware the 50/500 rule is a rule of thumb and should be used with caution. It is not a one-size-fits-all rule and should be used in conjunction with other information about the species and its habitat. It has been criticized for being too simplistic and not taking into account the specific needs of individual species.
+
+## 1. Current effective population size
+
+
+There are various methods to estimate current effective population size. In this section, we are going to focus on linkage disequilbrium and we will use the methods implemented in `NeEstimator`. `dartR.popgen` has a wrapper to run `NeEstimator`, which has been recently updated to include the new adjustments from Waples et al 2016. Also, we will look at possible causes of $Inf$ estimates.
+
+## New dartR.popgen functionalities
+
+The method implemented in `NeEstimator` assumes that the loci are independent and that the linkage detected depends on the finite Ne of a population. Waples et al (2016) demonstrated that, in the genomic era when thousands of SNPs are available and when an annotated genome is available, the Ne can be improved (i.e. reduced downward bias) by considering linkage of only pairs of loci on different chromosomes. This option can now be easily accessed via `gl.LDNe` function using the argument `pairing` (and making sure information on Chromosomes were provided in the `@chromosome` slot.
+
+```{r}
+# Run as it was classically run
+# SNP data (use two populations and only the first 100 SNPs)
+pops <- possums.gl[1:60, 1:100]
+nes <- gl.LDNe(pops,  outfile = "popsLD.txt", neest.path = "./binaries",
+  critical = c(0, 0.05), singleton.rm = TRUE, mating = "random")
+
+# Using only pairs of loci on different chromosomes
+# made up some chromosome location
+pops@chromosome <- as.factor(sample(1:10, size = nLoc(pops), replace = TRUE))
+# Note the use of the argument 'pairing'
+nessep <- gl.LDNe(pops,
+              outfile = "popsLD.txt", pairing="separate",
+              neest.path = "./binaries",
+              critical = c(0, 0.05), singleton.rm = TRUE, mating = "random")
+
+```
+
+If the loci are not mapped, but the number of chromosomes or the genome length is known, it is possible to apply a correction (eq 1a or 1b of Waples et al (2016)) using the arguments `Waples.correction` and `Waples.correction.value`.
+
+```{r}
+# Correct estimates based on the number of chromosomes
+nes <- gl.LDNe(pops,   outfile = "popsLD.txt",  neest.path = "./binaries",
+  critical = c(0, 0.05), singleton.rm = TRUE, mating = "random",
+  Waples.correction='nChromosomes', Waples.correction.value=22) 
+
+```
+
+## The infinite problem
+
+Sometimes, Ne estimates are $Inf$. This is usually taken to mean that the population in question is very large. Indeed, in an infinitely large population no linkage should occur (between independent loci). However, it is sometimes useful to be able to understand the origin of this estimate.
+
+The original formula to calculate Ne for species with random mating systems is (eq 7 Waples 2006):
+
+$$
+1/3(\hat{r}^{2} - 1/S)
+$$
+
+while for species with monogamy is (eq 8 Waples 2006):
+
+$$
+2/3(\hat{r}^{2} - 1/S)
+$$
+
+where $\hat{r}^{2}$ is the estimate inter-locus correlation based on Burrows' $\Delta$. However, `NeEstimator` also applies an empirical correction that was demonstrated by Waples 2006 to reduce the bias of $N_e$ estimations. For example, for species with random mating and with a sample size $S\ge30$ this becomes:
+
+$$
+N_e = \frac{1/3 + \sqrt{(1/9 - 2.76 \hat{r}^{2}\prime)}}{2 \hat{r}^{2}\prime}
+$$
+
+Note that when $\hat{r}^{2}\prime > \frac{1}{9*2.76}$ --\> $\hat{r}^{2}\prime > 0.04025765$ the term within the square root is negative, so it becomes undefined.
+
+The observed inter-locus correlation is a combination of $\hat{r}^{2}_{drift} + E(\hat{r}^{2}_{sample})$. Because we are really after only $\hat{r}^{2}_{drift}$, we estimate it by subtracting $E(\hat{r}^{2}_{sample})$, i.e.:
+
+$$
+\hat{r}^{2}\prime = \hat{r}^{2} - E(\hat{r}^{2}_{sample})
+$$
+
+For small sample sizes, $E(\hat{r}^{2}_{sample})$ can be relatively large and our $N_e$ estimate can become negative. Let's have a look at possible values of $E(\hat{r}^{2}_{sample})$ for different sample size ($S\ge30$):
+
+```{r}
+r_sample <- function(S) (1/S) + (3.16/S^2)
+
+round(r_sample(seq(30, 50, by=5)), 3)
+```
+
+For $S<30$
+
+```{r}
+
+r_sample <- function(S) 0.018 + (0.907/S) + (4.44/S^2)
+
+round(r_sample(seq(5, 30, by=5)), 3)
+
+```
+
+it is easy then to imagine that for small sample sizes, we may 'overcorrect' and the denominator may become negative, which is a non-sense result. Generally, the interpretation is that the linkage detected is a result of simple sampling error. A test of whether the detected linkage is statistically significant may help to interpret the results.
+
+`gl.LDNe` gained the argument `naive`, which calculates $N_e$ without the empirical correction. This is mostly to aid the diagnostic of where the $Inf$ estimate (if it occurs) is coming from.
+
+```{r}
+# Correct estimates based on the number of chromosomes
+nes <- gl.LDNe(pops,  outfile = "popsLD.txt", neest.path = "./binaries",
+  critical = c(0, 0.05), singleton.rm = TRUE, mating = "random",
+  naive=TRUE) 
+
+```
+
+Other sources of problems are potentially coming from the loci selection that you have. If all sampled individuals are homozygous for the same allele (in one population) or are heterozygous, the estimation of $N_e$ fails. That is because the inter-locus correlation based on Burrows' $\Delta$ cannot be computed. `NeEstimator` removes all monomorphic loci (if you haven't done that before), so often this is not a problem, but (I think) it still may happen when all individuals are heterozygous.
+
+
+## 2. Historic effective population size
+
+### Based on SFS
+
+The Site Frequency Spectrum (SFS), sometimes referred to as the allele frequency spectrum, is a fundamental concept in population genetics that describes the distribution of allele frequencies at polymorphic sites within a sample of DNA sequences from a population. It provides a powerful summary of the genetic variation present in the population, capturing information about the history of mutations, demographic events (such as population expansions or bottlenecks). There are several methods to estimate historic, but we explore only two here: Epos @lynch2019 and Stairways2 @liu2020
+
+### The SFS
+
+It is straight forward to create the sfs from a genlight/dartR object. But first you want to make sure you do not have missing data in your dataset, because the allele frequency spectrum is sensitive to missing data.
+
+```{r}
+# Load the data
+gl100 <- readRDS("./data/slim_100.rds")
+#check the population size and number of populations
+table(pop(gl100))
+#number of individuals
+nInd(gl100)
+#number of loci
+nLoc(gl100)
+
+#create 
+sfscon <- gl.sfs(gl100, folded = TRUE)
+sfscon
+```
+
+As you can see the is simply a table of the number of alleles at each frequency. Be aware the the sfs is folded by default, but you can change this with the argument `folded = FALSE`. In most of the cases we will use the folded=TRUE option as you need phased data to use the unfolded sfs (and also have an idea which state is the ancestral one. Often the genomic of an ancestral outgroup is used for this information).
+
+::: callout-note
+## Exercise 1: Parameter in gl.sfs
+
+![](images/task.png){.class width="48" height="48"} Try different settings for the sfs and see what happens. There are three important parameters:
+
+-   `minbinsize` (default is 1)
+-   `folded` (default is TRUE)
+-   `singlepop` (default is TRUE) \[if you have more than one population in your genlight object\]
+:::
+
+```{r}
+#unfolded sfs
+un.sfs <- gl.sfs(gl100, folded = FALSE)
+un.sfs
+```
+
+In addition it is possible to create multidimensional sfs, which is useful for example when you have multiple populations (in case you want to have that use: singlepop=FALSE). Be aware if you want to create and multidimensional sfs from more than say 3 populations a 30 individuals you create a huge array of dimensions (61 x 61 x 61), with mainly zeros. So often multidemensional sfs are not very useful.
+
+So lets have a closer look at the folder sfs from the example. The simulated population had a constant (effective) population size *Ne* of 100 individuals. Hence we know from theory that we have to expect a sfs that follows an exponential distribution.
+
+We now load two more data sets:
+
+```{r}
+gldec <- readRDS("./data/slim_100_50_50yago.rds")
+glinc <- readRDS("./data/slim_100_200_50yago.rds")
+glbottle <- readRDS("./data/slim_100_10_50_50yago_10year.rds")
+
+```
+
+`gldec` is a population that experienced a decline from Ne=100 to Ne=50 50 years ago, while `glinc` is a population that experienced an increase from Ne=100 to Ne=200 50 years ago. And `glbottle` is a data set that experienced a bottleneck from Ne=100 to Ne=10 50 years ago and then an increase to Ne=50 after years.
+
+::: callout-note
+## Exercise 2: Compare SFS
+
+![](images/task.png){.class width="48" height="48"} Create a SFS for the three new datasets and compare them to the SFS of the constant population. What do you expect?
+:::
+
+Below is a plot that shows all four SFS.
+
+```{r}
+sfsdec <- gl.sfs(gldec, folded = TRUE)
+sfsinc <- gl.sfs(glinc, folded = TRUE)
+sfsbottle <- gl.sfs(glbottle, folded = TRUE)
+```
+
+### Examples for different sfs (simulated)
+
+```{r}
+
+df <- data.frame(x=0:50, sfscon, sfsdec, sfsinc, sfsbottle)
+
+g1 <- ggplot(df, aes(x=x, y=sfscon))+geom_bar(stat="identity")
+g2 <- ggplot(df, aes(x=x, y=sfsdec))+geom_bar(stat="identity")
+g3 <- ggplot(df, aes(x=x, y=sfsinc))+geom_bar(stat="identity")
+g4 <- ggplot(df, aes(x=x, y=sfsbottle))+geom_bar(stat="identity")
+
+g1+g2+g3+g4
+
+```
+
+As you can see it is not really possible to see the differences between the sfs, so lets check how good our methods are to recreate the historic population sizes.
+
+### Epos
+
+Lets start with the simple one and lets use Epos (as this is the fastest method). A typical epos run requires the genlight/dartR object, then the path to the epos binary.
+
+There are two more important parameters l and mu. l is the total lenght of the "sampled" chromosome and we will have a discussion on that. mu is the mutation rate per site per generation. The important concept to keep in mind is that:
+
+$$\LARGE x = mu \times L \times 2 \times Ne $$ , where x is the number of mutations in a generation.
+
+So to be able to estimate the trajectory in an absolute sense we need to know L and mu. In a simulation that is easy because we know how long the chromosome(s) were we did our simulation on. Here L=5e8 and mu was set to a value of 1e-8.
+
+We could provide the sfs, but the gl.epos function does take care of that in case none is provided (it call gl.sfs). Additional parameters in EPOS are the number of bootstraps that should be run for confidence intervalas (the more the more runs and the longer it takes) and the minimum bins size. Here we use minbinsize=1 (the default), because we have simulated data and also trust our low frequency bins. In a real data set you might want to change that to higer values, though if too high you might delete too much information from your data (the first bins have the highest number of entries and therefore should be the most informative ones).
+
+```{r}
+L <- 5e8
+mu = 1e-8
+
+#forgive me but you need to name "L" as little l in the function call. 
+#will be corrected in the ne
+ Ne_epos <- gl.epos(gl100, epos.path = "./binaries/" , l = L, u=mu, boot=10, minbinsize = 1)
+colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
+ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
+
+```
+
+As you might remember the population size was constant at 100 individuals. So we expect the Ne to be 100 for all generations. And indeed the median is 100 for allmost all generations. The confidence intervals are very narrow, which is expected as we have simulated this data set. There is little bit disturbing 'dip' at really low population sizes. This hints to the known limitation that in very recent times there had not been enough mutations to estimate the population size correctly.
+
+Before we go on with the other data sets (fairly easy to run, just replace the gl100 with the other data sets) we should discuss the parameter l and mu. The l parameter is the length of the chromosome that was sampled. In a real data set you might not know that, because this depends on your methods, the amount of filters etc. Hence the question is what happens if you set l wrong. Lets test set and set L to an often used value: number of loci times 69 (because in a dart analysis we get 69 bases of sequence hence that sounds like a reasonable idea).
+
+```{r}
+L <- 69 * nLoc(gl100)  #734505
+mu = 1e-8
+
+ Ne_epos <- gl.epos(gl100, epos.path = "./binaries/" , l = L, u=mu, boot=10, minbinsize = 1)
+colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
+ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
+ 
+ 
+```
+
+As you can see this is not a good idea the axis values are completely off. The reason is that the number of mutations is calculated as L \* mu \* Ne. So if you set L too low, you will get a too high Ne (and also the number of generations are off). If you set L too high, you will get a too low Ne. So you need to know the length of the chromosome that you are working with. The good news is that the trajectory is still correct, so we can rely on the shape of the curve, but the absolute values are wrong if L (or mu) are set incorrectly.
+
+::: callout-note
+## Exercise 3: Run Epos for different combinations of L and mu
+
+![](images/task.png){.class width="48" height="48"} You can now run epos for different combinations of L and mu. What do you expect if you set L and mu in such a way that L \* mu compensate each other?
+:::
+
+::: callout-note
+## Exercise 4: Run Epos for all data sets
+
+![](images/task.png){.class width="48" height="48"} And now to the next exercise which is the more intersting one: run Epos for all four data sets data sets(glcon, glinc, gldec, glbottle) and compare the results to the simulated trajectories. Once finished you can have a look at the code below.
+:::
+
+```{r}
+L <- 5e8
+mu = 1e-8
+
+#constant
+Ne_epos <- gl.epos(gl100, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
+colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
+pcon <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
+ 
+#constant
+Ne_epos <- gl.epos(glinc, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
+colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
+pinc <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
+
+#constant
+Ne_epos <- gl.epos(gldec, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
+colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
+pdec <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)+ylim(c(0, 200))
+
+#constant
+Ne_epos <- gl.epos(glbottle, epos.path = "./binaries" , l = L, u=mu, boot=10, minbinsize = 1)
+colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
+pbottle <- ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
+
+```
+
+And now we can plot them next all in one go:
+
+```{r}
+pcon + pinc + pdec + pbottle
+```
+
+Pretty good, or what do you think?
+
+### Stairways2
+
+Stairways is the actually more popular mehtod to estimate the historic population sizes from SNPs. The reason is most likely that EPOS was implemented in a way that makes it really hard to run for a not initiated person (you need to compile c++ and run some commands in GO). The upshot in Epos is that is it much much faster and the results are not too different to stairways. Nevertheless, we will have a go with stairways below.
+
+The good new is that stairways uses the identical input parameters: L, mu, minbinsize. Hence nothing new here an it "suffers" therefore from the same problem if we do not know mu of L the trajectory is okay, but the absolute values on the axis are off.
+
+The main difference (and here I admit I have to resort to a general explanation as it is beyond my paygrade to understand). Epos uses a simple semi-analytical optimization method to find the best fitting trajectory, whereas stairways uses a machine learning approach that takes longer (but potentially explores the parameter space better). My current approach is to use both methods and see if the results are similar.
+
+### Example run of Stairways2
+
+```{r, eval=TRUE}
+
+L <- 5e8
+mu = 1e-8
+#takes about 5 minutes so not run here
+#Ne_sw <- gl.stairway2(gl100, stairway.path="./binaries", mu = mu, gentime = 1, run=TRUE, nreps = 30, parallel=10, L=L, minbinsize =1)
+
+Ne_sw <- readRDS("./data/Ne_sw_gl100.rds")
+
+ggplot(Ne_sw, aes(x=year, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=Ne_2.5., ymax=Ne_97.5.), alpha=0.2)
+```
+
+::: callout-note
+## Exercise
+
+![](images/task.png){.class width="48" height="48"} Now that you have learned to run Epos and Stairways, perhaps try to run your own data sets or use the ones provided.
+
+Foxes in Australia (foxes.rds) Crocodiles in Australia (crocs.rds)
+
+You can also try to run the simulator to explore how good the methods are for more complicated demographic histories. \[slim simulator\]
+:::
+
+## Gone
+
+\[Needs more implementation and testing, but I will give a brief overview here.\] \[Be aware Gone is very data hungry and seems not to work too well with the number of SNPs we have at our disposal, but in simulations with Ne\~1000 and lots of individuals it seems to work well\].
+
+Gone is a very different method to estimate the population size. It was developed by @santiago2020. The authors utilize LD patterns to infer the demographic history of populations. LD can be affected by various factors including recombination, mutation, genetic drift, and population structure. The method is based on the idea that the LD decay is a function of the population size and the recombination rate. So we need next to our SNP data also a so called linkage map. This can be achieved if you have a reference genome available and you can map the SNPs to the reference genome. Gone itself has not been tested to much for recent population sizes and is still very much under research about its usefullness for recent population sizes.
+
+Below is an implementation to run Gone using the dartRverse, but be aware it has not been much tested. We certainly can run Gone using our simulated data (because we simulted 5 chromosomes and we have a full map of them on those chromosomes).
+
+To see that we can check how many snps we have on the chromosomes in our data sets.
+
+```{r}
+table(gl100@chromosome)
+
+
+```
+
+So lets run Gone (be aware it is not very userfriendly implemented yet in terms of the settings. Gone currently a script file that is hidden within the script_GONE.sh file and you need to edit it there to change it from the defaults.
+
+Explain the settings (important MAF)
+
+```{r}
+#take a bit long
+#Ne_gone <- gl.gone(gl100,gone.path = "./binaries") #runs parallel via InputParamters
+#load it instead
+Ne_gone <- readRDS("./data/Ne_gone_100.rds")
+
+colnames(Ne_gone) <- c("generation", "Ne_mean")
+
+ggplot(Ne_gone, aes(x=generation, y=Ne_mean))+geom_line()
+
+```
+
+Pretty terrible I guess. My first findings indicate the Gone is much more data hungry and works better with much more SNPs, more chromosomes and more individuals. There is a data set I available using 5 chromosomes (but twice in length) and 100 indivduals (being stable all the time)
+
+The plot is below:
+
+```{r}
+glgone100 <- readRDS("./data/slimgone_100.rds")
+
+#Ne_gone <- gl.gone(gl100,gone.path = "d:/bernd/r/geohippos/binaries/gone/windows/") #runs parallel via InputParamters
+#takes too long
+
+Ne_gone <- readRDS("./data/Ne_gone_100.rds")
+
+colnames(Ne_gone) <- c("generation", "Ne_mean")
+
+ggplot(Ne_gone, aes(x=generation, y=Ne_mean))+geom_line()
+
+```
+
+It is certainly possible that gone is "saveable" but it is obvious that Gone is not very "good" in recent years. There seems to be a sweet spot where Gone works well \>100 Generations and \<300 generations, but that needs more testing.
+
+::: callout-note
+## Exercise
+
+![](images/task.png){.class width="48" height="48"} Now that you have learned to run Gone perhaps try to run your own data sets or use the ones provided.
+
+You can also try to run the simulator to explore how good the methods are for more complicated demographic histories. \[slim simulator\]
+:::
+
+We hope you have fun runnig the code and please do not hesitate to ask questions or provide feedback.
+
+Cheers, Carlo & Bernd
