@@ -3,12 +3,10 @@ library(dartRverse)
 library(ggplot2)
 knitr::opts_knit$set(root.dir = "/cloud/project")
 
-
-
 ## ----------------------------------------------------------------------
 
 # load data
-load("../data/Session3_data.RData")
+load("./data/Session3_data.RData")
 
 #create a list of the kimberley genlights
 kimberley_names <- ls(pattern = "^Kimberley")
@@ -56,7 +54,7 @@ for(name in names(kimberley)) {
 
 # heterozygosity_reports_df now contains all the reports with an 
 # additional column for object names
-knitr::kable(heterozygosity_reports_df)
+heterozygosity_reports_df
 
 
 
@@ -72,7 +70,7 @@ kimberley_Ho_0.7callrate
 
 ## ----------------------------------------------------------------------
 # reload data
-load('../data/Session3_data.RData')
+load('./data/Session3_data.RData')
 # List all object names in the environment
 all_names <- ls()
 
@@ -123,7 +121,7 @@ for(name in names(kimberley)) {
 
 # heterozygosity_reports_df now contains all the reports with an 
 # additional column for object names
-knitr::kable(heterozygosity_reports_df_0.95)
+heterozygosity_reports_df_0.95
 
 
 ## ----------------------------------------------------------------------
