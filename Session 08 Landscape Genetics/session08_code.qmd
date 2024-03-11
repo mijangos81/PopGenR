@@ -2,8 +2,6 @@
 title: "Session 8: Landscape Genetics"
 ---
 
-
-
 # Landscape Genetics
 
 *Session Presenters*
@@ -41,13 +39,13 @@ library(ResistanceGA)
 
 ## Introduction
 
-Landscape genetics combines landscape ecology with population genetics to understand how the structure, composition and configuration of the landscape affect gene flow, genetic drift, and selection.
+Landscape genetics combines landscape ecology with population genetics to understand how the structure, composition and configuration of the landscape affects gene flow, genetic drift, and selection.
 
-In this tutorial, we will dive into the first question - how does the landscape influence gene flow? There are many ways to tackle this question, for example, we can explore gene flow among individuals across tens of metres up to entire landscapes, or among populations within a meta-population.
+In this tutorial, we will dive into the first question - how does the landscape influence gene flow? There are many ways to tackle this question, for example, we can explore gene flow at the individual or population level, over different spatial scales, and/or across a meta-population.
 
 Here we'll start with the basics, by looking at the spatial distribution of individuals, and build on this until we incorporate landscape features, to understand:
 
-1.  Different dispersal strategies
+1.  Different dispersal strategies; and
 
 2.  Limitations to gene flow, including:
 
@@ -57,13 +55,21 @@ Here we'll start with the basics, by looking at the spatial distribution of indi
 
     c\) Landscape attributes (isolation-by-resistance)
 
-## 1. Dispersal strategies
+# 1. Dispersal strategies
 
-Many biological and demographic processes can shape patterns of genetic structure. Dispersal and social behaviours often occur over a fine scale. This means that exploring patters within populations over 10s-100s of metres can often be very informative, especially in small and inconspicuous species.
+Many biological and demographic processes can shape patterns of genetic structure, for example, dispersal strategies, mating systems, and social behaviours. These processes often occur over a fine scale. As such, exploring patterns within populations over 10s-100s of metres can be very informative, especially in small and inconspicuous species.
 
-Before diving into more complex and correlative analyses, it can be very useful to understand some of the baseline life-history and demographic traits in your species. One common question is: *how far do individuals disperse and is this the same/different for males and females?* When one sex disperses further than the other, this is known as sex-biased dispersal. This can be detected via genetic spatial autocorrelation analysis, as increased philopatry by one sex (i.e. individuals remain close to where they are born) results in greater genetic similarity among neighbouring individuals, while genetic similarity is reduced in the dispersing sex.
+Before diving into more complex and correlative analyses, it is useful to understand some of the baseline life-history and demographic traits in your species. One common question is: *how far do individuals disperse and is this the same or different for males and females?*
 
-To explore the genetic patterns that result from sex-biased dispersal, we're going to simulate this process in a population. First, we need to set up the dispersal kernels, using the custom function below.
+When one sex disperses further than the other, this is known as sex-biased dispersal. This can be detected via genetic spatial autocorrelation analysis. We'll describe this in more detail later on, but in short, increased philopatry by one sex results in greater genetic similarity among neighbouring individuals, while genetic similarity is reduced in the dispersing sex. You can also learn more about it in [Banks & Peakall 2012](https://doi.org/10.1111/j.1365-294X.2012.05485.x) (and references therein).
+
+::: callout-tip
+### What is philopatry?
+
+Natal philopatry describes when an animal remains close or returns to the area where they were born.
+:::
+
+To explore the genetic patterns that result from sex-biased dispersal, we're going to simulate this process in a hypothetical animal population. First, we need to set up the dispersal kernels, using the custom function below.
 
 ```{r}
 # Create a function, where: 
@@ -90,7 +96,7 @@ pdispmale <- c(0, cumsum(dispmale)/sum(dispmale))
 
 ```
 
-Let's look at the dispersal curves. In this case, males disperse further than females (i.e. there is male-biased dispersal):
+Let's look at the dispersal curves. In this case, males disperse further than females (i.e., there is male-biased dispersal):
 
 ```{r}
 # Plot
@@ -110,7 +116,7 @@ plot(dispmale,
      ylab = "")
 ```
 
-Next we'll create a function that runs a simulation, based on the dispersal probabilities created above. We'll generate a population using the function `glSim`, which simulates simple SNP data, returning a genlight object.
+Next we'll create a function that generates a population using `glSim`, which simulates simple SNP data and returns a genlight object. In our hypothetical population, females randomly mate with the nearest male, produce two offspring at a 50:50 sex-ratio, and the offspring then disperse following the dispersal probabilities created above.
 
 ```{r}
 # Create a function, where: 
@@ -147,7 +153,8 @@ SimDisp <-
     
     # Set coordinates
     xy <- expand.grid(x=1:100, y=1:100)
-    xys <- xy[sample(1:nrow(xy), Nind, replace=FALSE),] # sample from the grid
+    # sample from the grid
+    xys <- xy[sample(1:nrow(xy), Nind, replace=FALSE),] 
     gg@other$ind.metrics$x <- xys$x
     gg@other$ind.metrics$y <- xys$y
   
@@ -196,7 +203,9 @@ SimDisp <-
       for (i in 1:nInd(gg)) {
         
         # Use dispersal curves generated above to determine distance
-        if (gg@other$ind.metrics$sex[i]=="M") dis <- max(which(runif(1)>pdispM)) else dis=max(which(runif(1)>pdispF))
+        if (gg@other$ind.metrics$sex[i]=="M") dis <- 
+            max(which(runif(1)>pdispM)) else 
+          dis=max(which(runif(1)>pdispF))
         
         # Dispersal direction
         dir <- runif(1,0,2*pi)
@@ -248,7 +257,21 @@ simdat <-
 
 ```
 
-What does this mean for fine-scale genetic structure? Can we identify different dispersal patterns for males and females? Let's run genetic spatial autocorrelation to find out. We'll use the function `gl.spatial.autoCorr`, which is a multivariate approach combining all loci into a single analysis. The autocorrelation coefficient "r" is calculated for each pair of individuals in each specified distance class (called "bins" in this function). We'll use evenly distributed bins and compare individuals at 10 m intervals up to 50 m.
+What does this mean for fine-scale genetic structure? Can we identify different dispersal patterns for males and females? Let's run genetic spatial autocorrelation to find out. We'll use the function `gl.spatial.autoCorr`. This is a multivariate approach that combines all loci into a single analysis ([Smouse & Peakall 1999](https://doi.org/10.1038/sj.hdy.6885180); [Peakall et al. 2003](https://doi.org/10.1111/j.0014-3820.2003.tb00327.x); [Banks & Peakall 2012](https://doi.org/10.1111/j.1365-294X.2012.05485.x)). The autocorrelation coefficient "r" is calculated for each pair of individuals in each specified distance class (called "bins" in this function).
+
+We'll use evenly distributed bins and compare individuals at 10 m intervals up to 50 m.
+
+::: callout-note
+### Significance testing
+
+There are two ways to test whether fine-scale genetic structure is significantly positive (i.e., individuals are genetically similar) or negative (i.e., individuals are genetically dissimilar).
+
+The first approach is a one-tail permutation test, which provides 95% null hypothesis confidence regions. If the autocorrelation coefficient "r" falls outsdide of this range, significant fine-scale spatial genetic structure is present.
+
+The second approach is to estimate 95% bootstrap confidence intervals (CIs) around the value for r. These are obtained by drawing (with replacement) from within the set of relevant pairwise comparisons for a given distance class. If bootstrap CIs do not overlap zero, fine-scale spatial genetic structure is present. Bootstrap CIs also allow you to test for significant differences between groups (e.g., between females and males). When CIs are non-overlapping, there is a significant difference.
+
+I tend to use 95% bootstrap CIs, since they are more conservative than permutational tests and allow for comparisons. The `gl.spatial.autoCorr` function below will output 95% bootstrap CIs. You can try a permutation test by adding `permutation = TRUE` (note that for this option to work, you will need to create separate plots for each sex by choosing `plot.pops.together = FALSE`).
+:::
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
 # Make 'sex' the population name
@@ -260,139 +283,112 @@ simdat@other$latlon <- data.frame(lon = simdat@other$ind.metrics$x,
 simdat@other$latlon <- Mercator(simdat@other$latlon, inverse = T)
 
 # Run genetic spatial autocorrelation
-gl.spatial.autoCorr(simdat, bins = seq(0, 50, 10), 
-                    plot.pops.together = T, 
+gl.spatial.autoCorr(simdat,
+                    bins = seq(0, 50, 10), 
+                    plot.pops.together = TRUE, 
                     plot.colors.pop = c('#E69F00', '#5D3FD3'))
 
 ```
 
 We can see that:
 
-1.  Both females and males show significant positive spatial autocorrelation up to 30 m (where confidence intervals overlap zero). In other words, once you start comparing individuals 30 m apart, they are unlikely to be related/genetically similar (regardless of sex).
-2.  Females have significantly stronger fine-scale genetic structure than males up to 10 m (i.e. a greater "r" value and female and male bootstrap CIs are non-overlapping).
+1.  Both females and males show significant positive spatial autocorrelation up to 30 m (where confidence intervals overlap zero). In other words, once you start comparing individuals that are 30 m apart, they are unlikely to be related/genetically similar (regardless of sex).
+2.  Females have significantly stronger fine-scale genetic structure than males up to 10 m (i.e., a greater "r" value and female and male bootstrap CIs are non-overlapping).
 
-These results are not surprising, since we set our distance classes based on the known (simulated) dispersal capacity of males and females, and we had large sample sizes (both individuals and loci). In reality, this analysis is a careful balance between power (maximising the sample size in each bin), and ensuring you are looking at the right scale (i.e. the size of the distance class).
-
-::: callout-caution
-#### What do you think would happen if you used a single 50 m distance class?
-
-While the sample size would be great, we might lose the signal of female philopatry. Give it a try above and see what happens.
-:::
+These results are not surprising, since we set our distance classes based on the known (simulated) dispersal capacity of males and females, and we had large sample sizes (both individuals and loci). In reality, this analysis is a careful balance between power (maximising the sample size in each bin), and ensuring you are looking at the right scale (i.e., the size of the distance class matches the extent of spatial-genetic structure).
 
 ::: blackbox
 ### Exercise
 
-*What happens when you vary the dispersal distances? Can you pick up small differences between the sexes?*
+1.  *What happens when you vary the dispersal distances? Can you pick up small differences between the sexes?*
 
-*What happens if you change the number of individuals or SNPs? Does this influence the sensitivity of the analysis? IWhich is more important - more individuals or more loci?*
+2.  *What happens if you change the number of individuals or SNPs? Does this influence the sensitivity of the analysis? Which is more important - more individuals or more loci?*
 
-*What happens when you vary the size and number of distance classes (i.e. bins)? How does this interact with sample size?*
+3.  *What happens when you vary the size and number of distance classes? How does this interact with sample size? What do you think would happen if you used a single 50 m distance class - do we still see the signal of male-biased dispersal*?
 :::
 
 ::: callout-tip
-Vary the dispersal parameters "d0" and "p" below
+### Re-run the code from the beginning
+
+Try varying the following parameters:
+
+-   Dispersal curves: "d0" and "p" when running the `p2p` function
+
+-   Sample sizes: "Nind" (number of individuals) and "Nsnp" (number of loci) when running the `SimDisp` function
+
+-   Distance classes: "bins" when running the `gl.spatial.autoCorr` function
 :::
 
-```{r, eval=FALSE}
-# Dispersal kernels: 
-# Females 
-dispfemale <- (p2p(x = 1:50,
-                   d0 = 1, # Try varying this parameter: mean disp. distance
-                   p = 0.5)) # Try varying this parameter: prop. that go to mean 
-pdispfemale <- c(0, cumsum(dispfemale)/sum(dispfemale))  
+# 2a. Isolation-by-distance
 
-# Males 
-dispmale <- (p2p(x = 1:50,
-                 d0 = 20, # Try varying this parameter: mean disp. distance
-                 p = 0.8)) # Try varying this parameter: prop. that go to mean  
-pdispmale <- c(0, cumsum(dispmale)/sum(dispmale))
+Isolation-by-distance (IBD) is a key concept in population genetics. It describes a simple idea: that geographic distance can influence gene flow because individuals or populations that are geographically distant from each other are less likely to share genetic material than those that are close (based on the "stepping-stone" model; [Kimura & Weiss 1964](https://doi.org/10.1093%2Fgenetics%2F49.4.561)).
 
-# Plot 
-plot(dispfemale,      
-     type = "l",      
-     col = '#E69F00',      
-     lwd = 2,      
-     main = "Female dispersal curve",       
-     xlab = "Distance (m)",      
-     ylab = "") 
-plot(dispmale,      
-     type = "l",      
-     lwd = 2,      
-     col =  '#5D3FD3',      
-     main = "Male dispersal curve",       
-     xlab = "Distance (m)",       
-     ylab = "")
+We can test for IBD with Mantel tests of matrix correspondence ([Mantel 1967](https://aacrjournals.org/cancerres/article/27/2_Part_1/209/476508/The-Detection-of-Disease-Clustering-and-a)), implemented using the function `gl.ibd`. This test compares pairwise geographic and genetic distance matrices, using permutations to test for significance. For the latter, you can use pairwise estimates of population differentiation or individual-by-individual genetic distances.
 
-```
+It's easy enough to plot the relationship between geographic and genetic distance. However, we can't use a standard regression to test this relationship because pairwise data are not independent. Mantel tests solve this problem by using permutation to test for significance (e.g., the data are randomly shuffled. The result will be similar to the shuffled outcome if there is no relationship present).
 
-::: callout-tip
-Vary the number of individuals or the number of SNPs
+::: callout-note
+### Populations vs. individuals
+
+IBD tests often use pairwise population metrics like FST. This is useful when there are lots of samples and populations are well defined. However, there are often situations where we don't have multiple samples per location, populations are difficult to define and/or individuals are more continuously distributed. In this case, we can use the individual as the unit of analysis.
+
+Where FST estimates represent evolutionary averages, pairwise individual genetic distances may represent more contemporary patterns of dispersal. Therefore, the approach you take depends on the species, your sampling, and the question you want to ask.
 :::
 
-```{r, eval=FALSE}
-simdat2 <- 
-    SimDisp(Nind = 100, # Try varying this parameter
-            Nsnp = 1000, # Try varying this parameter
-            pdispF = pdispfemale, 
-            pdispM = pdispmale, 
-            seed = 123)
-
-# Make 'sex' the population name
-pop(simdat)<- simdat@other$ind.metrics$sex
-
-# Add xy coordinates to the 'other' slot in genlight
-simdat@other$latlon <- data.frame(lon = simdat@other$ind.metrics$x, 
-                                  lat = simdat@other$ind.metrics$y)
-simdat@other$latlon <- Mercator(simdat@other$latlon, inverse = T)
-
-```
-
-::: callout-tip
-Try changing the size of the bins
-:::
-
-```{r, eval=FALSE}
-gl.spatial.autoCorr(simdat, bins = seq(0, 50, 5), # Try varying this parameter
-                    plot.pops.together = T, 
-                    plot.colors.pop = c('#E69F00', '#5D3FD3'))
-```
-
-## 2. Isolation-by-distance
-
-An isolation-by-distance model describes a genetic pattern where gene flow (i.e. dispersal/migration) is spatially limited, such that geographic distance alone explains genetic differentiation.
-
-Mantel test... something about individuals vs pops (genetic distance vs. FST)
-
-Let's take a look at IBD in our simulated data set:
+Let's test for IBD in our simulated data set:
 
 ```{r, results='hide'}
 
-gl.ibd(simdat, distance="euclidean", coordinates= 'latlon')
+total.ibd <- gl.ibd(simdat, distance="euclidean", coordinates= 'latlon')
 
 ```
 
-We find significant IBD across all individuals, but it's not very pronounced. Can we still see the signal of male-biased dispersal? Let's create separate IBD plots for females and males.
+```{r}
+# Show Mantel statistics
+total.ibd$mantel
+```
+
+There is significant IBD across all individuals, but it's not very pronounced. Can we still see the signal of male-biased dispersal? Let's create separate IBD plots for females and males:
 
 ```{r, results='hide'}
-gl.ibd(simdat[simdat@pop == "F"], distance="euclidean", coordinates= 'latlon')
-gl.ibd(simdat[simdat@pop == "M"], distance="euclidean", coordinates= 'latlon')
+f.ibd <- gl.ibd(simdat[simdat@pop == "F"], distance="euclidean", coordinates= 'latlon')
+m.ibd <- gl.ibd(simdat[simdat@pop == "M"], distance="euclidean", coordinates= 'latlon')
 ```
 
-Yes - we see significant IBD in females, since dispersal is more restricted. Males show no pattern of IBD, since many individuals can disperse right up to the scale we are sampling.... However, we lose some of the nuance from the previous analysis.
+```{r}
+# Show Mantel statistics for females
+f.ibd$mantel
+# Show Mantel statistics for males
+m.ibd$mantel
+```
+
+::: callout-important
+### Mantel test statistics
+
+Although a regression line is useful for visualising the relationship between geographic and genetic distance, we don't report the results of the regression (for reasons outlined above). Instead, we report the Mantel test statistic (and the p-value), which is the correlation between the two distance matrices. Values that approach -1 indicate a strong negative relationship, values close to 0 suggest there is no relationship, and values approaching +1 indicate a strong positive relationship (i.e., IBD).
+:::
+
+Above we can see that there is significant IBD in females, since dispersal is more restricted. Males show no pattern of IBD, since many individuals can disperse right up to the spatial extent of our sampling. However, we lose some of the nuance from the previous analysis.
 
 ::: callout-caution
 #### What can we learn from each analysis?
 
-By binning samples in the analysis above we learn about fine-scale patterns of structure, the extent of spatial genetic structure/dispersal, etc...
-
-Mantel tests show us the broad trends... and is a simple model for describing... can use individuals or populations.
+Mantel tests show us the broad trend across our study. IBD often acts as our null hypothesis (along with panmixia - i.e., random mating and dispersal) against which to test further landscape genetic analyses. However, unless the signal of sex-biased dispersal is very strong across the whole dataset, a Mantel test is unlikely to detect it. Spatial autocorrelation analysis is usually more powerful in detecting fine-scale genetic patterns than Mantel tests, because samples are "binned" and genetic structure is explored across multiple distance classes.
 :::
 
-We expect a continuous linear relationship - when there are discontinuities, this can be an indication that something else is happening. We can explore this idea using a real example?
+::: blackbox
+## Exercise
 
-### Lesser hairy-footed dunnartsin the Pilbara
+1.  *What happens if you use the proportion of shared alleles instead of euclidean distance?*
+:::
 
-![*Sminthopsis youngsonii*](../images/Dunnart.png){fig-align="left"}
+------------------------------------------------------------------------
+
+We expect a linear relationship between geographic distance (sometimes log-transformed) and genetic distance. A discontinuous relationship can be an indication that something else is going on. We will explore this idea below using a real example.
+
+## Lesser hairy-footed dunnarts in the Pilbara
+
+![*Sminthopsis youngsonii*](Data/Dunnart.png){fig-align="left" width="300"}
 
 ### Load the data
 
@@ -400,9 +396,9 @@ We expect a continuous linear relationship - when there are discontinuities, thi
 Sy.gl <- readRDS('./data/sy.gl.rds') # genetic data
 ```
 
-Something about the species... S. youngsonii is a sandy specialist.
+*Sminthopsis youngsonii* (or the lesser hairy footed dunnart), is a small carnivorous dasyurid found across the Australian arid region. As the name suggests, their hind foot is covered in short, bristly hairs, which are thought to help them move on sandy soils. They are usually found on sand dunes, inter dune swale and red sand plains.
 
-Let's take a look at a map ...
+These samples were taken in the Pilbara region at the very western edge of their range. Let's take a look at a map:
 
 ```{r}
 leaflet(Sy.gl@other$latlong) %>% 
@@ -411,35 +407,40 @@ leaflet(Sy.gl@other$latlong) %>%
                    popup = ~htmlEscape(lon))
 ```
 
-Is there isolation by distance? ...
+Given this is the edge of their range, and the Pilbara is quite rocky and doesn't harbour much of the ideal habitat for this species, we want to know a little more about dispersal and connectivity in this area. A good first step is to test for isolation by distance.
 
 ```{r, results='hide'}
 
-gl.ibd(Sy.gl, distance="euclidean")
+Sy.ibd <- gl.ibd(Sy.gl, distance="euclidean")
 
 ```
 
-Yes! The pattern is very strong. But... some of the points don't seem to follow the same slope? Why might this be?
+```{r}
+# Show Mantel statistics
+Sy.ibd$mantel
+```
 
-There seems to be a big gap in sampling. This might be due to sampling bias, or the species may not occur here, suggesting there might be something going on with the habitat.
+Yes - there is significant IBD! The pattern is very strong. But... some of the points don't seem to follow the same slope? Why might this be?
+
+There seems to be a big gap in sampling. This could be due to a sampling bias (e.g., the missing area is difficult to get to). Alternatively, the species may not occur here, suggesting there might be something going on with the habitat.
 
 ::: callout-caution
 #### Given what we know about the species, what would be a reasonable hypothesis?
 
-Could substrate be driving this sampling gap and the strange IBD pattern? Or could it be the Ashbuton river?
+Could substrate be driving this sampling gap and the strange IBD pattern?
 :::
 
-Let's separate the individuals into two populations on either side of this break, we'll use longitude to separate them. You can click on the points in the map above to choose the correct location.
+Let's separate the individuals into two populations using longitude. You can click on the points in the map above to choose a location.
 
 ```{r}
-
+# Choose a point that separates the samples into two populations
 lon.break <- 114.87
-
-Sy.gl@pop <- as.factor(ifelse(Sy.gl@other$latlong$lon < lon.break, "West", "East"))
+# Assign eastern and western populations based on this point
+Sy.gl@pop <- as.factor(ifelse(Sy.gl@other$latlong$lon < lon.break, "1.West", "2.East"))
 
 ```
 
-Let's take another look at IBD, including some information about the break
+Now let's take another look at IBD, but this time we'll include the population information.
 
 ```{r, results='hide'}
 
@@ -447,7 +448,7 @@ gl.ibd(Sy.gl, distance = "euclidean", paircols = 'pop')
 
 ```
 
-It looks like there are two slopes describing IBD within each 'population'. Discontinuities like this can sometimes suggest a barrier to gene flow. Let's take a look at the substrate.
+It looks like the magnitude of genetic distance is different and there are two different slopes describing IBD within each 'population'. The points with large geographic and genetic distances represent among population comparisons. Discontinuities like this can sometimes suggest a barrier to gene flow. Let's take a look at the substrate.
 
 ```{r, results='hide'}
 # Load a soil shapefile
@@ -462,12 +463,10 @@ pop.pal <- colorFactor(
 # Create a palette
 soil.pal <- colorFactor(
   palette = c("#9C640C", 
-              "#85929E", 
-              "#873600", 
+              "#5c3001", 
               "#C0392B", 
-              "#F4D03F", 
-              "#85929E",
-              "#A9CCE3"),
+              "#EDC001", 
+              "#FDEFB2"),
   domain = soil$Type
 )
 
@@ -486,7 +485,7 @@ leaflet(cbind(pop = Sy.gl@pop, Sy.gl@other$latlong)) %>%
                   position = 'topright', data = gadmCHE, group = 'Polygons')
 ```
 
-It looks like clay could be acting as a barrier. This is a good theory, but it would be useful to be able to visualise these patterns of isolation by distance spatially to get an indication of where exactly gene flow is being restricted. We can achieve this by estimating effective migration surfaces....
+It looks like clay could be acting as a barrier. This is a good theory, but it would be useful to be able to visualise these patterns of isolation by distance spatially to get an indication of where gene flow is being restricted. We'll explore this idea in the next section.
 
 ## 3. EEMS
 
@@ -588,7 +587,7 @@ eems.comp <- readRDS("data/eems_comp.rds")
 We have not looked at all of the output. There are actually 8 figures that are produced by the EEMS method. You can access the using the notation `eems.comp[[1]] or eems.comp$mrates01`.
 
 | Plot       | Description                                                                                                                                                                                                                                                                                                                                                                      |
-|-----------------|-------------------------------------------------------|
+|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `mrates01` | Effective migration surface. This contour plot visualizes the estimated effective migration rates (m), on the log10 scale after mean centering.                                                                                                                                                                                                                                  |
 | `mrates02` | Posterior probability contours ($P(\log(m) > 0) = p$) and ($P(\log(m) < 0) = p$) for the given probability level (p). Since migration rates are visualized on the log10 scale after mean centering, 0 corresponds to the overall mean migration rate. This contour plot emphasizes regions with effective migration that is significantly higher/lower than the overall average. |
 | `qrates01` | Effective diversity surface. This contour plot visualizes the estimated effective diversity rates (q), on the log10 scale after mean centering.                                                                                                                                                                                                                                  |
@@ -810,21 +809,22 @@ A bit mean is that we have not recoded the resistance layers, so you have to do 
 names(antechinus@other)
 ```
 
-
 ### Elevation layer
+
 ```{r}
 gl.map.interactive(antechinus, provider = "Esri.WorldImagery") %>% addRasterImage(elevation, opacity = 0.8)
 
 ```
 
 Roads layer
+
 ```{r}
 gl.map.interactive(antechinus, provider = "Esri.WorldImagery") %>% addRasterImage(roads, opacity = 0.5)
 
 ```
 
-
 Forest layer
+
 ```{r}
 gl.map.interactive(antechinus, provider = "Esri.WorldImagery") %>% addRasterImage(forest, opacity = 0.7)
 
