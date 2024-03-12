@@ -821,9 +821,9 @@ Gini -  Measurement of the cleanliness of feature split in the tree
 
 Ok let's change approach and check concordance:
 
-##### RAINBOWR ####
+## RAINBOWR
 
-## 1 Iputs 
+## 1 Inputs 
 
 First, we integrate our inputs in to a GWAS format for RAINBOWR.
 
