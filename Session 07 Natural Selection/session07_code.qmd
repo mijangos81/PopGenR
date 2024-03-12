@@ -647,7 +647,7 @@ So here we have the 363 samples, (180 small and 183 large), genotyped for a subs
 
 ## 2 Model tunning 
 
-The first step is  to crate our training and validation data in a 70:30 proportion.
+The first step is  to crate our training and validation data in a 70:25 proportion.
 
 Then we run a simple forest to see performance without tuning.
 
