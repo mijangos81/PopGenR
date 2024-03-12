@@ -876,7 +876,7 @@ normal.res <- RGWAS.normal(pheno = pheno.GWAS, geno = geno.GWAS, ZETA = ZETA, st
 
  Now, to perform single-SNP GWAS.
 
-```{r}
+```{r, results='hide', message=FALSE}
 
 normal.res <- RGWAS.normal(pheno = pheno.GWAS, geno = geno.GWAS, ZETA = ZETA, n.PC = 4, P3D = TRUE)
 
