@@ -1,5 +1,7 @@
 ---
 title: "Session 5: Effective Population Size"
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Effective Population Size
@@ -239,7 +241,7 @@ Lets start with the simple one and lets use Epos (as this is the fastest method)
 
 There are two more important parameters l and mu. l is the total lenght of the "sampled" chromosome and we will have a discussion on that. mu is the mutation rate per site per generation. The important concept to keep in mind is that:
 
-$$\LARGE x = mu \times L \times 2 \times Ne $$ , where x is the number of mutations in a generation.
+$$\LARGE x = mu \times L \times \times Ne $$ , where x is the number of mutations in a generation.
 
 So to be able to estimate the trajectory in an absolute sense we need to know L and mu. In a simulation that is easy because we know how long the chromosome(s) were we did our simulation on. Here L=5e8 and mu was set to a value of 1e-8.
 
@@ -250,7 +252,7 @@ L <- 5e8
 mu = 1e-8
 
 #forgive me but you need to name "L" as little l in the function call. 
-#will be corrected in the ne
+#will be corrected in the next version
  Ne_epos <- gl.epos(gl100, epos.path = path.binaries , l = L, u=mu, boot=10, minbinsize = 1)
 colnames(Ne_epos) <- c("generation", "low", "Ne_median", "high")
 ggplot(Ne_epos, aes(x=generation, y=Ne_median))+geom_line()+geom_ribbon(aes(ymin=low, ymax=high), alpha=0.2)
