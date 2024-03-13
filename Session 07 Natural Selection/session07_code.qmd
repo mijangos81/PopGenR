@@ -711,12 +711,12 @@ The next couple of steps could take **too long**, so here are the commands for y
 ## run in **your own time**
 
 ```{r, eval = FALSE}
-control <- trainControl(method="oob", number=10, search="random")
-set.seed(123)
-mtry <- sqrt(ncol(CaRF))
-rf_random <- train(Size~., data=CaRF, method="rf", metric=metric, tuneLength=15, trControl=control)
-(rf_random)
-plot(rf_random)
+# control <- trainControl(method="oob", number=10, search="random")
+# set.seed(123)
+# mtry <- sqrt(ncol(CaRF))
+# rf_random <- train(Size~., data=CaRF, method="rf", metric=metric, tuneLength=15, trControl=control)
+# (rf_random)
+# plot(rf_random)
 ```
 :::
 
@@ -753,21 +753,21 @@ But here is the code for you to try.
 
 ```{r, eval = FALSE}
 
-control <- trainControl(method="repeatedcv", number=10, repeats=3, search="grid")
-tunegrid <- expand.grid(.mtry= c(565, 665, 765))
-modellist <- list()
-seed<-123
-metric <- "Accuracy"
-for (ntree in c(200, 300, 500, 1000)) {
-  set.seed(seed)
-  fit <- train(Size~., data=CaRF, method="rf", metric=metric, tuneGrid=tunegrid, trControl=control, ntree=ntree)
-  key <- toString(ntree)
-  modellist[[key]] <- fit
-}
-# Then you can compare tuning results
-results <- resamples(modellist)
-summary(results)
-dotplot(results)
+# control <- trainControl(method="repeatedcv", number=10, repeats=3, search="grid")
+# tunegrid <- expand.grid(.mtry= c(565, 665, 765))
+# modellist <- list()
+# seed<-123
+# metric <- "Accuracy"
+# for (ntree in c(200, 300, 500, 1000)) {
+#   set.seed(seed)
+#   fit <- train(Size~., data=CaRF, method="rf", metric=metric, tuneGrid=tunegrid, trControl=control, ntree=ntree)
+#   key <- toString(ntree)
+#   modellist[[key]] <- fit
+# }
+# # Then you can compare tuning results
+# results <- resamples(modellist)
+# summary(results)
+# dotplot(results)
 ```
 
 :::
@@ -863,11 +863,11 @@ ZETA <- modify.CaGW.res$ZETA
 
 ```{r, eval = FALSE}
 
-### Population structure, using a structure Q values matrix, n.PC should be > 0
-normal.res <- RGWAS.normal(pheno = pheno.GWAS, geno = geno.GWAS, ZETA = ZETA, structure.matrix= QMATRIX, n.PC = 4, P3D = TRUE)
-
-#### other cofactors, like sex or age (a two-column table similar to phenotype table)
-normal.res <- RGWAS.normal(pheno = pheno.GWAS, geno = geno.GWAS, ZETA = ZETA, structure.matrix= QMATRIX, covariate = SEX_AGE,  n.PC = 4, P3D = TRUE)
+# ### Population structure, using a structure Q values matrix, n.PC should be > 0
+# normal.res <- RGWAS.normal(pheno = pheno.GWAS, geno = geno.GWAS, ZETA = ZETA, structure.matrix= QMATRIX, n.PC = 4, P3D = TRUE)
+# 
+# #### other cofactors, like sex or age (a two-column table similar to phenotype table)
+# normal.res <- RGWAS.normal(pheno = pheno.GWAS, geno = geno.GWAS, ZETA = ZETA, structure.matrix= QMATRIX, covariate = SEX_AGE,  n.PC = 4, P3D = TRUE)
 ```
 
 :::
@@ -929,7 +929,7 @@ If you have NAs in your phenotype dataset you have to remove them.
 
 ```{r, eval = FALSE}
 
-phenoNoNA <- pheno.mat2[noNA, , drop = FALSE]   ### remove NA
+#phenoNoNA <- pheno.mat2[noNA, , drop = FALSE]   ### remove NA
 
 ```
 
