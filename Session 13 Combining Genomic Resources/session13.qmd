@@ -1,0 +1,521 @@
+# Combining Genomic Resources
+
+*Session Presenters*
+
+![](images/Presenters13.png)
+# Introduction
+
+Chromosomal rearrangements are often associated with local adaptation and speciation because they suppress recombination, and as a result, rearrangements have been implicated in disrupting geneflow. Although there is strong evidence to suggest that chromosome rearrangements are a factor in genetic isolation of divergent populations, the underlying mechanism remains elusive. Here we applied an integrative cytogenetics and genomics approach testing whether chromosomal rearrangements are the initial process, or a consequence, of population divergence in the dwarf goanna, Varanus acanthurus. Specifically, we tested whether chromosome rearrangements are indicators of genetic barriers that can be used to identify divergent populations by looking at geneflow within and between populations with rearrangements. We found that geneflow was present between individuals with chromosome rearrangements within populations, but there was no geneflow between populations that had similar chromosome rearrangements. Moreover, we identified a correlation between reduced genetic variation in populations with a higher frequency of homozygous submetacentric individuals. These findings suggest that chromosomal rearrangements were widespread prior to divergence and because we found populations with higher frequencies of submetacentric chromosomes were associated with lower genetic diversity, this could indicate that polymorphisms within populations are early indicators of genetic drift. 
+
+## *Required packages*
+
+```{r, warning=FALSE, message=FALSE}
+library(dartRverse) 
+library(tidyverse) 
+library(RColorBrewer) 
+library(patchwork) 
+library(scales) 
+library(gridExtra) 
+library(grid) 
+library(raster) 
+library(otuSummary) 
+```
+
+*make sure you have the packages installed, see* [Install dartRverse](install.qmd)
+
+## Geneflow between Karyotypes
+
+```{r}
+# setup -----------------------
+## load ---
+vac.glch2 <- readRDS("/cloud/project/data/spiny_gl1.rds")
+
+# missing karyotype MM in East population 
+vac.glch2@other$ind.metrics$karyo[grep("AA095619", vac.glch2@ind.names)] <- "MM"
+
+
+## overview --------------------------------------------------------------------
+vac.glch2
+pop(vac.glch2) %>% table
+
+table(vac.glch2@other$ind.metrics$PCR1)
+vac.glch2@other$ind.metrics$sex = NULL
+
+sex = toupper(as.character(vac.glch2@other$ind.metrics$PCR1))
+# sex[sex==""] = "M" #TODO FIX na
+vac.glch2@other$ind.metrics$sex <- sex
+
+#gl.smearplot(vac.glch2, group.pop = FALSE)
+## filtering -------------------------------------------------------------------
+vac.pops <-gl.keep.pop(vac.glch2, pop.list = c("North","South","East","West"))
+
+sex <- gl.filter.sexlinked(vac.glch2, system = "zw")
+
+vac.glch2@other$loc.metrics$Chrom_Varanus_JD_infer_w
+vac.pops@other$ind.metrics$PCR1
+
+
+#gl.smearplot(vac.pops, group.pop = TRUE)
+
+```
+
+```{r}
+## start ----------
+
+vac.gl1 <- gl.filter.callrate(vac.pops, method = "loc", threshold = 0.80)
+vac.gl1 <- gl.filter.callrate(vac.gl1, method = "ind", threshold = 0.75) 
+vac.gl1 <- gl.filter.reproducibility(vac.gl1, t = 0.99)
+vac.gl1 <- gl.filter.monomorphs(vac.gl1, v = 0)
+
+## colours -----------------------------------
+popcolors <- c(East = "#0571b0", North = "#404040", 
+               South = "#5e3c99", West = "#e66101")
+
+karyocolors <- c("MM" = "red", "MA" = "black", "AA" = "blue")
+
+```
+
+```{r}
+## pcoa ------------------------------------------------------------------------
+pc <- gl.pcoa(vac.gl1, nfactors = 5)
+
+## ibd data --------------------------------------------------------------------
+# pop
+indexXY <- complete.cases(vac.gl1@other$latlon) # missing locations
+vac.gl17 <- gl.keep.ind(vac.gl1,ind.list = indNames(vac.gl1)[indexXY])
+
+latAdjust <- runif(nInd(vac.gl17))/10000 # unique individual locations
+vac.gl17@other$latlon$lat <- vac.gl17@other$latlon$lat+ latAdjust
+
+# karyo
+vac.gl18 <- gl.drop.pop(vac.gl17, as.pop = "karyo", pop.list = "")
+pop(vac.gl18) <- vac.gl18@other$ind.metrics$karyo
+
+# figure 3 ---------------------------------------------------------------------
+popi <- levels(vac.gl1@pop)
+vac.edit <- vac.gl1
+# all East population assumed to be MM
+vac.edit@other$ind.metrics$karyo[pop(vac.gl1)=="East"] <- "MM"
+
+```
+# Within population PCoA and IBD
+```{r, message=FALSE}
+
+for(i in 1:4){
+  #pcoa
+  vac.popi <- gl.keep.pop(vac.edit, pop.list = popi[i], as.pop = "pop")
+  vacp <- gl.filter.monomorphs(vac.popi, verbose = 0)
+  pop(vacp) <- vacp@other$ind.metrics$karyo
+  vacpK <- gl.keep.pop(vacp, as.pop = "karyo", pop.list = names(karyocolors), verbose = 0)
+  pca <- gl.pcoa(vacpK, nfactors = 5)
+ gl.pcoa.plot(pca, vacpK)#plot.pcoa(pca, vacpK, xpc = 1, ypc = 2, popColors = karyocolors)
+  
+  plotfiles <- list.files(tempdir())[grep("Plot", list.files(tempdir()))]
+  unlink(paste0(tempdir(), "/", plotfiles))
+  
+  #ibd 
+   gl.ibd(vacpK, distance = "propShared", paircols = "pop",
+                     Dgeo_trans = "Dgeo")
+
+  
+}
+```
+# Between population PCoA and IBD
+```{r}
+# figure 4 ---------------------------------------------------------------------
+## pcoa figures ----------------------------------------------------------------
+gl.pcoa.plot(pc, vac.gl1, xaxis =  1, yaxis = 2,pt.colors = popcolors)
+gl.pcoa.plot(pc, vac.gl1, xaxis = 3, yaxis = 4, pt.colors = popcolors)
+
+## ibd figures -----------------------------------------------------------------
+
+# pop
+gl.ibd(vac.gl17, distance = "propShared",
+                 paircols = "pop", Dgeo_trans = "Dgeo")
+
+# karyo
+gl.ibd(vac.gl18, distance = "propShared",
+                   paircols = "pop", Dgeo_trans = "Dgeo")
+```
+# Multiple linear regression model for within and between populations testing same vs different karyotypes
+```{r}
+## reviewer figures -------------------------------------------------------------
+# reviewer ibd karyo
+review.analysis <- function(gl, analysis = "between"){
+  
+  if(analysis == "within"){ ndist <- 51; diffCol = "#FFC33B"}
+  if(analysis == "between"){ ndist <- 1050; diffCol = "#FF5AAF"}
+  
+  karyoibd <- gl.ibd(gl, distance = "propShared",
+                     paircols = "pop", Dgeo_trans = "Dgeo")
+  
+  
+  mat <- karyoibd$Dgeo/1000
+  prop <- karyoibd$Dgen
+  
+  dfDist <- matrixConvert(mat, c("id1", "id2", "geo"))
+  dfGen <- matrixConvert(prop, c("id1", "id2", "gen"))
+  jason2 <- gl
+  dfkaryo <- jason2@other$ind.metrics[,c("id", "karyo")]
+  dfpop <- jason2@other$ind.metrics[,c("id", "pop")]
+  
+  
+  
+  df <- left_join(dfGen, dfDist) %>% 
+    left_join(dfkaryo, by = c("id1" = "id")) %>% 
+    left_join(dfkaryo, by = c("id2" = "id")) %>% 
+    left_join(dfpop, by = c("id1" = "id")) %>% 
+    left_join(dfpop, by = c("id2" = "id")) %>% 
+    mutate(pair = paste(karyo.x,"-", karyo.y)) %>% 
+    filter(geo <= ndist) %>%        # change based on question between or within
+  rowwise() %>% 
+    mutate(karyo = ifelse(karyo.x == karyo.y, "same", "different"),
+           diffpop = pop.x == pop.y) 
+
+  indexPost <- c(df$id1, df$id2)
+  
+
+  m <- lm(gen ~ geo, data = df)
+  summary(m)
+  
+  m2 <- lm(gen ~  geo + karyo, data = df)
+  summary(m2)
+  
+ # tab_model(m, m2, show.aic = TRUE, file = "temp.html")
+ #  webshot("temp.html",file = paste0("model_karyo_ibd_", ndist, ".png") , 
+ #  vwidth = 441, vheight = 351)
+  
+  aic <- AIC(m, m2)
+  aic$delta <- aic$AIC - min(aic$AIC)
+  
+  x <- 1:ndist
+  
+  y1 <- predict(m, newdata = data.frame(geo = x), interval = 'confidence')
+  y2 <- predict(m2, newdata = data.frame(geo = x, karyo = "same"))
+  y3 <- predict(m2, newdata = data.frame(geo = x, karyo = "different"))
+  
+  predmodel <- data.frame(geo = rep(x,2), gen = c(y2, y3), 
+                          karyo = rep(c("same", "different"), each = ndist))
+  
+  sm <- summary(m2)
+  
+  b0 <- round(m2$coefficients[1],3)
+  b1 <- signif(m2$coefficients[2], 1)
+  b2 <- round(m2$coefficients[3], 3)
+  
+  r2 <- round(sm$r.squared,2)
+  tb2 <- round(sm$coefficients[3,3], 2)
+  
+  mExpress <- paste0(b0 ,
+                     " + ", b1, " + ", b2)
+  pval <- round(sm$coefficients[3,4],2)
+  
+  grob_m <- grobTree(textGrob(bquote(paste(italic("y = "), "β"[0], 
+                                           " + ",  "β"[1], italic(" x"),"  + ",  
+                                           "β"[2],italic(" same karyo"))),
+                              x= 0.30,  
+                              y= 0.12,
+                              hjust=0, rot = 0,
+                              gp=gpar(col="black", fontsize=10, fontface="italic",
+                                      backgroun = "white")))
+  
+  
+  grob_m2 <- grobTree(textGrob(bquote(paste("β"[2]," = ", .(b2), " (", italic("t = "),.(tb2),
+                                            italic(", p = "), .(pval), ")")),
+                               x= 0.30,  
+                               y= 0.05,
+                               hjust=0, rot = 0,
+                               gp=gpar(col="black", fontsize=8, fontface="italic",
+                                       backgroun = "white")))
+  
+  
+  
+  reviewerPlot <-ggplot(df, aes(geo, gen, fill = karyo)) +
+    geom_point(alpha = 0.7, size = 4, pch = 21) +
+    theme_classic() +
+    geom_line(data = filter(predmodel, geo < ndist), 
+              aes(x = geo, y = gen, colour = karyo), linewidth = 1, lty = 5)+
+    xlab("Distance (km)")+
+    ylab("1-(Proportion of Shared Alleles)")+
+    scale_fill_manual(values = c(different = diffCol, same = "black"))+
+    scale_colour_manual(values = c(different = diffCol, same = "black"))+
+    # theme(legend.position = "none") +
+    geom_text(aes(x = 39, y = 0.05, label = c("")), cex = 5)+
+    theme(legend.position = "bottom")+
+    labs(fill = "Karyotype", colour = "Karyotype")+
+    annotation_custom(grob_m)+
+    annotation_custom(grob_m2)
+  
+  
+  return(reviewerPlot)
+  
+}
+```
+
+```{r}
+review.analysis(gl = vac.gl18, analysis = "between")
+
+
+review.analysis(gl = vac.gl18, analysis = "within")
+
+```
+
+## Characterising a large chromosomal inversion
+
+```{r}
+vac.gl <- gl.load("/cloud/project/data/varanus_MBE_Karyotypes.rds")
+
+class(vac.gl) <- "dartR"
+
+####Add position for loci metadata
+vac.gl@position <- as.integer(runif(nLoc(vac.gl), 2, 49))
+
+# subset SNPs that align to inferred chromosome pool scaffolds -----------------
+# how many reads align to flow sorted chromosome pool?
+
+table(vac.gl@other$loc.metrics$Chrom_Varanus_JD_vac_aligned_chr6_7 != "")
+
+# Index those loci
+
+index6 <-
+  vac.gl@other$loc.metrics$Chrom_Varanus_JD_vac_aligned_chr6_7 != ""
+
+# assign alleles aligned to chromosome 6_7 scaffolds to a new genlight object --
+
+vac.gl6 <- vac.gl[, index6]
+
+gl.smearplot(vac.gl6, group.pop = FALSE)
+# add DAPI Karyotype individual metric
+```
+
+
+```{r}
+# report private alleles and fixed alleles per pair of populations for vac.gl6
+gl.report.pa(vac.gl6)
+
+#pop(vac.gl6) <- vac.gl6@other$ind.metrics$DAPI
+
+table(pop(vac.gl6))
+
+#s <- gl.smearplot(glkaryo, group.pop = TRUE)
+
+pop(vac.gl6) <- vac.gl6@other$ind.metrics$pop
+```
+
+
+# Investigate the West only - all three karyotypes with geneflow
+
+```{r}
+### Check the genlight object for dartR requirements
+
+
+vac.gl6 <- gl.compliance.check(vac.gl6)
+vac.gl6@loc.names %>% duplicated %>% table
+
+# Subset the western population ------------------------------------------------
+
+vac.gl6@other$ind.metrics$ind
+
+west <- gl.keep.pop(vac.gl6, c("bh"))
+
+# Group individuals of the western population by karyotype
+
+pop(west) <- west@other$ind.metrics$karyo
+
+# Reassign karyotype to a new genlight object ----------------------------------
+
+west <- gl.keep.pop(west, c("AA", "MA", "MM"))
+
+# Report private and fixed alleles for each karyotype
+
+gl.report.pa(west)
+
+# Add individual metadata to specimen IDs --------------------------------------
+
+pop(west) <-
+  paste(
+    west@other$ind.metrics$karyo,
+    west@other$ind.metrics$id,
+    west@other$ind.metrics$pop
+  )
+
+# Fixed difference analysis ----------------------------------------------------
+
+fp6 <- gl.fixed.diff(west)
+fp6$df
+table(pop(west))
+fp6 <- (gl.fixed.diff(west))
+
+
+
+# Figure 2 ---------------------------------------------------------------------
+
+res <- as.matrix(gl.fixed.diff(west)$fd)
+
+gl.plot.heatmap(res, margins = c(10, 10))
+```
+
+```{r}
+# Table of SNPs per scaffold that align to chromosome 6 ------------------------
+
+table(vac.gl6@other$loc.metrics["Chrom_Varanus_JD_vac_aligned_chr6_7"])
+
+# Fixed allele analysis for with predicted Karyotypes --------------
+
+pop(vac.gl6) <- vac.gl6@other$ind.metrics$karyo
+vac.karyo <- gl.keep.pop(vac.gl6, c("AA", "MA", "MM"))
+pop(vac.karyo) <- vac.karyo@other$ind.metrics$karyo
+
+gl.fixed.diff(vac.karyo)
+fpk6.1 <- gl.fixed.diff(vac.karyo)
+fpk6.1$fd
+table(pop(vac.karyo))
+
+
+# group individuals by karyotype
+pops <- seppop(vac.karyo)
+
+# Identify those loci that are fixed for one allele in AA and opposite allele in
+# MM and MA are heterozygotes
+
+themany <- which(((abs(
+    colMeans(as.matrix(pops$AA), na.rm = TRUE) - colMeans(as.matrix(pops$MM),
+                                                          na.rm = TRUE)
+  )) == 2) & colMeans(as.matrix(pops$MA) == 1, na.rm = T))
+
+themany
+
+# Supplemenarty Table 5 of SNPs sorted for fixed differences--------------------
+
+
+vac.karyo@other$loc.metrics$TrimmedSequence[themany]
+hits <- vac.karyo@other$loc.metrics[themany, ]
+hits
+
+vac.pops <- vac.karyo
+
+# SNPs aligning to scaffolds of interest following fixed allele analysis
+
+table(vac.pops@other$loc.metrics[themany, "Chrom_Varanus_JD_vac_aligned_chr6_7"])
+```
+
+
+```{r}
+# create an index for only those loci on scaf_178-------------------------------
+
+index_178 <- which(vac.pops@other$loc.metrics$Chrom_Varanus_JD_vac_aligned_chr6_7 == "scaf_178")
+
+# check the index to verify genlight object
+index_178
+
+
+# combine the indexed loci with loci names
+
+index_178names <- locNames(vac.pops)[index_178]
+
+
+# make a new genlight object with only those indexed loci
+
+vac.gl_178 <- gl.keep.loc(vac.pops, loc.list = index_178names)
+vac.gl_178 <- gl.compliance.check(vac.gl_178)
+
+
+
+vac.gl_178
+
+vac.gl_178 <- gl.keep.pop(vac.gl_178, c("AA", "MA", "MM"))
+table(vac.gl_178$pop)
+
+# Concantenate the SNPs for scaf_178 for phylogenetic inference----------------- 
+# The .FASTA file was used as input sequences for Genieous Prime
+
+fasta <-
+  gl2fasta(
+    vac.gl_178,
+    method = 3,
+    outfile = "/vac.gl_178_concat.fasta",
+    outpath = "/cloud/project/data/",
+    verbose = 3
+  )
+
+
+# Supplementary Figure 4--------------------------------------------------------
+
+vac.pops_temp <- gl.filter.callrate(vac.gl_178, threshold = 1)
+gl.smearplot(
+  vac.pops_temp,
+  ind.labels =  T,
+  plot.colors = c('royalblue', 
+                  'yellow', 'red'),
+  label.size  = 6,
+  group.pop = T
+)
+
+vac.pops_temp
+
+```
+
+```{r} 
+library(GENESPACE)
+
+genomeRepo <- normalizePath("rawGenomes")
+wd <- "."
+path2mcscanx = "~/Downloads/MCScanX-master/"
+
+
+
+localGenomes <- c("Vacscaf178","Podarcis","Sceloporus", "Anolis", "Zootoca","Thamnophis", "Chrysemys", "platypus", "Gallus")
+
+genomes2run <- names(localGenomes)
+translatedCDS <- sprintf("%stranslated_cds.faa.gz", localGenomes)
+geneGff <- sprintf("%sgenomic.gff.gz", localGenomes)
+
+names(translatedCDS) <- genomes2run
+names(geneGff) <- genomes2run
+writeDirs <- file.path(genomeRepo, genomes2run)
+names(writeDirs) <- genomes2run
+
+for(i in localGenomes)
+  if(!(i %in% localGenomes)) {
+    download.file(
+      url = geneGff[i],
+      destfile = file.path(writeDirs[i], basename(geneGff[i])))
+    download.file(
+      url = translatedCDS[i],
+      destfile = file.path(writeDirs[i], basename(translatedCDS[i])))
+  }
+
+
+genomes2run <- c("Vacscaf178","Podarcis","Sceloporus", "Anolis", "Zootoca","Thamnophis", "Chrysemys", "platypus", "Gallus")
+parsedPaths <- parse_annotations(
+  rawGenomeRepo = genomeRepo,
+  genomeDirs = genomes2run,
+  genomeIDs = genomes2run,
+  presets = "ncbi",
+  genespaceWd = wd)
+
+gpar <- init_genespace(
+  wd = wd,
+  path2mcscanx = path2mcscanx)
+
+## uncomment to RUN
+out <- run_genespace(gpar, overwrite = T)
+saveRDS(out,"out_genespace.rds")
+out <- readRDS("./cloud/project/data/out_genespace.rds")
+
+ripd <- plot_riparian(
+  gsParam = out,
+  refGenome = "Vacscaf178",
+  useRegions = FALSE)
+
+
+
+```
+
+## *Further Study*
+
+Link to github repository of GENESPACE: <https://github.com/jtlovell/GENESPACE/tree/master>
+
+@dobry_fixed_2023
+
+@dobry_widespread_2023
