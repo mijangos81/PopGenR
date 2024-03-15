@@ -1,3 +1,9 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
 # 11 From Genes to Kin: Dissecting Relatedness & Kinship
 
 *Session Presenters*
@@ -51,23 +57,22 @@ library(kinship2)
 
 Two alleles are identical by descent (IBD) if they are identical copies of the same ancestral allele in a base population. Relatedness is the proportion of alleles shared between individuals that are IBD. Kinship is the probability that two alleles, one taken at random from each individual, are IBD ([Wang 2022](https://doi.org/10.1111/2041-210X.13963)). Kinship considers half the genetic information because it looks at the probability that one individual inherits a particular allele from a common ancestor shared with another individual. Therefore, kinship is equal to half of relatedness.
 
-Reletedness/kinship are not absolute states but are estimated relative to a reference population for which there is generally little information, so that we can estimate the kinship of a pair of individuals only relative to some other quantity. 
+Reletedness/kinship are not absolute states but are estimated relative to a reference population for which there is generally little information, so that we can estimate the kinship of a pair of individuals only relative to some other quantity.
 
 ::: callout-tip
-
 Below is a table modified from Speed & Balding ([2015](https://doi.org/10.1038/nrg382)) showing kinship values, and their confidence intervals (CI) for different relationships.
 
-|Relationship|Kinship|CI(95%)|
-|:----------|:-----:|:-:|
-|Identical twins/clones/same individual | 0.5 | - |
-|Sibling/Parent-Offspring | 0.25 | (0.204, 0.296)|
-|Half-sibling | 0.125 | (0.092, 0.158)|
-|First cousin | 0.062 | (0.038, 0.089)|
-|Half-cousin | 0.031 | (0.012, 0.055)|
-|Second cousin | 0.016 | (0.004, 0.031)|
-|Half-second cousin | 0.008 | (0.001, 0.020)|
-|Third cousin | 0.004 | (0.000, 0.012)|
-|Unrelated | 0 | - |
+| Relationship                           | Kinship |    CI(95%)     |
+|:---------------------------------------|:-------:|:--------------:|
+| Identical twins/clones/same individual |   0.5   |       \-       |
+| Sibling/Parent-Offspring               |  0.25   | (0.204, 0.296) |
+| Half-sibling                           |  0.125  | (0.092, 0.158) |
+| First cousin                           |  0.062  | (0.038, 0.089) |
+| Half-cousin                            |  0.031  | (0.012, 0.055) |
+| Second cousin                          |  0.016  | (0.004, 0.031) |
+| Half-second cousin                     |  0.008  | (0.001, 0.020) |
+| Third cousin                           |  0.004  | (0.000, 0.012) |
+| Unrelated                              |    0    |       \-       |
 :::
 
 ## The Quest to Quash the Cane Toad Conundrum in Mandalong
@@ -79,13 +84,14 @@ Introduced to Australia in the 1930s to combat cane beetles, cane toads have sin
 *The key issue here is figuring out if the young toads at Mandalong are locals, born and bred, or if they've crashed the party as a group from elsewhere.*
 
 #### Loading data
+
 ```{r}
 t1 <- gl.load("./data/cane_toad.rds")
 ```
 
 #### Finding duplicated samples
 
-It is critical to identify and remove duplicated samples. To identify duplicated samples, we used the software Colony ([Jones & Wang, 2010](https://doi.org/10.1111/j.1755-0998.2009.02787.x)) and compare it with dartR function `gl.report.replicates`. 
+It is critical to identify and remove duplicated samples. To identify duplicated samples, we used the software Colony ([Jones & Wang, 2010](https://doi.org/10.1111/j.1755-0998.2009.02787.x)) and compare it with dartR function `gl.report.replicates`.
 
 ::: callout-tip
 Ideally, in a large dataset with related and unrelated individuals and several replicated individuals, such as in a capture/mark/recapture study, the first histogram should have four "peaks". The first peak should represent unrelated individuals, the second peak should correspond to second-degree relationships (such as cousins), the third peak should represent first-degree relationships (like parent/offspring and full siblings), and the fourth peak should represent replicated individuals.
@@ -113,8 +119,8 @@ cat(res_dup_2,sep="\n")
 
 ### COLONY
 
-We will use 
-[Diana Robledo's](https://doi.org/10.1111/1755-0998.13844) function to convert a genlight object into COLONY format.
+We will use [Diana Robledo's](https://doi.org/10.1111/1755-0998.13844) function to convert a genlight object into COLONY format.
+
 ```{r}
 # loading gl2colony function from Diana Robledo 
 source("./Session 11 From Genes to Kin/functions/gl2colony.R")
@@ -168,12 +174,13 @@ gl2colony(gl = t3,
 # read the output
 duplicates <- read.csv("./data/my_project.PairwiseCloneDyad")
 duplicates
+
 cat(res_dup_2,sep="\n")
 ```
 
 ### Filtering
 
-Initially, it's essential to ascertain the optimal approach for filtering, selecting between individual missingness and loci missingness. This decision is critical as individuals of lower quality can significantly impact loci that are otherwise deemed acceptable. Similarly, loci of subpar quality contribute to an increase in missing data among individuals who would otherwise meet our criteria. In our scenario, the priority is to retain individuals over loci. This prioritization is based on the premise that if the missing loci are uniformly distributed across all individuals, opting for individual-based filtering will not markedly influence the outcomes when compared to loci-based filtering.  
+Initially, it's essential to ascertain the optimal approach for filtering, selecting between individual missingness and loci missingness. This decision is critical as individuals of lower quality can significantly impact loci that are otherwise deemed acceptable. Similarly, loci of subpar quality contribute to an increase in missing data among individuals who would otherwise meet our criteria. In our scenario, the priority is to retain individuals over loci. This prioritization is based on the premise that if the missing loci are uniformly distributed across all individuals, opting for individual-based filtering will not markedly influence the outcomes when compared to loci-based filtering.
 
 ::: callout-note
 Previous studies showed that around 5,000 SNPs are sufficient to accurately estimate relatedness and kinship ([Goudet et al., 2018](https://doi.org/10.1111/mec.14833)).
@@ -261,6 +268,7 @@ EMIBD9_col <- as.data.frame(as.table(as.matrix(EMIBD9_col)))
 ```
 
 ### GCTA
+
 Relatedness estimation using a genetic relationship matrix ([Lee et al., 2011](https://doi.org/10.1016/j.ajhg.2011.02.002)) as implemented in the program GCTA ([Yang et al., 2011](10.1016/j.ajhg.2010.11.011)).
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
@@ -368,7 +376,6 @@ grm_first_cos <- gl.grm.network_2(mat_coan, t2,
                                   title="Coancestry relatedness > 0.125 \n(parent–offspring & full sibs + half sibs + first cousins) ")
 ```
 
-
 ```{r, warning=FALSE, results='hide', message=FALSE}
 # TABLE
 rel_cal <- cbind(coan_col,EMIBD9_col$Freq,GCTA_col$Freq,GRM_col$Freq)
@@ -385,7 +392,7 @@ rel_plot_2 <- melt(rel_cal, id.vars = c("ind1","ind2"))
 
 ```
 
-Box and violin plots showing the distribution of kinship values from four methods. Relatedness estimates from Coancestry, GCTA and rrBLUP methods were divided by two to obtain kinship estimates. Kinship values shown in the plot, were filtered such as the minimum kinship value in all the datasets was >0.05 for any pairwise relationship.
+Box and violin plots showing the distribution of kinship values from four methods. Relatedness estimates from Coancestry, GCTA and rrBLUP methods were divided by two to obtain kinship estimates. Kinship values shown in the plot, were filtered such as the minimum kinship value in all the datasets was \>0.05 for any pairwise relationship.
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
 
@@ -403,7 +410,6 @@ ggplot(rel_plot_2,aes(y=value,x=variable,color = variable,fill = variable)) +
          legend.key.height=unit(1, "cm"))+
   ylab("Kiship") 
 ```
-
 
 ## Feathers of Laughter: Unveiling the Mysteries of the Amazonian Giggletuft (Hilaroplumis amazoniana)"
 
@@ -447,7 +453,7 @@ analysis_coancestry_2$clutch_1 <- as.factor(analysis_coancestry_2$clutch_1)
 
 ```
 
-### Plotting 
+### Plotting
 
 All the individuals had a coefficient of relatedness within clutches greater than 0.25, with means within each clutch close to 0.50. We can therefore conclude that all individuals within each clutch were full siblings who share the same mother and father.
 
@@ -478,10 +484,10 @@ print(
 
 The Arabian oryx, once extinct in the wild by 1972, found a lifeline through global zoo and private collection breeding efforts. Thanks to "The World Herd" in the Phoenix Zoo and Saudi Arabian private reserves, these oryxes were reintroduced into the wild. Now, we've got about 1,000 roaming free and another 6,000-7,000 in captivity, marking a historic comeback from extinction to vulnerable status. Quite the turnaround for these majestic creatures in Oman!
 
-![*Arabian oryx (Oryx leucoryx)*](../images/oryx_timeline.png){fig-align="left" width="100%"}
-Timeline of the Arabian oryx reintroduction program in Oman and establishment of the “World Herd”. Top row displays the years when the animals were captured, translocated or released and the country where the event took place. Middle boxes show the major event and activity at that time. Bottom boxes show the number and sex of animals which had been used.
+![Arabian oryx (Oryx leucoryx)](../images/oryx_timeline.png){fig-align="left" width="100%"} Timeline of the Arabian oryx reintroduction program in Oman and establishment of the “World Herd”. Top row displays the years when the animals were captured, translocated or released and the country where the event took place. Middle boxes show the major event and activity at that time. Bottom boxes show the number and sex of animals which had been used.
 
 ### Load dataset and filtering
+
 ```{r, warning=FALSE, results='hide', message=FALSE}
 oryx_gl <- gl.load("./data/oryx.rds")
 t1_dup <- oryx_gl
@@ -512,16 +518,13 @@ Heatmap of the probabilities of identity by descent in the group formed by the h
 oryx_related_matrix_all <- gl.grm(oryx_gl,palette_convergent = gl.colors(type="con"))
 ```
 
-
 ```{r, warning=FALSE, results='hide', message=FALSE}
 gl.grm.network(oryx_related_matrix_all,
                oryx_gl)
 
 ```
 
-
 ### SEQUOIA
-
 
 ```{r, warning=FALSE, results='hide', message=FALSE}
 LifeHistData_2 <- as.data.frame(oryx_gl$ind.names)
@@ -562,6 +565,3 @@ pedigree_res$sex <- c(as.character(oryx_gl$other$ind.metrics$Gender),rep("Female
 family <- pedigree(id=pedigree_res$id, dadid=pedigree_res$sire, momid=pedigree_res$dam,sex=pedigree_res$sex)
 plot(family)
 ```
-
-
-
